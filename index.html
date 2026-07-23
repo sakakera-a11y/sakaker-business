@@ -76,3 +76,835 @@ box-shadow:0 0 25px gold;
 
 
 </div>
+
+<!-- Emerald Music Overlay START -->
+<div id="emeraldMusicHost">
+  <div id="emOpenBtn">🎹💎</div>
+</div>
+
+<style>
+:root{--em:#00ffd5}
+
+/* host أعلى من كل شيء ومعزول */
+#emeraldMusicHost{
+  position:fixed; inset:0;
+  z-index:2147483647;
+  pointer-events:none;
+  font-family:"Tajawal",sans-serif;
+}
+#emeraldMusicHost *{box-sizing:border-box}
+
+/* زر الفتح */
+#emeraldMusicHost #emOpenBtn{
+  pointer-events:auto;
+  position:fixed;bottom:200px;right:280px;width:78px;height:78px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:2px solid var(--em);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;cursor:pointer;box-shadow:0 0 18px var(--em);
+  z-index:2147483646;
+}
+
+/* الغطاء */
+#emeraldMusicHost .emModal{
+  pointer-events:auto;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.82);
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* الصندوق المرن */
+#emeraldMusicHost .emBox{
+  width:min(1200px,96vw);
+  max-height:94vh;
+  overflow:auto;
+  background:#041014;
+  border:1px solid var(--em);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 0 28px rgba(0,255,213,.6);
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+#emeraldMusicHost .emClose{
+  position:absolute; top:10px; right:14px;
+  font-size:22px; cursor:pointer; color:var(--em);
+  z-index:99999;
+  width:34px; height:34px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(0,255,213,.35);
+  box-shadow:0 0 12px rgba(0,255,213,.55);
+}
+
+/* شريط علوي: الدفع أقصى اليسار والكاميرا يمين */
+#emeraldMusicHost .emTopbar{
+  display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+  direction:ltr;
+}
+
+/* PayPal صغير */
+#emeraldMusicHost .emPayBox{
+  width:min(240px, 92%);
+  background:rgba(0,0,0,.65);
+  border:1px solid var(--em);
+  border-radius:12px;
+  padding:6px 8px;
+  font-size:11px;
+  box-shadow:0 0 10px rgba(0,255,213,.55);
+  text-align:center;
+  line-height:1.35;
+}
+#emeraldMusicHost .emPayBox b{color:#ffd700}
+#emeraldMusicHost #emPaypalBox{
+  background:#fff; border-radius:10px; margin-top:6px; padding:3px;
+  transform:scale(.86); transform-origin:top center;
+}
+
+/* الكاميرا يمين */
+#emeraldMusicHost .emCamBox{
+  width:min(360px, 92%);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 0 22px var(--em);
+}
+#emeraldMusicHost .emCamBox video{width:100%;display:block;background:#000}
+
+/* صفوف وأزرار (أسماء خاصة لتفادي تعارض موقعك) */
+#emeraldMusicHost .emRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#emeraldMusicHost .emBtn{
+  padding:6px 12px;border-radius:999px;background:#0b1b1f;
+  border:1px solid rgba(0,255,213,.4);color:#eaffff;cursor:pointer;font-size:12px
+}
+#emeraldMusicHost .emBtn.emActive{background:var(--em);color:#000}
+#emeraldMusicHost .emBtn.emWarn{border-color:rgba(255,170,0,.55)}
+#emeraldMusicHost .emBadge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(0,255,213,.35);
+  font-size:12px; color:#dff
+}
+#emeraldMusicHost .emHint{font-size:11px;opacity:.85;text-align:center;line-height:1.5}
+
+/* لوحة المفاتيح */
+#emeraldMusicHost .emKeysWrap{
+  border-radius:16px;
+  background:radial-gradient(circle at top,#003b3b,#000 75%);
+  box-shadow:0 0 24px var(--em);padding:12px
+}
+#emeraldMusicHost .emKeysRow{display:flex;justify-content:center;gap:4px;overflow-x:auto;scrollbar-width:thin}
+#emeraldMusicHost .emKey{
+  width:calc(92vw/12);max-width:64px;min-width:40px;height:24vw;
+  max-height:130px;min-height:90px;border-radius:8px;border:1px solid #555;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:6px;cursor:pointer;user-select:none;transition:.1s
+}
+#emeraldMusicHost .emWhite{background:linear-gradient(#fff,#cfcfcf);color:#000}
+#emeraldMusicHost .emBlack{background:linear-gradient(#222,#000);color:#fff}
+#emeraldMusicHost .emKey.emKeyActive{
+  background:linear-gradient(#eaffff,#00ffd5);
+  box-shadow:0 0 24px rgba(0,255,213,.95);
+  border-color:rgba(0,255,213,.95);
+}
+#emeraldMusicHost .emKey small{font-size:9px;opacity:.95}
+#emeraldMusicHost .emKey .n{font-weight:800;font-size:12px;margin-bottom:2px}
+
+/* نافذة النوتات */
+#emeraldMusicHost .emNotesModal{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.7);
+  align-items:center; justify-content:center;
+}
+#emeraldMusicHost .emNotesBox{
+  width:min(520px,92vw);
+  max-height:80vh;
+  overflow:auto;
+  background:#04161b;
+  border:1px solid var(--em);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 0 26px rgba(0,255,213,.6);
+  position:relative;
+}
+#emeraldMusicHost .emNotesClose{position:absolute;top:10px;right:12px;cursor:pointer;color:var(--em);font-size:18px}
+#emeraldMusicHost .emNotesBox h3{margin:0 0 10px;text-align:center;color:#dff}
+#emeraldMusicHost .emNotesBox h4{margin:12px 0 6px;color:#bff}
+#emeraldMusicHost .emNotesBox p{margin:0 0 10px;font-size:13px;line-height:1.6}
+
+#emeraldMusicHost .emCredit{
+  text-align:center;margin:10px 0 2px;font-size:11px;opacity:.9;color:#bff;
+  text-shadow:0 0 10px rgba(0,255,213,.65);
+}
+
+/* للجوال */
+@media (max-width: 720px){
+  #emeraldMusicHost .emTopbar{flex-direction:column; align-items:stretch}
+  #emeraldMusicHost .emPayBox, #emeraldMusicHost .emCamBox{width:100%}
+}
+</style>
+
+<script>
+/* تحميل PayPal SDK إذا لم يكن موجود */
+(function(){
+  if(window.paypal) return;
+  var s=document.createElement("script");
+  s.src="https://www.paypal.com/sdk/js?client-id=BAAQAE5C8rFrqoJpWqxpYluOT09waMhuzhF4ug2QGvJm76YmqiCmzkP31wl8xZq9W5WkJSvAx6ZoujIBFw&components=hosted-buttons&disable-funding=venmo&currency=USD";
+  s.onload=function(){};
+  document.head.appendChild(s);
+})();
+
+const emeraldHost=document.getElementById("emeraldMusicHost");
+const emOpenBtn=document.getElementById("emOpenBtn");
+
+/* ================== الأصوات (آلات كثيرة) ================== */
+const base={
+  piano  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/",
+  epiano :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/electric_piano_1-mp3/",
+  oud    :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_guitar_nylon-mp3/",
+  buzuq  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_guitar_steel-mp3/",
+  guitar :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/electric_guitar_clean-mp3/",
+  bass   :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/electric_bass_finger-mp3/",
+  qanun  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/dulcimer-mp3/",
+  violin :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/violin-mp3/",
+  strings:"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/string_ensemble_1-mp3/",
+  sax    :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/alto_sax-mp3/",
+  trumpet:"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/trumpet-mp3/",
+  nay    :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/flute-mp3/",
+  choir  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/choir_aahs-mp3/",
+  drums  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/standard_kit-mp3/"
+};
+const LABEL={
+  piano:"🎹 Piano", epiano:"🎹 E-Piano", oud:"🪕 Oud", qanun:"🎼 Qanun", buzuq:"🪕 Buzuq",
+  guitar:"🎸 Guitar", bass:"🎸 Bass", violin:"🎻 Violin", strings:"🎻 Strings",
+  sax:"🎷 Sax", trumpet:"🎺 Trumpet", nay:"🎵 Nay", choir:"🎤 Choir", drums:"🥁 Drums"
+};
+
+/* ================== إعدادات ================== */
+let inst="piano", mix="none", vol=1, echo=1, octShift=0;
+const activeHold={};
+let keyElByNote = {};
+
+/* ================== نوتات 36 من D2 ================== */
+const notes=[], order=["D","E","F","G","A","B","C"];
+let o=2; while(notes.length<36){ for(const l of order){ if(notes.length<36) notes.push(l+o); } o++; }
+
+/* ================== مساعدات ================== */
+function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+function isBlack(n){ return ["E","G","B"].includes(n[0]); }
+function noteWithOctShift(note){
+  const letter = note[0];
+  const baseOct = parseInt(note.slice(1),10);
+  const finalOct = clamp(baseOct + octShift, 0, 9);
+  return letter + finalOct;
+}
+function glow(){
+  emeraldHost.classList.add("emGlow");
+  setTimeout(()=>emeraldHost.classList.remove("emGlow"),120);
+}
+function highlightKey(note){
+  const el = keyElByNote[note] || null;
+  if(!el) return;
+  el.classList.add("emKeyActive");
+  try{ el.scrollIntoView({behavior:"smooth", block:"nearest", inline:"center"}); }catch(_){}
+  setTimeout(()=>el.classList.remove("emKeyActive"),160);
+}
+
+/* ================== تشغيل ================== */
+function playOnce(note, instName, volumeMul=1){
+  const nn = noteWithOctShift(note);
+  const src = (base[instName]||base.piano) + nn + ".mp3";
+  const a = new Audio(src);
+  a.volume = clamp((vol||1) * (volumeMul||1), 0, 1);
+  a.play().catch(()=>{});
+  return a;
+}
+function startHold(note, holdId, alsoEl=null){
+  if(activeHold[holdId]) return;
+  const arr=[];
+  const nn = noteWithOctShift(note);
+
+  const a1=new Audio((base[inst]||base.piano)+nn+".mp3");
+  a1.loop=true; a1.volume=clamp(vol,0,1);
+  a1.play().catch(()=>{});
+  arr.push(a1);
+
+  if(mix!=="none" && mix!==inst){
+    const a2=new Audio((base[mix]||base.piano)+nn+".mp3");
+    a2.loop=true; a2.volume=clamp(vol,0,1);
+    a2.play().catch(()=>{});
+    arr.push(a2);
+  }
+
+  activeHold[holdId]=arr;
+  if(alsoEl) alsoEl.classList.add("emKeyActive");
+}
+function stopHold(id, alsoEl=null){
+  if(!activeHold[id]) return;
+  activeHold[id].forEach(a=>{ try{a.pause();}catch(_){} });
+  delete activeHold[id];
+  if(alsoEl) alsoEl.classList.remove("emKeyActive");
+}
+function shortPress(note, alsoEl=null){
+  playOnce(note, inst, 1);
+  if(mix!=="none" && mix!==inst) playOnce(note, mix, 1);
+
+  const e = clamp(echo,0,2);
+  if(e>0){
+    const repeats=5, baseDelay=120;
+    for(let i=1;i<=repeats;i++){
+      const v = clamp((e/(i+0.2)) * 0.7, 0, 1);
+      setTimeout(()=>{
+        playOnce(note, inst, v);
+        if(mix!=="none" && mix!==inst) playOnce(note, mix, v);
+      }, baseDelay*i);
+    }
+  }
+
+  if(alsoEl){
+    alsoEl.classList.add("emKeyActive");
+    try{ alsoEl.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}); }catch(_){}
+    setTimeout(()=>alsoEl.classList.remove("emKeyActive"),160);
+  }else{
+    highlightKey(note);
+  }
+}
+
+/* ================== مقطوعات ================== */
+const MELODIES={
+  scale:["D2","E2","F2","G2","A2","B2","C2","D3","E3","F3","G3","A3","B3","C3","D4","E4","F4","G4","A4","B4","C4","D5"],
+  hbd:["C4","C4","D4","C4","F4","E4","C4","C4","D4","C4","G4","F4","C4","C4","C5","A4","F4","E4","D4"],
+  fairuz:["E4","F4","G4","A4","G4","F4","E4","D4","E4","F4","G4","A4","G4","F4","E4","D4"],
+  beethoven9:[
+    "E4","E4","F4","G4","G4","F4","E4","D4",
+    "C4","C4","D4","E4","E4","D4","D4",
+    "E4","E4","F4","G4","G4","F4","E4","D4",
+    "C4","C4","D4","E4","D4","C4","C4"
+  ],
+  sabah:["G4","A4","B4","A4","G4","E4","D4","E4","G4","A4","G4","E4","D4"]
+};
+let timer=null;
+function stopMelody(){ if(timer){ clearInterval(timer); timer=null; } }
+function playMelody(arr, t=420){
+  stopMelody();
+  let i=0;
+  timer=setInterval(()=>{ if(i>=arr.length) return stopMelody(); shortPress(arr[i++]); }, t);
+}
+
+/* ================== كاميرا/مايك ================== */
+let camStream=null, mediaRecorder=null, chunks=[], camPaused=false;
+let camTrack=null, micTrack=null;
+
+async function startCamRecording(videoEl, recBtn, pauseBtn, camToggleBtn, micToggleBtn){
+  try{
+    camStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+    videoEl.srcObject = camStream;
+
+    camTrack = camStream.getVideoTracks()[0] || null;
+    micTrack = camStream.getAudioTracks()[0] || null;
+
+    chunks=[];
+    mediaRecorder = new MediaRecorder(camStream);
+    mediaRecorder.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+    mediaRecorder.onstop = ()=>{
+      const blob = new Blob(chunks,{type:"video/webm"});
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url; a.download="emerald-performance.webm"; a.click();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    };
+
+    mediaRecorder.start();
+    camPaused=false;
+
+    recBtn.textContent="⏹ Stop";
+    pauseBtn.style.display="inline-block";
+    pauseBtn.textContent="⏸ Pause";
+    camToggleBtn.style.display="inline-block";
+    micToggleBtn.style.display="inline-block";
+    camToggleBtn.textContent="📷 Camera: ON";
+    micToggleBtn.textContent="🎙 Mic: ON";
+    camToggleBtn.classList.remove("emWarn");
+    micToggleBtn.classList.remove("emWarn");
+  }catch(e){
+    alert("تعذر تشغيل الكاميرا/المايك.\nتأكد من HTTPS ومنح الصلاحيات.\n\n" + (e?.message||e));
+  }
+}
+function stopCamRecording(recBtn, pauseBtn, camToggleBtn, micToggleBtn){
+  try{ if(mediaRecorder && mediaRecorder.state!=="inactive") mediaRecorder.stop(); }catch(_){}
+  try{ if(camStream) camStream.getTracks().forEach(t=>t.stop()); }catch(_){}
+  mediaRecorder=null; camStream=null; camTrack=null; micTrack=null; camPaused=false;
+  recBtn.textContent="🎥 Record Video";
+  pauseBtn.style.display="none";
+  camToggleBtn.style.display="none";
+  micToggleBtn.style.display="none";
+}
+
+/* ================== فتح اللوحة ================== */
+emOpenBtn.onclick=()=>{
+  if(document.getElementById("emPanel")) return;
+
+  const prevOverflow = document.documentElement.style.overflow;
+  document.documentElement.style.overflow="hidden";
+
+  const p=document.createElement("div");
+  p.id="emPanel";
+  p.innerHTML=`
+    <div class="emModal">
+      <div class="emBox">
+        <div class="emClose">✖</div>
+
+        <div class="emTopbar">
+          <div class="emPayBox">
+            🎵  <b></b><br>          💎  Free for a limited timeمجاني لفتره محدوده
+    
+            <div id="emPaypalBox"></div>
+          </div>
+
+          <div class="emCamBox">
+            <video id="emCam" autoplay muted playsinline></video>
+          </div>
+        </div>
+
+        <div class="emRow">
+          <button class="emBtn" id="emCamRec">🎥 Record Video</button>
+          <button class="emBtn" id="emCamPause" style="display:none">⏸ Pause</button>
+          <button class="emBtn emWarn" id="emCamToggle" style="display:none">📷 Camera: ON</button>
+          <button class="emBtn emWarn" id="emMicToggle" style="display:none">🎙 Mic: ON</button>
+        </div>
+
+        <div class="emRow">
+          <button class="emBtn" id="emBeet">🎼 Beethoven 9</button>
+          <button class="emBtn" id="emSabah">🎵 Sabah</button>
+          <button class="emBtn" id="emScale">🎹 Scale</button>
+          <button class="emBtn" id="emHbd">🎂 Birthday</button>
+          <button class="emBtn" id="emFairuz">🎵 Fairuz</button>
+          <button class="emBtn" id="emStop">⏹ Stop</button>
+          <button class="emBtn" id="emNotesBtn">🎼 Notes</button>
+        </div>
+
+        <div class="emRow">
+          <span class="emBadge">🔊 Volume</span>
+          <input id="emV" type="range" min="0" max="100" value="100" style="width:160px">
+          <span class="emBadge">🎚 Echo</span>
+          <input id="emE" type="range" min="0" max="200" value="100" style="width:160px">
+          <span class="emBadge">🎹 Oct</span>
+          <button class="emBtn" id="emOctDown">-</button>
+          <span class="emBadge" id="emOctVal">0</span>
+          <button class="emBtn" id="emOctUp">+</button>
+        </div>
+
+        <div class="emHint">
+          ✅ ضغطة قصيرة = نغمة واحدة — ضغطة طويلة = استمرار الصوت (Sustain)<br>
+          ⌨️ كيبورد: 1-0 ثم Q..P ثم A..L ثم Z..M (ضغط مستمر = استمرار)
+        </div>
+
+        <div class="emKeysWrap"><div id="emKeys"></div></div>
+
+        <div class="emRow">
+          <span class="emBadge">🎛 الآلة الأساسية</span>
+          ${Object.keys(LABEL).map(k=>`<button class="emBtn ${k==="piano"?"emActive":""}" data-em-i="${k}">${LABEL[k]}</button>`).join("")}
+        </div>
+
+        <div class="emRow">
+          <span class="emBadge">🔀 الدمج (Mix)</span>
+          <button class="emBtn emActive" data-em-m="none">❌ Off</button>
+          ${Object.keys(LABEL).map(k=>`<button class="emBtn" data-em-m="${k}">${LABEL[k]}</button>`).join("")}
+        </div>
+
+        <div class="emCredit">✨It works offline. إعداد وتصميم وإنتاج أبوالقمر زمرد Preparation, design, and production by abwalqmrzmrd× Emerald Music ✨</div>
+
+        <div id="emNotesModal" class="emNotesModal">
+          <div class="emNotesBox">
+            <div class="emNotesClose">✖</div>
+            <h3>🎼 نوتات المقطوعات</h3>
+            <h4>🎼 Beethoven 9 (Simplified)</h4><p>${MELODIES.beethoven9.join(" ")}</p>
+            <h4>🎵 Sabah (Simplified)</h4><p>${MELODIES.sabah.join(" ")}</p>
+            <h4>🎹 Scale</h4><p>${MELODIES.scale.join(" ")}</p>
+            <h4>🎂 Happy Birthday</h4><p>${MELODIES.hbd.join(" ")}</p>
+            <h4>🎵 Fairuz (Short)</h4><p>${MELODIES.fairuz.join(" ")}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+  emeraldHost.appendChild(p);
+
+ /* PayPal render */
+function renderPay(){
+  try{
+    if(window.paypal && paypal.HostedButtons){
+      paypal.HostedButtons({hostedButtonId:"S9YLL5P5H47P4"}).render("#emPaypalBox");
+    }
+  }catch(e){ console.log("PayPal error:", e); }
+}
+
+
+  // قد يتأخر تحميل SDK
+  setTimeout(renderPay, 0);
+  setTimeout(renderPay, 900);
+
+  /* عناصر */
+  const closeBtn = p.querySelector(".emClose");
+  const cam = p.querySelector("#emCam");
+  const camRec = p.querySelector("#emCamRec");
+  const camPause = p.querySelector("#emCamPause");
+  const camToggle = p.querySelector("#emCamToggle");
+  const micToggle = p.querySelector("#emMicToggle");
+
+  const notesBtn = p.querySelector("#emNotesBtn");
+  const notesModal = p.querySelector("#emNotesModal");
+  const notesClose = p.querySelector(".emNotesClose");
+
+  notesBtn.onclick=()=>{ notesModal.style.display="flex"; };
+  notesClose.onclick=()=>{ notesModal.style.display="none"; };
+  notesModal.addEventListener("click",(e)=>{ if(e.target===notesModal) notesModal.style.display="none"; });
+
+  closeBtn.onclick=()=>{
+    stopMelody();
+    notesModal.style.display="none";
+    try{ if(mediaRecorder){ stopCamRecording(camRec, camPause, camToggle, micToggle); } }catch(_){}
+    Object.keys(activeHold).forEach(id=>stopHold(id));
+    p.remove();
+    document.documentElement.style.overflow = prevOverflow;
+  };
+
+  /* إغلاق عند الضغط خارج الصندوق + زر Esc */
+  const modalEl = p.querySelector(".emModal");
+  const boxEl = p.querySelector(".emBox");
+
+  if(modalEl && boxEl){
+    modalEl.addEventListener("click",(e)=>{
+      if(e.target === modalEl){
+        closeBtn.click();
+      }
+    });
+  }
+
+  const escHandler = (e)=>{
+    if(e.key === "Escape"){
+      try{ closeBtn.click(); }catch(_){}
+    }
+  };
+  window.addEventListener("keydown", escHandler);
+
+  // ضمان إزالة مستمع Esc عند الإغلاق
+  const _origClose = closeBtn.onclick;
+  closeBtn.onclick = ()=>{
+    try{ window.removeEventListener("keydown", escHandler); }catch(_){}
+    _origClose();
+  };
+
+  p.querySelector("#emBeet").onclick=()=>playMelody(MELODIES.beethoven9, 380);
+  p.querySelector("#emSabah").onclick=()=>playMelody(MELODIES.sabah, 420);
+  p.querySelector("#emScale").onclick=()=>playMelody(MELODIES.scale, 220);
+  p.querySelector("#emHbd").onclick=()=>playMelody(MELODIES.hbd, 420);
+  p.querySelector("#emFairuz").onclick=()=>playMelody(MELODIES.fairuz, 430);
+  p.querySelector("#emStop").onclick=()=>stopMelody();
+
+  /* الآلة */
+  p.querySelectorAll("[data-em-i]").forEach(b=>{
+    b.onclick=()=>{
+      p.querySelectorAll("[data-em-i]").forEach(x=>x.classList.remove("emActive"));
+      b.classList.add("emActive");
+      inst=b.dataset.emI;
+    };
+  });
+  /* الدمج */
+  p.querySelectorAll("[data-em-m]").forEach(b=>{
+    b.onclick=()=>{
+      p.querySelectorAll("[data-em-m]").forEach(x=>x.classList.remove("emActive"));
+      b.classList.add("emActive");
+      mix=b.dataset.emM;
+    };
+  });
+
+  p.querySelector("#emV").oninput=(e)=>vol = e.target.value/100;
+  p.querySelector("#emE").oninput=(e)=>echo = e.target.value/100;
+
+  const octVal=p.querySelector("#emOctVal");
+  function renderOct(){ octVal.textContent = String(octShift); }
+  p.querySelector("#emOctDown").onclick=()=>{ octShift=clamp(octShift-1,-2,2); renderOct(); };
+  p.querySelector("#emOctUp").onclick=()=>{ octShift=clamp(octShift+1,-2,2); renderOct(); };
+  renderOct();
+
+  camRec.onclick=async()=>{
+    if(!mediaRecorder){ await startCamRecording(cam, camRec, camPause, camToggle, micToggle); }
+    else{ stopCamRecording(camRec, camPause, camToggle, micToggle); }
+  };
+  camPause.onclick=()=>{
+    if(!mediaRecorder) return;
+    if(!camPaused){ try{ mediaRecorder.pause(); }catch(_){}
+      camPause.textContent="▶ Resume"; camPaused=true;
+    }else{ try{ mediaRecorder.resume(); }catch(_){}
+      camPause.textContent="⏸ Pause"; camPaused=false;
+    }
+  };
+  camToggle.onclick=()=>{
+    if(!camTrack) return;
+    camTrack.enabled = !camTrack.enabled;
+    camToggle.textContent = camTrack.enabled ? "📷 Camera: ON" : "📷 Camera: OFF";
+    camToggle.classList.toggle("emWarn", !camTrack.enabled);
+  };
+  micToggle.onclick=()=>{
+    if(!micTrack) return;
+    micTrack.enabled = !micTrack.enabled;
+    micToggle.textContent = micTrack.enabled ? "🎙 Mic: ON" : "🎙 Mic: OFF";
+    micToggle.classList.toggle("emWarn", !micTrack.enabled);
+  };
+
+  /* مفاتيح */
+  const keysWrap=p.querySelector("#emKeys");
+  const r1=document.createElement("div");
+  const r2=document.createElement("div");
+  r1.className=r2.className="emKeysRow";
+  keyElByNote = {};
+
+  notes.forEach((n,i)=>{
+    const d=document.createElement("div");
+    d.className="emKey "+(isBlack(n)?"emBlack":"emWhite");
+    d.innerHTML=`<div class="n">${i+1}</div><small>${n}</small>`;
+    const id="emKey-"+i;
+    keyElByNote[n]=d;
+
+    let downAt=0, didHold=false;
+    d.onpointerdown=(ev)=>{
+      ev.preventDefault();
+      downAt=Date.now();
+      didHold=false;
+      const localDownAt=downAt;
+      setTimeout(()=>{ if(downAt===localDownAt){ didHold=true; startHold(n, id, d); } }, 180);
+    };
+    const endPointer=()=>{ if(activeHold[id]) stopHold(id, d); downAt=0; };
+    d.onpointerup=endPointer;
+    d.onpointerleave=endPointer;
+    d.onpointercancel=endPointer;
+
+    d.onclick=()=>{ if(didHold) return; shortPress(n, d); };
+    (i<18?r1:r2).appendChild(d);
+  });
+  keysWrap.append(r1,r2);
+};
+
+/* ================== كيبورد الكمبيوتر ================== */
+const KEY_BIND=[
+  "Digit1","Digit2","Digit3","Digit4","Digit5","Digit6","Digit7","Digit8","Digit9","Digit0",
+  "KeyQ","KeyW","KeyE","KeyR","KeyT","KeyY","KeyU","KeyI","KeyO","KeyP",
+  "KeyA","KeyS","KeyD","KeyF","KeyG","KeyH","KeyJ","KeyK","KeyL",
+  "KeyZ","KeyX","KeyC","KeyV","KeyB","KeyN","KeyM"
+];
+const KI={}; KEY_BIND.forEach((k,i)=>KI[k]=i);
+
+window.addEventListener("keydown",(e)=>{
+  if(e.repeat) return;
+  const idx=KI[e.code];
+  if(idx===undefined || !notes[idx]) return;
+  const note=notes[idx];
+  startHold(note, "emKb-"+idx, keyElByNote[note]||null);
+});
+window.addEventListener("keyup",(e)=>{
+  const idx=KI[e.code];
+  if(idx===undefined) return;
+  const note=notes[idx];
+  stopHold("emKb-"+idx, keyElByNote[note]||null);
+});
+</script>
+
+<!-- Emerald Music Overlay END -->
+
+   
+<!-- 🔹 زر فتح اللعبة مع ألوان متغيرة -->
+<button id="pongGame-btn" style="
+  z-index: 9999;
+  position: fixed;
+  bottom : 20px;
+  right: 10px;
+  padding: 2px 2px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(45deg, #007bff, #00ffff);
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0,255,255,0.8);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+">
+  🏓 pongponG بونج بونج
+</button>
+
+<script>
+// 🎨 تغيير ألوان الخلفية كل ثانية
+const pongBtn = document.getElementById('pongGame-btn');
+setInterval(() => {
+  const colors = [
+    'linear-gradient(45deg, #ff1493, #ff69b4)',
+    'linear-gradient(45deg, #007bff, #00ffff)',
+    'linear-gradient(45deg, #00ffcc, #0066ff)',
+    'linear-gradient(45deg, #ff9900, #ff6600)',
+    'linear-gradient(45deg, #00ff00, #009933)',
+  ];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  pongBtn.style.background = color;
+  pongBtn.style.boxShadow = `0 0 25px ${color.split(',')[1] || '#fff'}`;
+}, 1000);
+
+// ✨ تأثير عند المرور بالماوس
+pongBtn.addEventListener('mouseenter', () => {
+  pongBtn.style.transform = 'scale(1.1)';
+});
+pongBtn.addEventListener('mouseleave', () => {
+  pongBtn.style.transform = 'scale(1)';
+});
+</script>
+
+<html lang="ar" dir="rtl">
+<head><!-- 🔹 حاوية اللعبة -->
+<div id="pongGame-container" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:black;
+z-index:2147483647;
+overflow:hidden;
+">
+  <!-- ✅ فيديو الخلفية لا يلتقط النقرات -->
+  <iframe id="pongGame-video"
+    src="https://www.youtube.com/embed/bG4NtWR2e88?autoplay=1&mute=1&loop=1&playlist=bG4NtWR2e88&enablejsapi=1"
+    frameborder="0" allow="autoplay;encrypted-media" allowfullscreen
+    style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;"></iframe>
+
+  <!-- قائمة الخيارات -->
+  <div id="pongGame-menu" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(0,0,0,0.6);padding:15px 25px;border-radius:12px;color:#fff;font-family:'Tajawal',sans-serif;z-index:3;">
+      
+>          💎  Free for a limited timeمجاني لفتره محدوده
+    
+    <label>🎨 المضرب 1: <input id="pongGame-p1Color" type="color" value="#FFD700"/></label>
+    <label>🎨 المضرب 2: <input id="pongGame-p2Color" type="color" value="#00BFFF"/></label>
+    <label>⚪ الكرة: <input id="pongGame-ballColor" type="color" value="#FFFFFF"/></label>
+    <label>🎯 المستوى:
+      <select id="pongGame-level">
+        <option value="easy">سهل</option>
+        <option value="hard">صعب</option>
+        <option value="harder">أصعب</option>
+        <option value="impossible">مستحيل</option>
+      </select>
+    </label>
+    <div style="margin-top:6px;">
+      <button onclick="pongGame.start('player')" style="padding:6px 14px;border:none;border-radius:6px;background:#FFD700;cursor:pointer;">🎮 لاعب</button>
+      <button onclick="pongGame.start('computer')" style="padding:6px 14px;border:none;border-radius:6px;background:#00BFFF;cursor:pointer;">🤖 كمبيوتر</button>
+    </div>
+    <button id="pongGame-back" style="margin-top:6px;padding:6px 14px;border:none;border-radius:6px;background:#555;color:#fff;cursor:pointer;">🔙 رجوع</button>
+  </div>
+
+  <!-- لوحة اللعب -->
+  <canvas id="pongGame-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;cursor:none;"></canvas>
+
+  <!-- أزرار التحكم -->
+  <button id="pongGame-close" style="position:absolute;top:10px;right:15px;font-size:24px;background:rgba(0,0,0,0.4);border:none;border-radius:50%;width:40px;height:40px;color:#fff;cursor:pointer;z-index:3;">✖</button>
+
+  <div style="position:absolute;bottom:10px;right:10px;display:flex;gap:8px;z-index:3;">
+    <button id="pongGame-play" style="padding:6px 10px;border:none;border-radius:6px;background:#333;color:#fff;cursor:pointer;">⏸</button>
+    <button id="pongGame-mute" style="padding:6px 10px;border:none;border-radius:6px;background:#333;color:#fff;cursor:pointer;">🔇</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const btn=document.getElementById('pongGame-btn'),
+        cont=document.getElementById('pongGame-container'),
+        cvs=document.getElementById('pongGame-canvas'),
+        ctx=cvs.getContext('2d'),
+        menu=document.getElementById('pongGame-menu'),
+        close=document.getElementById('pongGame-close'),
+        back=document.getElementById('pongGame-back'),
+        vid=document.getElementById('pongGame-video'),
+        play=document.getElementById('pongGame-play'),
+        mute=document.getElementById('pongGame-mute');
+
+  let anim, p1, p2, b, w=false,s=false,up=false,down=false;
+  let mode='player', playing=true, muted=true;
+
+  function resize(){ cvs.width=innerWidth; cvs.height=innerHeight; }
+  addEventListener('resize',resize);
+
+  const pongGame={
+    init(){
+      resize();
+      p1={x:20,y:cvs.height/2-50,w:15,h:100,color:document.getElementById('pongGame-p1Color').value,score:0};
+      p2={x:cvs.width-35,y:cvs.height/2-50,w:15,h:100,color:document.getElementById('pongGame-p2Color').value,score:0};
+      b={x:cvs.width/2,y:cvs.height/2,r:10,speed:6,dx:6,dy:6,color:document.getElementById('pongGame-ballColor').value};
+    },
+    start(m){mode=m;menu.style.display='none';this.init();this.loop();},
+    loop(){this.move();this.draw();anim=requestAnimationFrame(()=>this.loop());},
+    move(){
+      if(w)p1.y=Math.max(0,p1.y-7);
+      if(s)p1.y=Math.min(cvs.height-p1.h,p1.y+7);
+      if(mode==='player'){
+        if(up)p2.y=Math.max(0,p2.y-7);
+        if(down)p2.y=Math.min(cvs.height-p2.h,p2.y+7);
+      }else{
+        const lvl=document.getElementById('pongGame-level').value;
+        const sp=lvl==='easy'?3:lvl==='hard'?6:lvl==='harder'?10:15;
+        if(b.y>p2.y+p2.h/2)p2.y+=sp;else p2.y-=sp;
+        p2.y=Math.max(0,Math.min(cvs.height-p2.h,p2.y));
+      }
+      b.x+=b.dx;b.y+=b.dy;
+      if(b.y-b.r<0||b.y+b.r>cvs.height)b.dy*=-1;
+      if(hit(b,p1)){b.dx=Math.abs(b.dx);b.dy=(b.y-(p1.y+p1.h/2))/2;}
+      if(hit(b,p2)){b.dx=-Math.abs(b.dx);b.dy=(b.y-(p2.y+p2.h/2))/2;}
+      if(b.x-b.r<0){p2.score++;reset();}
+      if(b.x+b.r>cvs.width){p1.score++;reset();}
+    },
+    draw(){
+      ctx.clearRect(0,0,cvs.width,cvs.height);
+      ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fillRect(0,0,cvs.width,cvs.height);
+      ctx.fillStyle=p1.color;ctx.fillRect(p1.x,p1.y,p1.w,p1.h);
+      ctx.fillStyle=p2.color;ctx.fillRect(p2.x,p2.y,p2.w,p2.h);
+      ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='24px Tajawal';
+      ctx.fillText(p1.score,cvs.width/4,40);
+      ctx.fillText(p2.score,3*cvs.width/4,40);
+    }
+  };
+
+  function hit(b,p){return b.x-b.r<p.x+p.w&&b.x+b.r>p.x&&b.y+b.r>p.y&&b.y-b.r<p.y+p.h;}
+  function reset(){b.x=cvs.width/2;b.y=cvs.height/2;b.dx=(Math.random()<.5?-1:1)*b.speed;b.dy=(Math.random()<.5?-1:1)*b.speed;}
+
+  onkeydown=e=>{if(e.key==='w')w=true;if(e.key==='s')s=true;if(e.key==='ArrowUp')up=true;if(e.key==='ArrowDown')down=true;}
+  onkeyup=e=>{if(e.key==='w')w=false;if(e.key==='s')s=false;if(e.key==='ArrowUp')up=false;if(e.key==='ArrowDown')down=false;}
+
+  /* 🖱️ تحريك المضرب بالفأرة */
+  cvs.addEventListener('mousemove', e => {
+    const rect = cvs.getBoundingClientRect();
+    p1.y = e.clientY - rect.top - p1.h/2;
+    p1.y = Math.max(0, Math.min(cvs.height - p1.h, p1.y));
+  });
+
+  /* 📱 دعم اللمس للجوال */
+  cvs.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const rect = cvs.getBoundingClientRect();
+    const touchY = e.touches[0].clientY - rect.top;
+    p1.y = touchY - p1.h/2;
+    p1.y = Math.max(0, Math.min(cvs.height - p1.h, p1.y));
+  }, { passive: false });
+
+  btn.onclick=()=>{cont.style.display='block';document.body.style.overflow='hidden';};
+  close.onclick=back.onclick=()=>{cont.style.display='none';document.body.style.overflow='auto';cancelAnimationFrame(anim);menu.style.display='flex';};
+
+  play.onclick=()=>{playing=!playing;play.textContent=playing?'⏸':'▶️';vid.contentWindow.postMessage(`{"event":"command","func":"${playing?'playVideo':'pauseVideo'}","args":""}`,'*');};
+  mute.onclick=()=>{muted=!muted;mute.textContent=muted?'🔇':'🔊';vid.contentWindow.postMessage(`{"event":"command","func":"${muted?'mute':'unMute'}","args":""}`,'*');};
+
+  window.pongGame=pongGame;
+})();
+</script>
+
+</body>
+</html>
