@@ -1100,3 +1100,156 @@ window.firebaseStorage = storage;
 
 console.log("SAKAKER Firebase Ready");
 </script>
+<!-- 💚 PayPal Support Box -->
+<div id="emeraldMusicHost">
+
+  <div class="emPayBox">
+
+    <b>💚 دعم موقع أبوالقمر زمرد</b>
+
+    <div id="emPaypalBox"></div>
+
+  </div>
+
+</div>
+
+
+<style>
+
+/* PayPal صغير */
+#emeraldMusicHost .emPayBox{
+
+  width:min(240px,92%);
+
+  background:rgba(0,0,0,.65);
+
+  border:1px solid #00ffd5;
+
+  border-radius:12px;
+
+  padding:6px 8px;
+
+  font-size:11px;
+
+  box-shadow:
+  0 0 10px rgba(0,255,213,.55);
+
+  text-align:center;
+
+  line-height:1.35;
+
+}
+
+
+#emeraldMusicHost .emPayBox b{
+
+  color:#ffd700;
+
+  display:block;
+
+  margin-bottom:5px;
+
+}
+
+
+
+#emeraldMusicHost #emPaypalBox{
+
+  background:#fff;
+
+  border-radius:10px;
+
+  margin-top:6px;
+
+  padding:3px;
+
+  transform:scale(.86);
+
+  transform-origin:top center;
+
+}
+
+
+</style>
+
+
+
+<!-- 💳 تحميل PayPal SDK -->
+
+<script>
+
+(function(){
+
+if(window.paypal) return;
+
+
+var s=document.createElement("script");
+
+
+s.src=
+"https://www.paypal.com/sdk/js?client-id=BAAQAE5C8rFrqoJpWqxpYluOT09waMhuzhF4ug2QGvJm76YmqiCmzkP31wl8xZq9W5WkJSvAx6ZoujIBFw&components=hosted-buttons&disable-funding=venmo&currency=USD";
+
+
+s.onload=function(){
+
+console.log("PayPal SDK Ready");
+
+renderPay();
+
+};
+
+
+s.onerror=function(){
+
+console.log("PayPal SDK Load Failed");
+
+};
+
+
+document.head.appendChild(s);
+
+
+})();
+
+
+
+
+// 💳 عرض زر PayPal
+
+function renderPay(){
+
+try{
+
+
+if(window.paypal && paypal.HostedButtons){
+
+
+paypal.HostedButtons({
+
+hostedButtonId:"S9YLL5P5H47P4"
+
+
+}).render("#emPaypalBox");
+
+
+console.log("PayPal Button Loaded");
+
+
+}
+
+
+}catch(e){
+
+
+console.log(
+"PayPal error:",
+e
+);
+
+
+}
+
+
+}
+
+</script>
