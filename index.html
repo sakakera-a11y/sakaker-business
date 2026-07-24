@@ -1,8 +1,7 @@
-
-<!-- 🔒 قفل محتوى الموقع قبل تسجيل الدخول -->
+<!-- 🔒 منع ظهور محتوى الموقع قبل تسجيل الدخول -->
 <style>
 body.locked > *:not(#loginOverlay){
-  visibility:hidden;
+visibility:hidden;
 }
 </style>
 
@@ -11,7 +10,7 @@ document.body.classList.add("locked");
 </script>
 
 
-<!-- 🔒 صفحة الدخول الآمنة -->
+<!-- 🔒 نافذة الدخول -->
 <div id="loginOverlay" style="
 position:fixed;
 top:0;
@@ -19,32 +18,28 @@ left:0;
 width:100%;
 height:100%;
 background:url('https://i.ytimg.com/vi/0go3k0frmjc/maxresdefault.jpg') center/cover no-repeat;
-backdrop-filter:blur(5px);
 display:flex;
 align-items:center;
 justify-content:center;
 z-index:999999;
+backdrop-filter:blur(5px);
 ">
 
 <div style="
-background:rgba(0,0,0,.78);
-border:1px solid rgba(255,255,255,.2);
-border-radius:18px;
+background:rgba(0,0,0,.8);
 padding:25px;
 width:90%;
 max-width:420px;
-box-shadow:0 0 30px #00ffcc;
-color:white;
+border-radius:18px;
 text-align:center;
-font-family:Tajawal,Tahoma;
+color:white;
+font-family:Tajawal;
+box-shadow:0 0 30px #00ffcc;
 ">
 
 
-<h2 style="
-color:#00ffcc;
-margin-bottom:20px;
-">
-🔐 تسجيل الدخول للموقع
+<h2 style="color:#00ffcc">
+🔐 تسجيل الدخول
 </h2>
 
 
@@ -53,14 +48,12 @@ type="email"
 placeholder="📧 البريد الإلكتروني"
 style="
 width:100%;
-box-sizing:border-box;
 padding:12px;
-margin-bottom:12px;
+margin:8px 0;
 border-radius:10px;
 border:none;
-background:rgba(255,255,255,.15);
+background:#ffffff22;
 color:white;
-font-size:16px;
 ">
 
 
@@ -69,26 +62,23 @@ type="password"
 placeholder="🔒 كلمة المرور"
 style="
 width:100%;
-box-sizing:border-box;
 padding:12px;
-margin-bottom:12px;
+margin:8px 0;
 border-radius:10px;
 border:none;
-background:rgba(255,255,255,.15);
+background:#ffffff22;
 color:white;
-font-size:16px;
 ">
 
 
 <button id="loginButton" style="
 width:100%;
 padding:12px;
+margin-top:10px;
 border:none;
 border-radius:10px;
-background:linear-gradient(90deg,#00ffcc,#009688);
-color:#000;
+background:#00ffcc;
 font-weight:bold;
-font-size:17px;
 cursor:pointer;
 ">
 دخول
@@ -104,40 +94,27 @@ border-radius:10px;
 background:#4285F4;
 color:white;
 font-weight:bold;
-font-size:16px;
 cursor:pointer;
 ">
 🔵 الدخول بواسطة Google
 </button>
 
 
-<div id="loginError" style="
-color:#ff8888;
-font-size:14px;
-margin:10px;
-"></div>
-
-
-<p style="
-color:#ccc;
-font-size:14px;
-">
-أو إنشاء حساب جديد
-</p>
+<div id="loginError"
+style="color:#ff8888;margin:10px">
+</div>
 
 
 <button id="signupButton" style="
 width:100%;
 padding:12px;
 border-radius:10px;
-background:rgba(255,255,255,.12);
-border:1px solid #00ffcc;
+background:#ffffff22;
 color:white;
-font-size:16px;
-font-weight:bold;
+border:1px solid #00ffcc;
 cursor:pointer;
 ">
-📝 إنشاء حساب
+📝 إنشاء حساب جديد
 </button>
 
 
@@ -146,26 +123,23 @@ cursor:pointer;
 
 
 
-<!-- 👤 بطاقة المستخدم -->
+<!-- 👤 بيانات المستخدم -->
 <div id="userProfile" style="
 display:none;
 position:fixed;
 top:15px;
 right:15px;
 z-index:99999;
-background:rgba(0,0,0,.8);
+background:#000c;
 padding:10px;
 border-radius:15px;
 border:1px solid #00ffcc;
-box-shadow:0 0 15px #00ffcc;
 color:white;
-font-family:Tajawal;
 align-items:center;
 gap:10px;
 ">
 
 <img id="userPhoto"
-src=""
 style="
 width:45px;
 height:45px;
@@ -173,38 +147,26 @@ border-radius:50%;
 border:2px solid gold;
 ">
 
+<span id="userName"></span>
 
-<div>
-<div id="userName"
-style="font-weight:bold">
-</div>
-
-<div style="
-font-size:12px;
-color:#ccc">
-عضو الموقع
-</div>
-
-</div>
-
-
-<button id="logoutButton"
-style="
-background:#d9534f;
-color:white;
-border:none;
-border-radius:8px;
-padding:6px 10px;
-cursor:pointer;
-">
+<button id="logoutButton">
 خروج
 </button>
 
 </div>
+
+
+
 <script type="module">
 
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+
+
+import { getAnalytics }
+from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+
 
 import {
 getAuth,
@@ -217,35 +179,59 @@ setPersistence,
 browserLocalPersistence,
 signOut
 }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 
-// 🔥 إعداد Firebase
+import { getFirestore }
+from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+
+import { getStorage }
+from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
+
+
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyDDPcEIVAn-xv6dKcPrTzDeOIxSA8M58v8",
+apiKey:"AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
 
-authDomain: "abwalqmrzmrd-47557.firebaseapp.com",
+authDomain:"sakaker-basnusse.firebaseapp.com",
 
-databaseURL: "https://abwalqmrzmrd-47557-default-rtdb.firebaseio.com/",
+projectId:"sakaker-basnusse",
 
-projectId: "abwalqmrzmrd-47557",
+storageBucket:"sakaker-basnusse.firebasestorage.app",
 
-storageBucket: "abwalqmrzmrd-47557.appspot.com",
+messagingSenderId:"369109440957",
 
-messagingSenderId: "957400167542",
+appId:"1:369109440957:web:a3a460e5ef14c46a0d5ad4",
 
-appId: "1:957400167542:web:a3b341fad9b1142aaedb57",
-
-measurementId: "G-24BWC6N21W"
+measurementId:"G-FKQFWD7E2Z"
 
 };
 
 
-const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+const app=initializeApp(firebaseConfig);
+
+
+const analytics=getAnalytics(app);
+
+const auth=getAuth(app);
+
+const db=getFirestore(app);
+
+const storage=getStorage(app);
+
+
+
+window.firebaseApp=app;
+
+window.firebaseAuth=auth;
+
+window.firebaseDB=db;
+
+window.firebaseStorage=storage;
+
 
 
 await setPersistence(
@@ -254,95 +240,35 @@ browserLocalPersistence
 );
 
 
-// العناصر
 
-const overlay =
-document.getElementById("loginOverlay");
+const overlay=document.getElementById("loginOverlay");
 
-const loginBtn =
-document.getElementById("loginButton");
+const email=document.getElementById("emailInput");
 
-const signupBtn =
-document.getElementById("signupButton");
+const pass=document.getElementById("passwordInput");
 
-const googleBtn =
-document.getElementById("googleButton");
-
-
-const emailInput =
-document.getElementById("emailInput");
-
-const passwordInput =
-document.getElementById("passwordInput");
-
-
-const errorBox =
-document.getElementById("loginError");
+const error=document.getElementById("loginError");
 
 
 
-const userProfile =
-document.getElementById("userProfile");
+/* دخول */
 
-const userName =
-document.getElementById("userName");
-
-const userPhoto =
-document.getElementById("userPhoto");
-
-const logoutBtn =
-document.getElementById("logoutButton");
-
-
-
-function showError(text){
-
-errorBox.textContent=text;
-
-}
-
-
-
-function clearError(){
-
-errorBox.textContent="";
-
-}
-
-
-
-// 🔐 دخول بالبريد
-
-loginBtn.onclick = async()=>{
-
-clearError();
-
-let email=emailInput.value.trim();
-
-let pass=passwordInput.value;
-
-
-if(!email || !pass){
-
-showError("أدخل البريد وكلمة المرور");
-
-return;
-
-}
+document.getElementById("loginButton").onclick=async()=>{
 
 
 try{
 
+
 await signInWithEmailAndPassword(
 auth,
-email,
-pass
+email.value,
+pass.value
 );
 
 
 }catch(e){
 
-showError("❌ "+e.message);
+error.textContent="❌ "+e.message;
 
 }
 
@@ -350,31 +276,9 @@ showError("❌ "+e.message);
 
 
 
+/* إنشاء حساب */
 
-// 📝 إنشاء حساب
-
-signupBtn.onclick = async()=>{
-
-
-clearError();
-
-
-let email=emailInput.value.trim();
-
-let pass=passwordInput.value;
-
-
-
-if(!email || pass.length<6){
-
-showError(
-"أدخل بريد صحيح وكلمة مرور 6 أحرف على الأقل"
-);
-
-return;
-
-}
-
+document.getElementById("signupButton").onclick=async()=>{
 
 
 try{
@@ -382,22 +286,14 @@ try{
 
 await createUserWithEmailAndPassword(
 auth,
-email,
-pass
+email.value,
+pass.value
 );
-
-
-showError(
-"✅ تم إنشاء الحساب بنجاح"
-);
-
 
 
 }catch(e){
 
-
-showError("❌ "+e.message);
-
+error.textContent="❌ "+e.message;
 
 }
 
@@ -406,16 +302,12 @@ showError("❌ "+e.message);
 
 
 
-// 🔵 دخول Google
+/* Google */
 
-googleBtn.onclick = async()=>{
-
-
-clearError();
+document.getElementById("googleButton").onclick=async()=>{
 
 
-const provider =
-new GoogleAuthProvider();
+const provider=new GoogleAuthProvider();
 
 
 try{
@@ -427,14 +319,12 @@ provider
 );
 
 
-
 }catch(e){
 
-
-showError("❌ "+e.message);
-
+error.textContent="❌ "+e.message;
 
 }
+
 
 };
 
@@ -442,7 +332,7 @@ showError("❌ "+e.message);
 
 
 
-// 👤 متابعة حالة المستخدم
+/* مراقبة الدخول */
 
 onAuthStateChanged(auth,(user)=>{
 
@@ -452,25 +342,19 @@ if(user){
 
 overlay.style.display="none";
 
-
 document.body.classList.remove("locked");
 
 
-
-userProfile.style.display="flex";
-
+document.getElementById("userProfile").style.display="flex";
 
 
-userName.textContent =
-user.displayName ||
-user.email;
+document.getElementById("userName").textContent =
+user.displayName || user.email;
 
 
-
-userPhoto.src =
+document.getElementById("userPhoto").src =
 user.photoURL ||
 "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-
 
 
 }else{
@@ -478,11 +362,10 @@ user.photoURL ||
 
 overlay.style.display="flex";
 
-
 document.body.classList.add("locked");
 
 
-userProfile.style.display="none";
+document.getElementById("userProfile").style.display="none";
 
 
 }
@@ -493,17 +376,18 @@ userProfile.style.display="none";
 
 
 
-// 🚪 تسجيل الخروج
 
-logoutBtn.onclick=async()=>{
+/* خروج */
 
+document.getElementById("logoutButton").onclick=async()=>{
 
 await signOut(auth);
-
 
 };
 
 
+
+console.log("SAKAKER Firebase Ready");
 
 </script>
 <!DOCTYPE html>
