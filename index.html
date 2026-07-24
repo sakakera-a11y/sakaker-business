@@ -2308,23 +2308,16 @@ const msg = document.getElementById("loginMessage");
 const provider = new GoogleAuthProvider();
 
 /* تسجيل الدخول */
-
-loginBtn.onclick = async ()=>{
-
-try{
-
-await signInWithEmailAndPassword(
-auth,
-email.value,
-password.value
-);
-
-}catch(e){
-
-msg.innerHTML = e.message;
-
-}
-
+googleBtn.onclick = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    alert("تم تسجيل الدخول");
+    console.log(result.user);
+  } catch (e) {
+    console.error(e);
+    alert("Code: " + e.code);
+    alert("Message: " + e.message);
+  }
 };
 
 /* إنشاء حساب */
