@@ -1,3 +1,2092 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title> </title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+body{
+    margin:0;
+    font-family:Tahoma,sans-serif;
+    overflow:hidden;
+    height:100vh;
+
+    background:
+        linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.55)),
+        url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+
+    color:#fff;
+}
+
+
+
+.btn:hover{
+
+transform:scale(1.08);
+
+box-shadow:0 0 25px gold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="network"></div>
+
+<div class="box">
+
+
+</h1>
+
+<p>
+
+</p>
+<div class="box">
+
+    <div style="font-size:90px;margin-bottom:25px;">
+        🚧
+    </div>
+
+    <div style="
+        font-size:28px;
+        color:#00ffd5;
+        font-weight:bold;
+        letter-spacing:3px;
+        text-shadow:0 0 15px #00ffd5;
+        margin-bottom:15px;
+    ">
+متوقف للصيانة Down for maintenance
+    </div>
+
+
+</div>
+
+<!-- Emerald Music Overlay START -->
+<div id="emeraldMusicHost">
+  <div id="emOpenBtn">🎹💎</div>
+</div>
+
+<style>
+:root{--em:#00ffd5}
+
+/* host أعلى من كل شيء ومعزول */
+#emeraldMusicHost{
+  position:fixed; inset:0;
+  z-index:2147483647;
+  pointer-events:none;
+  font-family:"Tajawal",sans-serif;
+}
+#emeraldMusicHost *{box-sizing:border-box}
+
+/* زر الفتح */
+#emeraldMusicHost #emOpenBtn{
+  pointer-events:auto;
+  position:fixed;bottom:200px;right:280px;width:78px;height:78px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:2px solid var(--em);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;cursor:pointer;box-shadow:0 0 18px var(--em);
+  z-index:2147483646;
+}
+
+/* الغطاء */
+#emeraldMusicHost .emModal{
+  pointer-events:auto;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.82);
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* الصندوق المرن */
+#emeraldMusicHost .emBox{
+  width:min(1200px,96vw);
+  max-height:94vh;
+  overflow:auto;
+  background:#041014;
+  border:1px solid var(--em);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 0 28px rgba(0,255,213,.6);
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+#emeraldMusicHost .emClose{
+  position:absolute; top:10px; right:14px;
+  font-size:22px; cursor:pointer; color:var(--em);
+  z-index:99999;
+  width:34px; height:34px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(0,255,213,.35);
+  box-shadow:0 0 12px rgba(0,255,213,.55);
+}
+
+/* شريط علوي: الدفع أقصى اليسار والكاميرا يمين */
+#emeraldMusicHost .emTopbar{
+  display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+  direction:ltr;
+}
+
+/* PayPal صغير */
+#emeraldMusicHost .emPayBox{
+  width:min(240px, 92%);
+  background:rgba(0,0,0,.65);
+  border:1px solid var(--em);
+  border-radius:12px;
+  padding:6px 8px;
+  font-size:11px;
+  box-shadow:0 0 10px rgba(0,255,213,.55);
+  text-align:center;
+  line-height:1.35;
+}
+#emeraldMusicHost .emPayBox b{color:#ffd700}
+#emeraldMusicHost #emPaypalBox{
+  background:#fff; border-radius:10px; margin-top:6px; padding:3px;
+  transform:scale(.86); transform-origin:top center;
+}
+
+/* الكاميرا يمين */
+#emeraldMusicHost .emCamBox{
+  width:min(360px, 92%);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 0 22px var(--em);
+}
+#emeraldMusicHost .emCamBox video{width:100%;display:block;background:#000}
+
+/* صفوف وأزرار (أسماء خاصة لتفادي تعارض موقعك) */
+#emeraldMusicHost .emRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#emeraldMusicHost .emBtn{
+  padding:6px 12px;border-radius:999px;background:#0b1b1f;
+  border:1px solid rgba(0,255,213,.4);color:#eaffff;cursor:pointer;font-size:12px
+}
+#emeraldMusicHost .emBtn.emActive{background:var(--em);color:#000}
+#emeraldMusicHost .emBtn.emWarn{border-color:rgba(255,170,0,.55)}
+#emeraldMusicHost .emBadge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(0,255,213,.35);
+  font-size:12px; color:#dff
+}
+#emeraldMusicHost .emHint{font-size:11px;opacity:.85;text-align:center;line-height:1.5}
+
+/* لوحة المفاتيح */
+#emeraldMusicHost .emKeysWrap{
+  border-radius:16px;
+  background:radial-gradient(circle at top,#003b3b,#000 75%);
+  box-shadow:0 0 24px var(--em);padding:12px
+}
+#emeraldMusicHost .emKeysRow{display:flex;justify-content:center;gap:4px;overflow-x:auto;scrollbar-width:thin}
+#emeraldMusicHost .emKey{
+  width:calc(92vw/12);max-width:64px;min-width:40px;height:24vw;
+  max-height:130px;min-height:90px;border-radius:8px;border:1px solid #555;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:6px;cursor:pointer;user-select:none;transition:.1s
+}
+#emeraldMusicHost .emWhite{background:linear-gradient(#fff,#cfcfcf);color:#000}
+#emeraldMusicHost .emBlack{background:linear-gradient(#222,#000);color:#fff}
+#emeraldMusicHost .emKey.emKeyActive{
+  background:linear-gradient(#eaffff,#00ffd5);
+  box-shadow:0 0 24px rgba(0,255,213,.95);
+  border-color:rgba(0,255,213,.95);
+}
+#emeraldMusicHost .emKey small{font-size:9px;opacity:.95}
+#emeraldMusicHost .emKey .n{font-weight:800;font-size:12px;margin-bottom:2px}
+
+/* نافذة النوتات */
+#emeraldMusicHost .emNotesModal{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.7);
+  align-items:center; justify-content:center;
+}
+#emeraldMusicHost .emNotesBox{
+  width:min(520px,92vw);
+  max-height:80vh;
+  overflow:auto;
+  background:#04161b;
+  border:1px solid var(--em);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 0 26px rgba(0,255,213,.6);
+  position:relative;
+}
+#emeraldMusicHost .emNotesClose{position:absolute;top:10px;right:12px;cursor:pointer;color:var(--em);font-size:18px}
+#emeraldMusicHost .emNotesBox h3{margin:0 0 10px;text-align:center;color:#dff}
+#emeraldMusicHost .emNotesBox h4{margin:12px 0 6px;color:#bff}
+#emeraldMusicHost .emNotesBox p{margin:0 0 10px;font-size:13px;line-height:1.6}
+
+#emeraldMusicHost .emCredit{
+  text-align:center;margin:10px 0 2px;font-size:11px;opacity:.9;color:#bff;
+  text-shadow:0 0 10px rgba(0,255,213,.65);
+}
+
+/* للجوال */
+@media (max-width: 720px){
+  #emeraldMusicHost .emTopbar{flex-direction:column; align-items:stretch}
+  #emeraldMusicHost .emPayBox, #emeraldMusicHost .emCamBox{width:100%}
+}
+</style>
+
+<script>
+/* تحميل PayPal SDK إذا لم يكن موجود */
+(function(){
+  if(window.paypal) return;
+  var s=document.createElement("script");
+  s.src="https://www.paypal.com/sdk/js?client-id=BAAQAE5C8rFrqoJpWqxpYluOT09waMhuzhF4ug2QGvJm76YmqiCmzkP31wl8xZq9W5WkJSvAx6ZoujIBFw&components=hosted-buttons&disable-funding=venmo&currency=USD";
+  s.onload=function(){};
+  document.head.appendChild(s);
+})();
+
+const emeraldHost=document.getElementById("emeraldMusicHost");
+const emOpenBtn=document.getElementById("emOpenBtn");
+
+/* ================== الأصوات (آلات كثيرة) ================== */
+const base={
+  piano  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/",
+  epiano :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/electric_piano_1-mp3/",
+  oud    :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_guitar_nylon-mp3/",
+  buzuq  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_guitar_steel-mp3/",
+  guitar :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/electric_guitar_clean-mp3/",
+  bass   :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/electric_bass_finger-mp3/",
+  qanun  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/dulcimer-mp3/",
+  violin :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/violin-mp3/",
+  strings:"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/string_ensemble_1-mp3/",
+  sax    :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/alto_sax-mp3/",
+  trumpet:"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/trumpet-mp3/",
+  nay    :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/flute-mp3/",
+  choir  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/choir_aahs-mp3/",
+  drums  :"https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/standard_kit-mp3/"
+};
+const LABEL={
+  piano:"🎹 Piano", epiano:"🎹 E-Piano", oud:"🪕 Oud", qanun:"🎼 Qanun", buzuq:"🪕 Buzuq",
+  guitar:"🎸 Guitar", bass:"🎸 Bass", violin:"🎻 Violin", strings:"🎻 Strings",
+  sax:"🎷 Sax", trumpet:"🎺 Trumpet", nay:"🎵 Nay", choir:"🎤 Choir", drums:"🥁 Drums"
+};
+
+/* ================== إعدادات ================== */
+let inst="piano", mix="none", vol=1, echo=1, octShift=0;
+const activeHold={};
+let keyElByNote = {};
+
+/* ================== نوتات 36 من D2 ================== */
+const notes=[], order=["D","E","F","G","A","B","C"];
+let o=2; while(notes.length<36){ for(const l of order){ if(notes.length<36) notes.push(l+o); } o++; }
+
+/* ================== مساعدات ================== */
+function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+function isBlack(n){ return ["E","G","B"].includes(n[0]); }
+function noteWithOctShift(note){
+  const letter = note[0];
+  const baseOct = parseInt(note.slice(1),10);
+  const finalOct = clamp(baseOct + octShift, 0, 9);
+  return letter + finalOct;
+}
+function glow(){
+  emeraldHost.classList.add("emGlow");
+  setTimeout(()=>emeraldHost.classList.remove("emGlow"),120);
+}
+function highlightKey(note){
+  const el = keyElByNote[note] || null;
+  if(!el) return;
+  el.classList.add("emKeyActive");
+  try{ el.scrollIntoView({behavior:"smooth", block:"nearest", inline:"center"}); }catch(_){}
+  setTimeout(()=>el.classList.remove("emKeyActive"),160);
+}
+
+/* ================== تشغيل ================== */
+function playOnce(note, instName, volumeMul=1){
+  const nn = noteWithOctShift(note);
+  const src = (base[instName]||base.piano) + nn + ".mp3";
+  const a = new Audio(src);
+  a.volume = clamp((vol||1) * (volumeMul||1), 0, 1);
+  a.play().catch(()=>{});
+  return a;
+}
+function startHold(note, holdId, alsoEl=null){
+  if(activeHold[holdId]) return;
+  const arr=[];
+  const nn = noteWithOctShift(note);
+
+  const a1=new Audio((base[inst]||base.piano)+nn+".mp3");
+  a1.loop=true; a1.volume=clamp(vol,0,1);
+  a1.play().catch(()=>{});
+  arr.push(a1);
+
+  if(mix!=="none" && mix!==inst){
+    const a2=new Audio((base[mix]||base.piano)+nn+".mp3");
+    a2.loop=true; a2.volume=clamp(vol,0,1);
+    a2.play().catch(()=>{});
+    arr.push(a2);
+  }
+
+  activeHold[holdId]=arr;
+  if(alsoEl) alsoEl.classList.add("emKeyActive");
+}
+function stopHold(id, alsoEl=null){
+  if(!activeHold[id]) return;
+  activeHold[id].forEach(a=>{ try{a.pause();}catch(_){} });
+  delete activeHold[id];
+  if(alsoEl) alsoEl.classList.remove("emKeyActive");
+}
+function shortPress(note, alsoEl=null){
+  playOnce(note, inst, 1);
+  if(mix!=="none" && mix!==inst) playOnce(note, mix, 1);
+
+  const e = clamp(echo,0,2);
+  if(e>0){
+    const repeats=5, baseDelay=120;
+    for(let i=1;i<=repeats;i++){
+      const v = clamp((e/(i+0.2)) * 0.7, 0, 1);
+      setTimeout(()=>{
+        playOnce(note, inst, v);
+        if(mix!=="none" && mix!==inst) playOnce(note, mix, v);
+      }, baseDelay*i);
+    }
+  }
+
+  if(alsoEl){
+    alsoEl.classList.add("emKeyActive");
+    try{ alsoEl.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"}); }catch(_){}
+    setTimeout(()=>alsoEl.classList.remove("emKeyActive"),160);
+  }else{
+    highlightKey(note);
+  }
+}
+
+/* ================== مقطوعات ================== */
+const MELODIES={
+  scale:["D2","E2","F2","G2","A2","B2","C2","D3","E3","F3","G3","A3","B3","C3","D4","E4","F4","G4","A4","B4","C4","D5"],
+  hbd:["C4","C4","D4","C4","F4","E4","C4","C4","D4","C4","G4","F4","C4","C4","C5","A4","F4","E4","D4"],
+  fairuz:["E4","F4","G4","A4","G4","F4","E4","D4","E4","F4","G4","A4","G4","F4","E4","D4"],
+  beethoven9:[
+    "E4","E4","F4","G4","G4","F4","E4","D4",
+    "C4","C4","D4","E4","E4","D4","D4",
+    "E4","E4","F4","G4","G4","F4","E4","D4",
+    "C4","C4","D4","E4","D4","C4","C4"
+  ],
+  sabah:["G4","A4","B4","A4","G4","E4","D4","E4","G4","A4","G4","E4","D4"]
+};
+let timer=null;
+function stopMelody(){ if(timer){ clearInterval(timer); timer=null; } }
+function playMelody(arr, t=420){
+  stopMelody();
+  let i=0;
+  timer=setInterval(()=>{ if(i>=arr.length) return stopMelody(); shortPress(arr[i++]); }, t);
+}
+
+/* ================== كاميرا/مايك ================== */
+let camStream=null, mediaRecorder=null, chunks=[], camPaused=false;
+let camTrack=null, micTrack=null;
+
+async function startCamRecording(videoEl, recBtn, pauseBtn, camToggleBtn, micToggleBtn){
+  try{
+    camStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+    videoEl.srcObject = camStream;
+
+    camTrack = camStream.getVideoTracks()[0] || null;
+    micTrack = camStream.getAudioTracks()[0] || null;
+
+    chunks=[];
+    mediaRecorder = new MediaRecorder(camStream);
+    mediaRecorder.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+    mediaRecorder.onstop = ()=>{
+      const blob = new Blob(chunks,{type:"video/webm"});
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url; a.download="emerald-performance.webm"; a.click();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    };
+
+    mediaRecorder.start();
+    camPaused=false;
+
+    recBtn.textContent="⏹ Stop";
+    pauseBtn.style.display="inline-block";
+    pauseBtn.textContent="⏸ Pause";
+    camToggleBtn.style.display="inline-block";
+    micToggleBtn.style.display="inline-block";
+    camToggleBtn.textContent="📷 Camera: ON";
+    micToggleBtn.textContent="🎙 Mic: ON";
+    camToggleBtn.classList.remove("emWarn");
+    micToggleBtn.classList.remove("emWarn");
+  }catch(e){
+    alert("تعذر تشغيل الكاميرا/المايك.\nتأكد من HTTPS ومنح الصلاحيات.\n\n" + (e?.message||e));
+  }
+}
+function stopCamRecording(recBtn, pauseBtn, camToggleBtn, micToggleBtn){
+  try{ if(mediaRecorder && mediaRecorder.state!=="inactive") mediaRecorder.stop(); }catch(_){}
+  try{ if(camStream) camStream.getTracks().forEach(t=>t.stop()); }catch(_){}
+  mediaRecorder=null; camStream=null; camTrack=null; micTrack=null; camPaused=false;
+  recBtn.textContent="🎥 Record Video";
+  pauseBtn.style.display="none";
+  camToggleBtn.style.display="none";
+  micToggleBtn.style.display="none";
+}
+
+/* ================== فتح اللوحة ================== */
+emOpenBtn.onclick=()=>{
+  if(document.getElementById("emPanel")) return;
+
+  const prevOverflow = document.documentElement.style.overflow;
+  document.documentElement.style.overflow="hidden";
+
+  const p=document.createElement("div");
+  p.id="emPanel";
+  p.innerHTML=`
+    <div class="emModal">
+      <div class="emBox">
+        <div class="emClose">✖</div>
+
+        <div class="emTopbar">
+          <div class="emPayBox">
+            🎵  <b></b><br>          💎  Free for a limited timeمجاني لفتره محدوده
+    
+            <div id="emPaypalBox"></div>
+          </div>
+
+          <div class="emCamBox">
+            <video id="emCam" autoplay muted playsinline></video>
+          </div>
+        </div>
+
+        <div class="emRow">
+          <button class="emBtn" id="emCamRec">🎥 Record Video</button>
+          <button class="emBtn" id="emCamPause" style="display:none">⏸ Pause</button>
+          <button class="emBtn emWarn" id="emCamToggle" style="display:none">📷 Camera: ON</button>
+          <button class="emBtn emWarn" id="emMicToggle" style="display:none">🎙 Mic: ON</button>
+        </div>
+
+        <div class="emRow">
+          <button class="emBtn" id="emBeet">🎼 Beethoven 9</button>
+          <button class="emBtn" id="emSabah">🎵 Sabah</button>
+          <button class="emBtn" id="emScale">🎹 Scale</button>
+          <button class="emBtn" id="emHbd">🎂 Birthday</button>
+          <button class="emBtn" id="emFairuz">🎵 Fairuz</button>
+          <button class="emBtn" id="emStop">⏹ Stop</button>
+          <button class="emBtn" id="emNotesBtn">🎼 Notes</button>
+        </div>
+
+        <div class="emRow">
+          <span class="emBadge">🔊 Volume</span>
+          <input id="emV" type="range" min="0" max="100" value="100" style="width:160px">
+          <span class="emBadge">🎚 Echo</span>
+          <input id="emE" type="range" min="0" max="200" value="100" style="width:160px">
+          <span class="emBadge">🎹 Oct</span>
+          <button class="emBtn" id="emOctDown">-</button>
+          <span class="emBadge" id="emOctVal">0</span>
+          <button class="emBtn" id="emOctUp">+</button>
+        </div>
+
+        <div class="emHint">
+          ✅ ضغطة قصيرة = نغمة واحدة — ضغطة طويلة = استمرار الصوت (Sustain)<br>
+          ⌨️ كيبورد: 1-0 ثم Q..P ثم A..L ثم Z..M (ضغط مستمر = استمرار)
+        </div>
+
+        <div class="emKeysWrap"><div id="emKeys"></div></div>
+
+        <div class="emRow">
+          <span class="emBadge">🎛 الآلة الأساسية</span>
+          ${Object.keys(LABEL).map(k=>`<button class="emBtn ${k==="piano"?"emActive":""}" data-em-i="${k}">${LABEL[k]}</button>`).join("")}
+        </div>
+
+        <div class="emRow">
+          <span class="emBadge">🔀 الدمج (Mix)</span>
+          <button class="emBtn emActive" data-em-m="none">❌ Off</button>
+          ${Object.keys(LABEL).map(k=>`<button class="emBtn" data-em-m="${k}">${LABEL[k]}</button>`).join("")}
+        </div>
+
+        <div class="emCredit">✨It works offline. إعداد وتصميم وإنتاج أبوالقمر زمرد Preparation, design, and production by abwalqmrzmrd× Emerald Music ✨</div>
+
+        <div id="emNotesModal" class="emNotesModal">
+          <div class="emNotesBox">
+            <div class="emNotesClose">✖</div>
+            <h3>🎼 نوتات المقطوعات</h3>
+            <h4>🎼 Beethoven 9 (Simplified)</h4><p>${MELODIES.beethoven9.join(" ")}</p>
+            <h4>🎵 Sabah (Simplified)</h4><p>${MELODIES.sabah.join(" ")}</p>
+            <h4>🎹 Scale</h4><p>${MELODIES.scale.join(" ")}</p>
+            <h4>🎂 Happy Birthday</h4><p>${MELODIES.hbd.join(" ")}</p>
+            <h4>🎵 Fairuz (Short)</h4><p>${MELODIES.fairuz.join(" ")}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+  emeraldHost.appendChild(p);
+
+ /* PayPal render */
+function renderPay(){
+  try{
+    if(window.paypal && paypal.HostedButtons){
+      paypal.HostedButtons({hostedButtonId:"S9YLL5P5H47P4"}).render("#emPaypalBox");
+    }
+  }catch(e){ console.log("PayPal error:", e); }
+}
+
+
+  // قد يتأخر تحميل SDK
+  setTimeout(renderPay, 0);
+  setTimeout(renderPay, 900);
+
+  /* عناصر */
+  const closeBtn = p.querySelector(".emClose");
+  const cam = p.querySelector("#emCam");
+  const camRec = p.querySelector("#emCamRec");
+  const camPause = p.querySelector("#emCamPause");
+  const camToggle = p.querySelector("#emCamToggle");
+  const micToggle = p.querySelector("#emMicToggle");
+
+  const notesBtn = p.querySelector("#emNotesBtn");
+  const notesModal = p.querySelector("#emNotesModal");
+  const notesClose = p.querySelector(".emNotesClose");
+
+  notesBtn.onclick=()=>{ notesModal.style.display="flex"; };
+  notesClose.onclick=()=>{ notesModal.style.display="none"; };
+  notesModal.addEventListener("click",(e)=>{ if(e.target===notesModal) notesModal.style.display="none"; });
+
+  closeBtn.onclick=()=>{
+    stopMelody();
+    notesModal.style.display="none";
+    try{ if(mediaRecorder){ stopCamRecording(camRec, camPause, camToggle, micToggle); } }catch(_){}
+    Object.keys(activeHold).forEach(id=>stopHold(id));
+    p.remove();
+    document.documentElement.style.overflow = prevOverflow;
+  };
+
+  /* إغلاق عند الضغط خارج الصندوق + زر Esc */
+  const modalEl = p.querySelector(".emModal");
+  const boxEl = p.querySelector(".emBox");
+
+  if(modalEl && boxEl){
+    modalEl.addEventListener("click",(e)=>{
+      if(e.target === modalEl){
+        closeBtn.click();
+      }
+    });
+  }
+
+  const escHandler = (e)=>{
+    if(e.key === "Escape"){
+      try{ closeBtn.click(); }catch(_){}
+    }
+  };
+  window.addEventListener("keydown", escHandler);
+
+  // ضمان إزالة مستمع Esc عند الإغلاق
+  const _origClose = closeBtn.onclick;
+  closeBtn.onclick = ()=>{
+    try{ window.removeEventListener("keydown", escHandler); }catch(_){}
+    _origClose();
+  };
+
+  p.querySelector("#emBeet").onclick=()=>playMelody(MELODIES.beethoven9, 380);
+  p.querySelector("#emSabah").onclick=()=>playMelody(MELODIES.sabah, 420);
+  p.querySelector("#emScale").onclick=()=>playMelody(MELODIES.scale, 220);
+  p.querySelector("#emHbd").onclick=()=>playMelody(MELODIES.hbd, 420);
+  p.querySelector("#emFairuz").onclick=()=>playMelody(MELODIES.fairuz, 430);
+  p.querySelector("#emStop").onclick=()=>stopMelody();
+
+  /* الآلة */
+  p.querySelectorAll("[data-em-i]").forEach(b=>{
+    b.onclick=()=>{
+      p.querySelectorAll("[data-em-i]").forEach(x=>x.classList.remove("emActive"));
+      b.classList.add("emActive");
+      inst=b.dataset.emI;
+    };
+  });
+  /* الدمج */
+  p.querySelectorAll("[data-em-m]").forEach(b=>{
+    b.onclick=()=>{
+      p.querySelectorAll("[data-em-m]").forEach(x=>x.classList.remove("emActive"));
+      b.classList.add("emActive");
+      mix=b.dataset.emM;
+    };
+  });
+
+  p.querySelector("#emV").oninput=(e)=>vol = e.target.value/100;
+  p.querySelector("#emE").oninput=(e)=>echo = e.target.value/100;
+
+  const octVal=p.querySelector("#emOctVal");
+  function renderOct(){ octVal.textContent = String(octShift); }
+  p.querySelector("#emOctDown").onclick=()=>{ octShift=clamp(octShift-1,-2,2); renderOct(); };
+  p.querySelector("#emOctUp").onclick=()=>{ octShift=clamp(octShift+1,-2,2); renderOct(); };
+  renderOct();
+
+  camRec.onclick=async()=>{
+    if(!mediaRecorder){ await startCamRecording(cam, camRec, camPause, camToggle, micToggle); }
+    else{ stopCamRecording(camRec, camPause, camToggle, micToggle); }
+  };
+  camPause.onclick=()=>{
+    if(!mediaRecorder) return;
+    if(!camPaused){ try{ mediaRecorder.pause(); }catch(_){}
+      camPause.textContent="▶ Resume"; camPaused=true;
+    }else{ try{ mediaRecorder.resume(); }catch(_){}
+      camPause.textContent="⏸ Pause"; camPaused=false;
+    }
+  };
+  camToggle.onclick=()=>{
+    if(!camTrack) return;
+    camTrack.enabled = !camTrack.enabled;
+    camToggle.textContent = camTrack.enabled ? "📷 Camera: ON" : "📷 Camera: OFF";
+    camToggle.classList.toggle("emWarn", !camTrack.enabled);
+  };
+  micToggle.onclick=()=>{
+    if(!micTrack) return;
+    micTrack.enabled = !micTrack.enabled;
+    micToggle.textContent = micTrack.enabled ? "🎙 Mic: ON" : "🎙 Mic: OFF";
+    micToggle.classList.toggle("emWarn", !micTrack.enabled);
+  };
+
+  /* مفاتيح */
+  const keysWrap=p.querySelector("#emKeys");
+  const r1=document.createElement("div");
+  const r2=document.createElement("div");
+  r1.className=r2.className="emKeysRow";
+  keyElByNote = {};
+
+  notes.forEach((n,i)=>{
+    const d=document.createElement("div");
+    d.className="emKey "+(isBlack(n)?"emBlack":"emWhite");
+    d.innerHTML=`<div class="n">${i+1}</div><small>${n}</small>`;
+    const id="emKey-"+i;
+    keyElByNote[n]=d;
+
+    let downAt=0, didHold=false;
+    d.onpointerdown=(ev)=>{
+      ev.preventDefault();
+      downAt=Date.now();
+      didHold=false;
+      const localDownAt=downAt;
+      setTimeout(()=>{ if(downAt===localDownAt){ didHold=true; startHold(n, id, d); } }, 180);
+    };
+    const endPointer=()=>{ if(activeHold[id]) stopHold(id, d); downAt=0; };
+    d.onpointerup=endPointer;
+    d.onpointerleave=endPointer;
+    d.onpointercancel=endPointer;
+
+    d.onclick=()=>{ if(didHold) return; shortPress(n, d); };
+    (i<18?r1:r2).appendChild(d);
+  });
+  keysWrap.append(r1,r2);
+};
+
+/* ================== كيبورد الكمبيوتر ================== */
+const KEY_BIND=[
+  "Digit1","Digit2","Digit3","Digit4","Digit5","Digit6","Digit7","Digit8","Digit9","Digit0",
+  "KeyQ","KeyW","KeyE","KeyR","KeyT","KeyY","KeyU","KeyI","KeyO","KeyP",
+  "KeyA","KeyS","KeyD","KeyF","KeyG","KeyH","KeyJ","KeyK","KeyL",
+  "KeyZ","KeyX","KeyC","KeyV","KeyB","KeyN","KeyM"
+];
+const KI={}; KEY_BIND.forEach((k,i)=>KI[k]=i);
+
+window.addEventListener("keydown",(e)=>{
+  if(e.repeat) return;
+  const idx=KI[e.code];
+  if(idx===undefined || !notes[idx]) return;
+  const note=notes[idx];
+  startHold(note, "emKb-"+idx, keyElByNote[note]||null);
+});
+window.addEventListener("keyup",(e)=>{
+  const idx=KI[e.code];
+  if(idx===undefined) return;
+  const note=notes[idx];
+  stopHold("emKb-"+idx, keyElByNote[note]||null);
+});
+</script>
+
+<!-- Emerald Music Overlay END -->
+
+  <!-- =========================================
+      أيقونة لعبة Pong الاحترافية
+========================================= -->
+
+<div id="pongIcon" onclick="openPongWindow()">
+    🏓
+    <span>PONG</span>
+</div>
+
+<div id="pongWindow">
+
+    <div id="pongHeader">
+
+        <span>🏓 Abwalqmrzmrd Pong</span>
+
+        <button onclick="closePongWindow()">✕</button>
+
+    </div>
+
+    <div id="pongContent">
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>🏓 Abwalqmrzmrd Pong</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Tahoma,sans-serif; 
+}
+
+body{
+
+overflow:hidden;
+background:
+color:#fff;
+
+}
+
+/* خلفية */
+
+#bg{
+
+position:fixed;
+inset:0;
+
+background:
+linear-gradient(to bottom,
+#00131d,
+#003049,
+#00131d);
+
+overflow:hidden;
+
+}
+
+/* البحر */
+
+#sea{
+
+position:absolute;
+bottom:0;
+
+width:100%;
+height:45%;
+
+background:
+linear-gradient(
+to top,
+#004d66,
+#0088aa,
+transparent);
+
+animation:seaMove 8s ease-in-out infinite;
+
+}
+
+@keyframes seaMove{
+
+0%{transform:translateY(0);}
+50%{transform:translateY(8px);}
+100%{transform:translateY(0);}
+
+}
+
+/* القمر */
+
+#moon{
+
+position:absolute;
+
+top:60px;
+left:50%;
+
+transform:translateX(-50%);
+
+width:140px;
+height:140px;
+
+border-radius:50%;
+
+background:
+
+radial-gradient(circle,
+#fff,
+gold 60%,
+#ffd700);
+
+box-shadow:
+
+0 0 50px gold,
+0 0 120px #fff;
+
+}
+
+/* النجوم */
+
+.star{
+
+position:absolute;
+
+width:3px;
+height:3px;
+
+background:white;
+
+border-radius:50%;
+
+animation:blink 3s infinite;
+
+}
+
+@keyframes blink{
+
+0%,100%{opacity:1;}
+50%{opacity:.2;}
+
+}
+
+/* الواجهة */
+
+#menu{
+
+position:absolute;
+
+top:50%;
+left:50%;
+
+transform:translate(-50%,-50%);
+
+width:min(500px,92%);
+
+padding:40px;
+
+border-radius:25px;
+
+background:rgba(0,0,0,.45);
+
+backdrop-filter:blur(18px);
+
+border:1px solid rgba(255,255,255,.2);
+
+text-align:center;
+
+box-shadow:0 0 40px rgba(0,255,255,.35);
+
+}
+
+h1{
+
+font-size:46px;
+
+background:linear-gradient(90deg,gold,#fff,gold);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+margin-bottom:15px;
+
+}
+
+.subtitle{
+
+font-size:20px;
+color:#ddd;
+margin-bottom:35px;
+
+}
+
+.menuBtn{
+
+display:block;
+
+width:100%;
+
+padding:18px;
+
+margin:12px auto;
+
+border:none;
+
+border-radius:40px;
+
+font-size:22px;
+
+cursor:pointer;
+
+background:
+
+linear-gradient(90deg,
+gold,
+white,
+gold);
+
+color:black;
+
+font-weight:bold;
+
+transition:.3s;
+
+}
+
+.menuBtn:hover{
+
+transform:scale(1.05);
+
+box-shadow:0 0 25px gold;
+
+}
+
+.version{
+
+margin-top:30px;
+
+color:#aaa;
+
+font-size:15px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="bg">
+
+<div id="moon"></div>
+
+<div id="sea"></div>
+
+</div>
+
+<div id="menu">
+
+<h1>
+🏓
+Abwalqmrzmrd Pong
+</h1>
+
+<div class="subtitle">
+
+الإصدار الاحترافي
+
+</div>
+
+<button class="menuBtn">
+🎮
+ابدأ اللعب
+</button>
+
+<button class="menuBtn">
+👥
+لاعبان
+</button>
+
+<button class="menuBtn">
+🏆
+أفضل اللاعبين
+</button>
+
+<button class="menuBtn">
+💬
+الدردشة
+</button>
+
+<button class="menuBtn">
+⚙️
+الإعدادات
+</button>
+
+<button class="menuBtn">
+💰
+PayPal
+</button>
+
+<div class="version">
+
+Version 1.0
+
+</div>
+
+</div>
+
+<script>
+
+/* إنشاء النجوم */
+
+for(let i=0;i<180;i++){
+
+let s=document.createElement("div");
+
+s.className="star";
+
+s.style.left=Math.random()*100+"%";
+
+s.style.top=Math.random()*100+"%";
+
+s.style.animationDelay=Math.random()*5+"s";
+
+document.getElementById("bg").appendChild(s);
+
+}
+
+</script>
+
+</body>
+</html>
+<!-- ===================== -->
+<!-- ملعب لعبة Pong -->
+<!-- ===================== -->
+
+<canvas id="pongGame" width="1000" height="600"
+style="
+display:none;
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+background:
+z-index:
+"></canvas>
+
+<script>
+
+const startBtn=document.querySelector(".menuBtn");
+const menu=document.getElementById("menu");
+const canvas=document.getElementById("pongGame");
+const ctx=canvas.getContext("2d");
+
+canvas.width=1000;
+canvas.height=600;
+
+/* بدء اللعبة */
+
+startBtn.onclick=function(){
+
+menu.style.display="none";
+canvas.style.display="block";
+
+requestAnimationFrame(gameLoop);
+
+}
+
+/* المضرب الأيسر */
+
+const left={
+
+x:30,
+y:250,
+
+w:18,
+h:120,
+
+speed:8
+
+};
+
+/* المضرب الأيمن */
+
+const right={
+
+x:952,
+y:250,
+
+w:18,
+h:120,
+
+speed:6
+
+};
+
+/* الكرة */
+
+const ball={
+
+x:500,
+y:300,
+
+r:12,
+
+dx:6,
+dy:4
+
+};
+
+/* التحكم */
+
+const keys={};
+
+document.addEventListener("keydown",e=>{
+
+keys[e.key]=true;
+
+});
+
+document.addEventListener("keyup",e=>{
+
+keys[e.key]=false;
+
+});
+
+/* لمس الجوال */
+
+canvas.addEventListener("touchmove",e=>{
+
+const t=e.touches[0];
+
+const rect=canvas.getBoundingClientRect();
+
+left.y=t.clientY-rect.top-left.h/2;
+
+});
+
+/* تحديث */
+
+function update(){
+
+if(keys["ArrowUp"])
+right.y-=right.speed;
+
+if(keys["ArrowDown"])
+right.y+=right.speed;
+
+if(keys["w"])
+left.y-=left.speed;
+
+if(keys["s"])
+left.y+=left.speed;
+
+ball.x+=ball.dx;
+ball.y+=ball.dy;
+
+if(ball.y<ball.r||ball.y>canvas.height-ball.r)
+ball.dy*=-1;
+
+}
+
+/* رسم */
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+/* منتصف */
+
+ctx.setLineDash([12,12]);
+
+ctx.strokeStyle="#00ffee";
+
+ctx.beginPath();
+
+ctx.moveTo(canvas.width/2,0);
+
+ctx.lineTo(canvas.width/2,canvas.height);
+
+ctx.stroke();
+
+ctx.setLineDash([]);
+
+/* المضارب */
+
+ctx.fillStyle="gold";
+
+ctx.fillRect(left.x,left.y,left.w,left.h);
+
+ctx.fillRect(right.x,right.y,right.w,right.h);
+
+/* الكرة */
+
+ctx.beginPath();
+
+ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
+
+ctx.fillStyle="white";
+
+ctx.shadowBlur=30;
+
+ctx.shadowColor="gold";
+
+ctx.fill();
+
+ctx.shadowBlur=0;
+
+}
+
+/* الحلقة */
+
+function gameLoop(){
+
+update();
+
+draw();
+
+requestAnimationFrame(gameLoop);
+
+}
+
+</script>
+
+
+/* ===========================
+   النتيجة
+=========================== */
+
+let leftScore=0;
+let rightScore=0;
+
+/* إعادة الكرة */
+
+function resetBall(){
+
+ball.x=canvas.width/2;
+ball.y=canvas.height/2;
+
+ball.dx=(Math.random()>0.5?6:-6);
+ball.dy=(Math.random()*6)-3;
+
+}
+
+/* تحديث اللعبة */
+
+function update(){
+
+/* تحكم اللاعب */
+
+if(keys["w"]||keys["W"])
+left.y-=left.speed;
+
+if(keys["s"]||keys["S"])
+left.y+=left.speed;
+
+if(keys["ArrowUp"])
+right.y-=right.speed;
+
+if(keys["ArrowDown"])
+right.y+=right.speed;
+
+/* حدود المضارب */
+
+left.y=Math.max(0,Math.min(canvas.height-left.h,left.y));
+right.y=Math.max(0,Math.min(canvas.height-right.h,right.y));
+
+/* حركة الكرة */
+
+ball.x+=ball.dx;
+ball.y+=ball.dy;
+
+/* أعلى وأسفل */
+
+if(ball.y<=ball.r||ball.y>=canvas.height-ball.r){
+
+ball.dy*=-1;
+
+}
+
+/* اصطدام بالمضرب الأيسر */
+
+if(
+
+ball.x-ball.r<=left.x+left.w&&
+ball.y>=left.y&&
+ball.y<=left.y+left.h
+
+){
+
+ball.dx=Math.abs(ball.dx);
+
+}
+
+/* اصطدام بالمضرب الأيمن */
+
+if(
+
+ball.x+ball.r>=right.x&&
+ball.y>=right.y&&
+ball.y<=right.y+right.h
+
+){
+
+ball.dx=-Math.abs(ball.dx);
+
+}
+
+/* هدف يسار */
+
+if(ball.x<0){
+
+rightScore++;
+
+resetBall();
+
+}
+
+/* هدف يمين */
+
+if(ball.x>canvas.width){
+
+leftScore++;
+
+resetBall();
+
+}
+
+}
+
+/* الرسم */
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+/* الخط الأوسط */
+
+ctx.setLineDash([12,12]);
+
+ctx.strokeStyle="#00ffee";
+
+ctx.beginPath();
+
+ctx.moveTo(canvas.width/2,0);
+ctx.lineTo(canvas.width/2,canvas.height);
+
+ctx.stroke();
+
+ctx.setLineDash([]);
+
+/* المضارب */
+
+ctx.fillStyle="gold";
+
+ctx.fillRect(left.x,left.y,left.w,left.h);
+
+ctx.fillRect(right.x,right.y,right.w,right.h);
+
+/* الكرة */
+
+ctx.beginPath();
+
+ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
+
+ctx.fillStyle="white";
+
+ctx.shadowColor="gold";
+ctx.shadowBlur=25;
+
+ctx.fill();
+
+ctx.shadowBlur=0;
+
+/* لوحة النتائج */
+
+ctx.fillStyle="white";
+
+ctx.font="40px Tahoma";
+
+ctx.fillText(leftScore,420,60);
+
+ctx.fillText(rightScore,560,60);
+
+}
+
+</script>
+
+/*==========================
+   الذكاء الاصطناعي
+==========================*/
+
+let aiLevel = 0.12; // سهل
+
+function updateAI(){
+
+let target = ball.y - right.h/2;
+
+right.y += (target - right.y) * aiLevel;
+
+if(right.y < 0) right.y = 0;
+if(right.y > canvas.height-right.h)
+right.y = canvas.height-right.h;
+
+}
+
+/*==========================
+   زيادة سرعة الكرة
+==========================*/
+
+function increaseSpeed(){
+
+if(ball.dx>0) ball.dx+=0.15;
+else ball.dx-=0.15;
+
+if(ball.dy>0) ball.dy+=0.08;
+else ball.dy-=0.08;
+
+}
+
+/*==========================
+   الاصطدام بالمضرب
+==========================*/
+
+function paddleCollision(){
+
+/* اليسار */
+
+if(
+
+ball.x-ball.r<=left.x+left.w &&
+ball.y>=left.y &&
+ball.y<=left.y+left.h
+
+){
+
+ball.dx=Math.abs(ball.dx);
+
+increaseSpeed();
+
+}
+
+/* اليمين */
+
+if(
+
+ball.x+ball.r>=right.x &&
+ball.y>=right.y &&
+ball.y<=right.y+right.h
+
+){
+
+ball.dx=-Math.abs(ball.dx);
+
+increaseSpeed();
+
+}
+
+}
+
+/*==========================
+   تعديل update
+==========================*/
+
+const oldUpdate = update;
+
+update = function(){
+
+oldUpdate();
+
+updateAI();
+
+paddleCollision();
+
+}
+
+/*==========================
+   تغيير مستوى الصعوبة
+==========================*/
+
+function setDifficulty(level){
+
+switch(level){
+
+case "easy":
+aiLevel=0.08;
+break;
+
+case "normal":
+aiLevel=0.12;
+break;
+
+case "hard":
+aiLevel=0.18;
+break;
+
+case "impossible":
+aiLevel=0.28;
+break;
+
+}
+
+console.log("AI:",level);
+
+}
+
+/* الوضع الافتراضي */
+
+setDifficulty("normal");
+
+</script>
+<script>
+
+/*=============================
+      أصوات اللعبة
+=============================*/
+
+const hitSound=new Audio(
+"https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+);
+
+const goalSound=new Audio(
+"https://actions.google.com/sounds/v1/cartoon/concussive_hit_guitar_boing.ogg"
+);
+
+/*=============================
+      تأثير انفجار الكرة
+=============================*/
+
+let particles=[];
+
+function createExplosion(x,y){
+
+for(let i=0;i<20;i++){
+
+particles.push({
+
+x:x,
+y:y,
+
+dx:(Math.random()-0.5)*8,
+dy:(Math.random()-0.5)*8,
+
+life:40
+
+});
+
+}
+
+}
+
+function drawParticles(){
+
+ctx.fillStyle="gold";
+
+particles.forEach((p,index)=>{
+
+ctx.beginPath();
+
+ctx.arc(p.x,p.y,3,0,Math.PI*2);
+
+ctx.fill();
+
+p.x+=p.dx;
+p.y+=p.dy;
+
+p.life--;
+
+if(p.life<=0)
+particles.splice(index,1);
+
+});
+
+}
+
+/*=============================
+      تعديل الاصطدام
+=============================*/
+
+const oldCollision=paddleCollision;
+
+paddleCollision=function(){
+
+let before=ball.dx;
+
+oldCollision();
+
+if(before!=ball.dx){
+
+hitSound.currentTime=0;
+hitSound.play();
+
+createExplosion(ball.x,ball.y);
+
+}
+
+}
+
+/*=============================
+      تعديل إعادة الكرة
+=============================*/
+
+const oldReset=resetBall;
+
+resetBall=function(){
+
+goalSound.currentTime=0;
+goalSound.play();
+
+oldReset();
+
+}
+
+/*=============================
+      الفوز
+=============================*/
+
+let winScore=10;
+
+function drawWinner(){
+
+if(leftScore>=winScore){
+
+ctx.fillStyle="gold";
+
+ctx.font="70px Tahoma";
+
+ctx.fillText("🏆 اللاعب الأول فاز",220,300);
+
+cancelAnimationFrame(gameLoop);
+
+}
+
+if(rightScore>=winScore){
+
+ctx.fillStyle="gold";
+
+ctx.font="70px Tahoma";
+
+ctx.fillText("🏆 الكمبيوتر فاز",220,300);
+
+cancelAnimationFrame(gameLoop);
+
+}
+
+}
+
+/*=============================
+      تعديل الرسم
+=============================*/
+
+const oldDraw=draw;
+
+draw=function(){
+
+oldDraw();
+
+drawParticles();
+
+drawWinner();
+
+}
+
+/*=============================
+      زر الرجوع للقائمة
+=============================*/
+
+document.addEventListener("keydown",e=>{
+
+if(e.key==="Escape"){
+
+canvas.style.display="none";
+
+menu.style.display="block";
+
+leftScore=0;
+rightScore=0;
+
+resetBall();
+
+}
+
+});
+
+</script>
+let currentUser="";
+
+function loginUser(){
+
+currentUser=document.getElementById("userName").value;
+
+if(currentUser==""){
+
+alert("اكتب اسم اللاعب");
+
+return;
+
+}
+
+closeLogin();
+
+alert("مرحباً "+currentUser);
+
+}
+
+function openLogin(){
+
+document.getElementById("loginWindow").style.display="block";
+
+}
+
+function closeLogin(){
+
+document.getElementById("loginWindow").style.display="none";
+
+}
+
+function openChat(){
+
+document.getElementById("chatWindow").style.display="block";
+
+}
+
+function closeChat(){
+
+document.getElementById("chatWindow").style.display="none";
+
+}
+
+function sendMessage(){
+
+let txt=document.getElementById("chatInput");
+
+if(txt.value=="") return;
+
+let box=document.getElementById("chatMessages");
+
+box.innerHTML+=`
+
+<div style="padding:8px">
+
+<b style="color:gold">
+
+${currentUser}
+
+</b>
+
+:
+
+${txt.value}
+
+</div>
+
+`;
+
+box.scrollTop=box.scrollHeight;
+
+txt.value="";
+
+}
+/* نافذة اللاعبين */
+
+function openPlayers(){
+
+document.getElementById("playersWindow").style.display="block";
+
+}
+
+function closePlayers(){
+
+document.getElementById("playersWindow").style.display="none";
+
+}
+
+/* نافذة الإعدادات */
+
+function openSettings(){
+
+document.getElementById("settingsWindow").style.display="block";
+
+}
+
+function closeSettings(){
+
+document.getElementById("settingsWindow").style.display="none";
+
+}
+
+/* حفظ الإعدادات */
+
+function saveSettings(){
+
+localStorage.setItem(
+"pong_paddle",
+document.getElementById("paddleColor").value
+);
+
+localStorage.setItem(
+"pong_ball",
+document.getElementById("ballColor").value
+);
+
+localStorage.setItem(
+"pong_level",
+document.getElementById("difficulty").value
+);
+
+alert("تم حفظ الإعدادات");
+
+closeSettings();
+
+}
+ 
+/* تحميل الإعدادات */
+
+window.onload=function(){
+
+if(localStorage.getItem("pong_paddle"))
+document.getElementById("paddleColor").value=
+localStorage.getItem("pong_paddle");
+
+if(localStorage.getItem("pong_ball"))
+document.getElementById("ballColor").value=
+localStorage.getItem("pong_ball");
+
+if(localStorage.getElementById && false){}
+
+/* تطبيق الصعوبة */
+
+let level=localStorage.getItem("pong_level");
+
+if(level){
+
+document.getElementById("difficulty").value=level;
+
+if(typeof setDifficulty==="function")
+setDifficulty(level);
+
+}
+
+}
+    </div>
+
+</div>
+
+<style>
+
+#pongIcon{
+
+position:fixed;
+bottom:95px;
+right:20px;
+
+width:85px;
+height:85px;
+
+border-radius:50%;
+
+background:
+linear-gradient(135deg,
+#00ff99,
+#00ffee,
+gold);
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+
+cursor:pointer;
+
+font-size:34px;
+font-weight:bold;
+
+color:white;
+
+box-shadow:
+0 0 18px #00ffee,
+0 0 40px gold;
+
+animation:pongGlow 2s infinite;
+
+z-index:99999;
+
+transition:.35s;
+
+}
+
+#pongIcon span{
+
+font-size:12px;
+margin-top:2px;
+
+}
+
+#pongIcon:hover{
+
+transform:scale(1.12);
+
+}
+
+@keyframes pongGlow{
+
+0%{
+
+box-shadow:
+0 0 15px #00ffee,
+0 0 25px gold;
+
+}
+
+50%{
+
+box-shadow:
+0 0 35px white,
+0 0 60px gold;
+
+}
+
+100%{
+
+box-shadow:
+0 0 15px #00ffee,
+0 0 25px gold;
+
+}
+
+}
+
+#pongWindow{
+
+display:none;
+
+position:fixed;
+
+left:50%;
+top:50%;
+
+transform:translate(-50%,-50%);
+
+width:95%;
+max-width:1050px;
+
+height:90%;
+
+background:#000;
+
+border-radius:20px;
+
+overflow:hidden;
+
+box-shadow:
+0 0 35px cyan;
+
+z-index:100000;
+
+}
+
+#pongHeader{
+
+height:55px;
+
+background:
+linear-gradient(90deg,
+#004d66,
+#00ffee,
+#004d66);
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:0 18px;
+
+color:white;
+
+font-size:22px;
+
+font-weight:bold;
+
+}
+
+#pongHeader button{
+
+width:40px;
+height:40px;
+
+border:none;
+
+border-radius:50%;
+
+cursor:pointer;
+
+background:red;
+
+color:white;
+
+font-size:22px;
+
+}
+
+#pongContent{
+
+width:100%;
+height:calc(100% - 55px);
+
+overflow:hidden;
+
+position:relative;
+
+background:black;
+
+}
+
+</style>
+
+<script>
+
+function openPongWindow(){
+
+document.getElementById("pongWindow").style.display="block";
+
+}
+
+function closePongWindow(){
+
+document.getElementById("pongWindow").style.display="none";
+
+}
+
+</script> 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
+  authDomain: "sakaker-basnusse.firebaseapp.com",
+  projectId: "sakaker-basnusse",
+  storageBucket: "sakaker-basnusse.firebasestorage.app",
+  messagingSenderId: "369109440957",
+  appId: "1:369109440957:web:a3a460e5ef14c46a0d5ad4",
+  measurementId: "G-FKQFWD7E2Z"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Services
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+// نجعلها متاحة لبقية ملفات اللعبة
+window.firebaseApp = app;
+window.firebaseAuth = auth;
+window.firebaseDB = db;
+window.firebaseStorage = storage;
+
+console.log("SAKAKER Firebase Ready");
+</script>
 <!-- =========================
       شاشة تسجيل الدخول
 ========================= -->
