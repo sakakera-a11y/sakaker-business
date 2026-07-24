@@ -56,26 +56,6 @@ box-shadow:0 0 25px gold;
 
 <p>
 
-</p>
-<div class="box">
-
-    <div style="font-size:90px;margin-bottom:25px;">
-        🚧
-    </div>
-
-    <div style="
-        font-size:28px;
-        color:#00ffd5;
-        font-weight:bold;
-        letter-spacing:3px;
-        text-shadow:0 0 15px #00ffd5;
-        margin-bottom:15px;
-    ">
-متوقف للصيانة Down for maintenance
-    </div>
-
-
-</div>
 
 <!-- Emerald Music Overlay START -->
 <div id="emeraldMusicHost">
@@ -247,14 +227,6 @@ box-shadow:0 0 25px gold;
 </style>
 
 <script>
-/* تحميل PayPal SDK إذا لم يكن موجود */
-(function(){
-  if(window.paypal) return;
-  var s=document.createElement("script");
-  s.src="https://www.paypal.com/sdk/js?client-id=BAAQAE5C8rFrqoJpWqxpYluOT09waMhuzhF4ug2QGvJm76YmqiCmzkP31wl8xZq9W5WkJSvAx6ZoujIBFw&components=hosted-buttons&disable-funding=venmo&currency=USD";
-  s.onload=function(){};
-  document.head.appendChild(s);
-})();
 
 const emeraldHost=document.getElementById("emeraldMusicHost");
 const emOpenBtn=document.getElementById("emOpenBtn");
@@ -458,10 +430,8 @@ emOpenBtn.onclick=()=>{
 
         <div class="emTopbar">
           <div class="emPayBox">
-            🎵  <b></b><br>          💎  Free for a limited timeمجاني لفتره محدوده
-    
-            <div id="emPaypalBox"></div>
-          </div>
+           Free for a limited time ....... مجاني لفتره محدودة
+          </div>  
 
           <div class="emCamBox">
             <video id="emCam" autoplay muted playsinline></video>
