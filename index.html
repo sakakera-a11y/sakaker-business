@@ -1,6 +1,7 @@
 
 
 
+
 <!-- 🔒 منع ظهور محتوى الموقع قبل تسجيل الدخول -->
 <style>
 body.locked > *:not(#loginOverlay){
@@ -20,7 +21,7 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:url('https://i.ytimg.com/vi/0go3k0frmjc/maxresdefault.jpg') center/cover no-repeat;
+background:url("https://d.top4top.io/p_3858dvoq11.png"); center/cover no-repeat;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -194,6 +195,7 @@ from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
 
 
 
+
 const firebaseConfig = {
 
 apiKey:"AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
@@ -211,7 +213,6 @@ appId:"1:369109440957:web:a3a460e5ef14c46a0d5ad4",
 measurementId:"G-FKQFWD7E2Z"
 
 };
-
 
 
 const app=initializeApp(firebaseConfig);
@@ -393,6 +394,44 @@ await signOut(auth);
 console.log("SAKAKER Firebase Ready");
 
 </script>
+  <!-- ================= خلفية موقع ================= -->
+<style>
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+}
+
+body{
+    background-image:url("https://d.top4top.io/p_3858dvoq11.png");
+    background-size:cover;
+    background-position:center center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+    background-color:#000;
+}
+
+/* طبقة توهج زمردي */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+        radial-gradient(circle at center,
+        rgba(0,255,200,.10),
+        rgba(0,0,0,.45));
+    pointer-events:none;
+    z-index:-1;
+}
+
+/* جميع عناصر الموقع فوق الخلفية */
+body>*{
+    position:relative;
+    z-index:1;
+}
+</style>
 <!-- 🔹 زر فتح اللعبة مع ألوان متغيرة -->
 <button id="pongGame-btn" style="
   z-index: 9999;
