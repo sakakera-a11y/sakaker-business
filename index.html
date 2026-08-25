@@ -1714,11 +1714,31 @@ e
 
 
 </script>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Sakaker Public Chat</title>
+
+</head>
+
+<body>
+
+
+<!-- =========================================================
+     SAKAKER PUBLIC CHAT
+========================================================= -->
+
 <script type="module">
 
 /* =========================================================
-   SAKAKER PUBLIC CHAT
-   ========================================================= */
+   FIREBASE IMPORTS
+========================================================= */
 
 import {
     initializeApp
@@ -1744,9 +1764,9 @@ import {
 
 /* =========================================================
    FIREBASE CONFIG
-   ========================================================= */
+========================================================= */
 
-const sakakerFirebaseConfig = {
+const firebaseConfig = {
 
     apiKey:
     "AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
@@ -1767,33 +1787,37 @@ const sakakerFirebaseConfig = {
     "369109440957",
 
     appId:
-    "1:369109440957:web:a3a460e5ef14c46a0d5ad4"
+    "1:369109440957:web:a3a460e5ef14c46a0d5ad4",
+
+    measurementId:
+    "G-FKQFWD7E2Z"
 };
 
 
 /* =========================================================
-   FIREBASE
-   ========================================================= */
+   FIREBASE APP
+========================================================= */
 
-const sakakerApp =
-    initializeApp(
-        sakakerFirebaseConfig,
-        "sakaker-chat-final"
-    );
+const app = initializeApp(
+    firebaseConfig,
+    "SakakerPublicChat"
+);
 
-const db =
-    getDatabase(sakakerApp);
+const db = getDatabase(app);
 
-const auth =
-    getAuth(sakakerApp);
+const auth = getAuth(app);
 
 
 /* =========================================================
-   ISOLATED HOST
-   ========================================================= */
+   SHADOW DOM
+   لمنع تعارض الدردشة مع أيقونات الموقع
+========================================================= */
 
 const host =
-    document.createElement("div");
+document.createElement("div");
+
+host.id =
+"sakaker-public-chat-host";
 
 host.style.cssText = `
 position:fixed;
@@ -1808,14 +1832,14 @@ document.body.appendChild(host);
 
 
 const shadow =
-    host.attachShadow({
-        mode:"open"
-    });
+host.attachShadow({
+    mode:"open"
+});
 
 
 /* =========================================================
-   HTML
-   ========================================================= */
+   FULL DESIGN
+========================================================= */
 
 shadow.innerHTML = `
 
@@ -1825,55 +1849,57 @@ shadow.innerHTML = `
     box-sizing:border-box;
 }
 
+
+/* =========================================================
+   CHAT BUTTON
+========================================================= */
+
 #chatButton{
 
     position:fixed;
 
-    right:25px;
-    bottom:225px;
+    right:22px;
+    bottom:222px;
 
-    width:70px;
-    height:70px;
+    width:68px;
+    height:68px;
 
     border-radius:50%;
 
-    border:2px solid
-    rgba(255,215,0,.8);
+    border:
+    2px solid #ffd700;
 
     background:
     linear-gradient(
         145deg,
-        #063b58,
+        #075878,
         #021923
     );
 
-    color:#fff;
+    color:#ffffff;
 
     font-family:
     Arial,
     Tahoma,
     sans-serif;
 
-    font-size:15px;
+    font-size:14px;
 
     font-weight:bold;
-
-    letter-spacing:1px;
 
     cursor:pointer;
 
     pointer-events:auto;
 
     box-shadow:
-    0 0 12px
-    rgba(255,215,0,.5),
+    0 0 12px rgba(255,215,0,.65),
+    0 0 35px rgba(0,180,255,.35);
 
-    0 0 30px
-    rgba(0,180,255,.35);
+    transition:
+    transform .25s,
+    box-shadow .25s;
 
-    transition:.25s;
-
-    z-index:10000;
+    z-index:999999;
 }
 
 #chatButton:hover{
@@ -1881,43 +1907,41 @@ shadow.innerHTML = `
     transform:scale(1.08);
 
     box-shadow:
-    0 0 18px
-    rgba(255,215,0,.8),
-
-    0 0 45px
-    rgba(0,190,255,.55);
+    0 0 20px rgba(255,215,0,.95),
+    0 0 50px rgba(0,180,255,.55);
 }
 
 #chatButton span{
 
     display:block;
 
-    font-size:10px;
-
-    color:#78ddff;
-
     margin-top:3px;
+
+    color:#75e2ff;
+
+    font-size:12px;
 }
 
 
-/* WINDOW */
+/* =========================================================
+   CHAT WINDOW
+========================================================= */
 
 #chatWindow{
 
     position:fixed;
 
-    right:25px;
+    right:22px;
     bottom:105px;
 
     width:760px;
+    height:650px;
 
     max-width:
     calc(100vw - 30px);
 
-    height:650px;
-
     max-height:
-    calc(100vh - 130px);
+    calc(100vh - 125px);
 
     display:none;
 
@@ -1927,32 +1951,33 @@ shadow.innerHTML = `
 
     pointer-events:auto;
 
-    border-radius:24px;
+    border-radius:22px;
 
-    border:1px solid
-    rgba(90,220,255,.35);
+    border:
+    1px solid
+    rgba(100,220,255,.45);
 
-    background:#02141f;
+    background:
+    #031824;
 
-    box-shadow:
-    0 0 30px
-    rgba(0,0,0,.8),
-
-    0 0 70px
-    rgba(0,160,220,.2);
+    color:#ffffff;
 
     font-family:
     Tahoma,
     Arial,
     sans-serif;
 
-    color:white;
+    box-shadow:
+    0 0 40px rgba(0,0,0,.8),
+    0 0 80px rgba(0,150,220,.25);
 
-    z-index:9999;
+    z-index:999998;
 }
 
 
-/* SEA */
+/* =========================================================
+   SEA BACKGROUND
+========================================================= */
 
 #sea{
 
@@ -1960,20 +1985,20 @@ shadow.innerHTML = `
 
     inset:0;
 
+    overflow:hidden;
+
     z-index:0;
 
     background:
     linear-gradient(
         180deg,
-        #063a58 0%,
-        #075474 45%,
-        #021822 100%
+        #06415f 0%,
+        #075875 45%,
+        #021722 100%
     );
-
-    overflow:hidden;
 }
 
-#sea:after{
+#sea::before{
 
     content:"";
 
@@ -1981,47 +2006,50 @@ shadow.innerHTML = `
 
     width:220%;
 
-    height:50%;
+    height:60%;
 
     left:-60%;
 
-    bottom:-10%;
-
-    opacity:.25;
+    bottom:-25%;
 
     background:
     repeating-radial-gradient(
         ellipse at center,
-        rgba(255,255,255,.25)
-        0 2px,
+        rgba(255,255,255,.20) 0 2px,
         transparent 3px 22px
     );
 
+    opacity:.28;
+
     animation:
-    waves 12s linear infinite;
+    waves 14s linear infinite;
 }
 
 @keyframes waves{
 
-    from{
+    0%{
         transform:translateX(0);
     }
 
-    to{
+    100%{
         transform:translateX(-12%);
     }
 }
 
 
-/* HEADER */
+/* =========================================================
+   HEADER
+========================================================= */
 
 #header{
 
     position:relative;
 
-    z-index:3;
+    z-index:5;
 
     height:72px;
+
+    flex-shrink:0;
 
     display:flex;
 
@@ -2030,7 +2058,7 @@ shadow.innerHTML = `
     justify-content:center;
 
     background:
-    rgba(0,10,20,.75);
+    rgba(0,10,20,.82);
 
     border-bottom:
     1px solid
@@ -2044,11 +2072,11 @@ shadow.innerHTML = `
 
     text-align:center;
 
+    color:#eaffff;
+
     font-size:21px;
 
     font-weight:bold;
-
-    color:#eaffff;
 
     text-shadow:
     0 0 12px
@@ -2057,61 +2085,69 @@ shadow.innerHTML = `
 
 #subtitle{
 
-    text-align:center;
-
     margin-top:4px;
 
-    font-size:10px;
+    text-align:center;
 
-    color:#71d7f5;
+    color:#72d7f5;
+
+    font-size:10px;
 }
 
-#close{
+
+/* CLOSE */
+
+#closeButton{
 
     position:absolute;
 
-    left:15px;
+    left:14px;
 
-    top:15px;
+    top:14px;
 
     width:40px;
-
     height:40px;
 
     border-radius:50%;
 
-    border:1px solid
-    rgba(255,255,255,.2);
+    border:
+    1px solid
+    rgba(255,255,255,.25);
 
     background:
-    rgba(0,0,0,.4);
+    rgba(0,0,0,.45);
 
-    color:#fff;
+    color:#ffffff;
 
     font-size:22px;
 
     cursor:pointer;
 }
 
-#language{
+
+/* LANGUAGE */
+
+#languageButton{
 
     position:absolute;
 
-    right:15px;
+    right:14px;
 
-    top:15px;
+    top:14px;
 
-    border:1px solid
-    rgba(100,220,255,.35);
+    padding:
+    7px 12px;
 
     border-radius:20px;
 
-    padding:7px 12px;
+    border:
+    1px solid
+    rgba(100,220,255,.4);
 
     background:
-    rgba(0,35,55,.8);
+    rgba(0,35,55,.85);
 
-    color:white;
+    color:#ffffff;
 
     cursor:pointer;
 
@@ -2119,13 +2155,15 @@ shadow.innerHTML = `
 }
 
 
-/* BODY */
+/* =========================================================
+   BODY
+========================================================= */
 
 #body{
 
     position:relative;
 
-    z-index:2;
+    z-index:3;
 
     flex:1;
 
@@ -2138,47 +2176,55 @@ shadow.innerHTML = `
 }
 
 
-/* USERS */
+/* =========================================================
+   USERS
+========================================================= */
 
-#users{
+#usersPanel{
+
+    min-height:0;
 
     display:flex;
 
     flex-direction:column;
 
-    min-height:0;
-
     background:
-    rgba(0,12,22,.55);
+    rgba(0,10,20,.55);
 
     border-left:
     1px solid
-    rgba(100,220,255,.13);
+    rgba(100,220,255,.15);
 }
 
-#usersTitle{
+#usersHeader{
+
+    flex-shrink:0;
 
     padding:14px 5px;
 
     text-align:center;
 
-    color:#91e9ff;
+    color:#8de8ff;
 
     font-size:13px;
 
     border-bottom:
     1px solid
-    rgba(100,220,255,.13);
+    rgba(100,220,255,.15);
 }
 
-#count{
+#onlineCount{
 
-    color:white;
+    color:#ffffff;
+
+    font-weight:bold;
 }
 
 #usersList{
 
     flex:1;
+
+    min-height:0;
 
     overflow-y:auto;
 
@@ -2191,7 +2237,7 @@ shadow.innerHTML = `
 
     align-items:center;
 
-    gap:7px;
+    gap:8px;
 
     padding:9px;
 
@@ -2200,30 +2246,33 @@ shadow.innerHTML = `
     border-radius:9px;
 
     background:
-    rgba(255,255,255,.05);
+    rgba(255,255,255,.06);
+
+    color:#ffffff;
 
     font-size:12px;
 }
 
-.dot{
+.onlineDot{
 
-    width:7px;
+    width:8px;
 
-    height:7px;
-
-    border-radius:50%;
+    height:8px;
 
     flex-shrink:0;
 
-    background:#25e58b;
+    border-radius:50%;
+
+    background:#22e58b;
 
     box-shadow:
-    0 0 9px
-    #25e58b;
+    0 0 10px #22e58b;
 }
 
 
-/* MAIN */
+/* =========================================================
+   MAIN
+========================================================= */
 
 #main{
 
@@ -2236,16 +2285,21 @@ shadow.innerHTML = `
     flex-direction:column;
 }
 
+
+/* ROOM */
+
 #room{
+
+    flex-shrink:0;
 
     padding:10px 15px;
 
     background:
-    rgba(0,0,0,.2);
+    rgba(0,0,0,.22);
 
     border-bottom:
     1px solid
-    rgba(100,220,255,.1);
+    rgba(100,220,255,.12);
 }
 
 #roomName{
@@ -2259,14 +2313,14 @@ shadow.innerHTML = `
 
 #roomInfo{
 
+    margin-top:3px;
+
     color:#72bdd1;
 
     font-size:9px;
-
-    margin-top:3px;
 }
 
-#status{
+#connection{
 
     float:left;
 
@@ -2276,7 +2330,9 @@ shadow.innerHTML = `
 }
 
 
-/* MESSAGES */
+/* =========================================================
+   MESSAGES
+========================================================= */
 
 #messages{
 
@@ -2304,31 +2360,49 @@ shadow.innerHTML = `
     border-radius:13px;
 
     background:
-    rgba(255,255,255,.06);
+    rgba(255,255,255,.07);
 
     border:
     1px solid
-    rgba(100,220,255,.1);
+    rgba(100,220,255,.12);
+
+    animation:
+    messageIn .2s ease;
+}
+
+@keyframes messageIn{
+
+    from{
+        opacity:0;
+        transform:translateY(5px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
 }
 
 .messageName{
 
-    color:#75dcfa;
+    margin-bottom:3px;
+
+    color:#73ddfb;
 
     font-size:10px;
 
     font-weight:bold;
-
-    margin-bottom:3px;
 }
 
 .messageText{
 
-    color:white;
+    color:#ffffff;
 
     font-size:13px;
 
     line-height:1.6;
+
+    white-space:pre-wrap;
 
     word-break:break-word;
 }
@@ -2339,7 +2413,7 @@ shadow.innerHTML = `
 
     text-align:center;
 
-    color:#7ea9b8;
+    color:#80a9b8;
 
     font-size:12px;
 
@@ -2352,26 +2426,30 @@ shadow.innerHTML = `
 }
 
 
-/* INPUT */
+/* =========================================================
+   LOGIN / SEND
+========================================================= */
 
-#login,
-#send{
+#loginArea,
+#sendArea{
 
-    padding:10px;
+    flex-shrink:0;
 
     display:flex;
 
     gap:7px;
+
+    padding:10px;
 
     border-top:
     1px solid
     rgba(100,220,255,.13);
 
     background:
-    rgba(0,0,0,.28);
+    rgba(0,0,0,.30);
 }
 
-#send{
+#sendArea{
 
     display:none;
 }
@@ -2382,19 +2460,20 @@ shadow.innerHTML = `
 
     min-width:0;
 
-    border:1px solid
-    rgba(100,220,255,.25);
+    padding:11px 12px;
 
     border-radius:10px;
 
-    background:
-    rgba(0,8,15,.8);
+    border:
+    1px solid
+    rgba(100,220,255,.3);
 
-    color:white;
+    background:
+    rgba(0,8,15,.82);
+
+    color:#ffffff;
 
     outline:none;
-
-    padding:11px 12px;
 
     font-family:
     Tahoma,
@@ -2405,20 +2484,21 @@ shadow.innerHTML = `
 .input:focus{
 
     border-color:
-    rgba(100,220,255,.7);
+    rgba(100,220,255,.75);
 
     box-shadow:
     0 0 10px
-    rgba(0,180,255,.15);
+    rgba(0,180,255,.2);
 }
 
-.action{
+.actionButton{
+
+    padding:
+    0 18px;
 
     border:none;
 
     border-radius:10px;
-
-    padding:0 18px;
 
     background:
     linear-gradient(
@@ -2427,7 +2507,7 @@ shadow.innerHTML = `
         #126ea8
     );
 
-    color:white;
+    color:#ffffff;
 
     font-weight:bold;
 
@@ -2437,36 +2517,35 @@ shadow.innerHTML = `
 }
 
 
-/* MOBILE */
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media(max-width:700px){
 
     #chatButton{
 
-        right:15px;
+        right:14px;
 
-        bottom:15px;
+        bottom:14px;
 
         width:62px;
-
         height:62px;
-
-        font-size:13px;
     }
 
     #chatWindow{
 
-        right:8px;
+        right:7px;
 
-        bottom:88px;
+        bottom:85px;
 
         width:
-        calc(100vw - 16px);
+        calc(100vw - 14px);
 
         max-width:none;
 
         height:
-        calc(100vh - 105px);
+        calc(100vh - 100px);
 
         max-height:none;
 
@@ -2477,19 +2556,19 @@ shadow.innerHTML = `
 
         grid-template-columns:1fr;
 
-        grid-template-rows:75px 1fr;
+        grid-template-rows:78px 1fr;
     }
 
-    #users{
+    #usersPanel{
 
         border-left:none;
 
         border-bottom:
         1px solid
-        rgba(100,220,255,.13);
+        rgba(100,220,255,.15);
     }
 
-    #usersTitle{
+    #usersHeader{
 
         padding:7px;
     }
@@ -2530,27 +2609,44 @@ shadow.innerHTML = `
 
         max-width:92%;
     }
+
 }
 
 </style>
 
 
+<!-- =======================================================
+     CHAT BUTTON
+======================================================= -->
+
 <button id="chatButton">
+
     CHAT
+
     <span>💬</span>
+
 </button>
 
 
+<!-- =======================================================
+     CHAT WINDOW
+======================================================= -->
+
 <div id="chatWindow">
+
 
     <div id="sea"></div>
 
 
+    <!-- HEADER -->
+
     <div id="header">
 
-        <button id="close">×</button>
+        <button id="closeButton">
+            ×
+        </button>
 
-        <button id="language">
+        <button id="languageButton">
             English
         </button>
 
@@ -2569,15 +2665,19 @@ shadow.innerHTML = `
     </div>
 
 
+    <!-- BODY -->
+
     <div id="body">
 
 
-        <aside id="users">
+        <!-- USERS -->
 
-            <div id="usersTitle">
+        <aside id="usersPanel">
+
+            <div id="usersHeader">
 
                 👥 الموجودون الآن
-                (<span id="count">0</span>)
+                (<span id="onlineCount">0</span>)
 
             </div>
 
@@ -2585,6 +2685,8 @@ shadow.innerHTML = `
 
         </aside>
 
+
+        <!-- MAIN -->
 
         <main id="main">
 
@@ -2595,7 +2697,7 @@ shadow.innerHTML = `
                     💬 الدردشة العامة
                 </span>
 
-                <span id="status">
+                <span id="connection">
                     ● متصل
                 </span>
 
@@ -2605,6 +2707,8 @@ shadow.innerHTML = `
 
             </div>
 
+
+            <!-- MESSAGES -->
 
             <div id="messages">
 
@@ -2624,39 +2728,49 @@ shadow.innerHTML = `
             </div>
 
 
-            <div id="login">
+            <!-- LOGIN -->
+
+            <div id="loginArea">
 
                 <input
-                    id="name"
+                    id="chatName"
                     class="input"
+                    type="text"
                     maxlength="20"
                     autocomplete="off"
                     placeholder="اكتب اسمك المستعار"
                 >
 
                 <button
-                    id="join"
-                    class="action">
+                    id="joinChat"
+                    class="actionButton">
+
                     دخول
+
                 </button>
 
             </div>
 
 
-            <div id="send">
+            <!-- SEND -->
+
+            <div id="sendArea">
 
                 <input
-                    id="text"
+                    id="chatMessage"
                     class="input"
+                    type="text"
                     maxlength="300"
                     autocomplete="off"
                     placeholder="اكتب رسالتك..."
                 >
 
                 <button
-                    id="sendButton"
-                    class="action">
+                    id="sendMessage"
+                    class="actionButton">
+
                     إرسال
+
                 </button>
 
             </div>
@@ -2671,82 +2785,130 @@ shadow.innerHTML = `
 
 
 /* =========================================================
-   ELEMENT HELPER
-========================================================= */
-
-function el(id){
-
-    return shadow.getElementById(id);
-
-}
-
-
-/* =========================================================
    ELEMENTS
 ========================================================= */
 
-const button =
-    el("chatButton");
+const chatButton =
+    shadow.getElementById(
+        "chatButton"
+    );
 
-const windowChat =
-    el("chatWindow");
+const chatWindow =
+    shadow.getElementById(
+        "chatWindow"
+    );
 
-const close =
-    el("close");
+const closeButton =
+    shadow.getElementById(
+        "closeButton"
+    );
 
 const languageButton =
-    el("language");
+    shadow.getElementById(
+        "languageButton"
+    );
 
 const nameInput =
-    el("name");
+    shadow.getElementById(
+        "chatName"
+    );
 
-const join =
-    el("join");
+const joinButton =
+    shadow.getElementById(
+        "joinChat"
+    );
 
-const login =
-    el("login");
+const loginArea =
+    shadow.getElementById(
+        "loginArea"
+    );
 
 const sendArea =
-    el("send");
+    shadow.getElementById(
+        "sendArea"
+    );
 
-const textInput =
-    el("text");
+const messageInput =
+    shadow.getElementById(
+        "chatMessage"
+    );
 
 const sendButton =
-    el("sendButton");
+    shadow.getElementById(
+        "sendMessage"
+    );
 
-const messages =
-    el("messages");
+const messagesBox =
+    shadow.getElementById(
+        "messages"
+    );
 
 const welcome =
-    el("welcome");
+    shadow.getElementById(
+        "welcome"
+    );
 
 const usersList =
-    el("usersList");
+    shadow.getElementById(
+        "usersList"
+    );
 
-const count =
-    el("count");
+const onlineCount =
+    shadow.getElementById(
+        "onlineCount"
+    );
 
-const status =
-    el("status");
+const connection =
+    shadow.getElementById(
+        "connection"
+    );
 
+const title =
+    shadow.getElementById(
+        "title"
+    );
+
+const subtitle =
+    shadow.getElementById(
+        "subtitle"
+    );
+
+const roomName =
+    shadow.getElementById(
+        "roomName"
+    );
+
+const roomInfo =
+    shadow.getElementById(
+        "roomInfo"
+    );
+
+const welcomeText =
+    shadow.getElementById(
+        "welcomeText"
+    );
+
+const usersHeader =
+    shadow.getElementById(
+        "usersHeader"
+    );
 
 
 /* =========================================================
-   OPEN
+   OPEN / CLOSE
 ========================================================= */
 
-button.onclick =
+chatButton.onclick =
 function(){
 
-    windowChat.style.display =
+    chatWindow.style.display =
         "flex";
 
-    button.style.display =
+    chatButton.style.display =
         "none";
 
     setTimeout(
-        () => {
+        function(){
 
             nameInput.focus();
 
@@ -2757,90 +2919,129 @@ function(){
 };
 
 
-close.onclick =
+closeButton.onclick =
 function(){
 
-    windowChat.style.display =
+    chatWindow.style.display =
         "none";
 
-    button.style.display =
+    chatButton.style.display =
         "block";
 
 };
-
 
 
 /* =========================================================
    LANGUAGE
 ========================================================= */
 
-let lang =
-    "ar";
+let language =
+"ar";
 
 
-const tr = {
+const translations = {
 
     ar:{
 
-        language:"English",
+        button:
+        "English",
 
-        title:"🌊 دردشة سكاكر",
+        title:
+        "🌊 دردشة سكاكر",
 
-        subtitle:"الدردشة العامة",
+        subtitle:
+        "الدردشة العامة",
 
-        users:"👥 الموجودون الآن",
+        users:
+        "👥 الموجودون الآن",
 
-        room:"💬 الدردشة العامة",
+        room:
+        "💬 الدردشة العامة",
 
-        info:"تحدث مع جميع الزوار",
+        info:
+        "تحدث مع جميع الزوار",
 
         welcome:
         "أهلاً بك في الدردشة العامة<br>اكتب اسمًا مستعارًا للانضمام",
 
-        name:"اكتب اسمك المستعار",
+        name:
+        "اكتب اسمك المستعار",
 
-        join:"دخول",
+        join:
+        "دخول",
 
-        message:"اكتب رسالتك...",
+        message:
+        "اكتب رسالتك...",
 
-        send:"إرسال",
+        send:
+        "إرسال",
 
-        connected:"● متصل",
+        connected:
+        "● متصل",
 
-        errorName:
-        "اكتب اسمًا من حرفين على الأقل"
+        connecting:
+        "● جاري الاتصال",
+
+        nameError:
+        "اكتب اسمًا من حرفين على الأقل",
+
+        notReady:
+        "انتظر حتى يتم الاتصال بالدردشة",
+
+        sendError:
+        "تعذر إرسال الرسالة"
 
     },
 
     en:{
 
-        language:"العربية",
+        button:
+        "العربية",
 
-        title:"🌊 Sakaker Chat",
+        title:
+        "🌊 Sakaker Chat",
 
-        subtitle:"Public Chat",
+        subtitle:
+        "Public Chat",
 
-        users:"👥 Online Users",
+        users:
+        "👥 Online Users",
 
-        room:"💬 Public Chat",
+        room:
+        "💬 Public Chat",
 
-        info:"Chat with all visitors",
+        info:
+        "Chat with all visitors",
 
         welcome:
         "Welcome to the public chat<br>Enter a nickname to join",
 
-        name:"Enter your nickname",
+        name:
+        "Enter your nickname",
 
-        join:"Join",
+        join:
+        "Join",
 
-        message:"Write your message...",
+        message:
+        "Write your message...",
 
-        send:"Send",
+        send:
+        "Send",
 
-        connected:"● Connected",
+        connected:
+        "● Connected",
 
-        errorName:
-        "Enter a name with at least 2 characters"
+        connecting:
+        "● Connecting",
+
+        nameError:
+        "Enter a name with at least 2 characters",
+
+        notReady:
+        "Please wait for the chat connection",
+
+        sendError:
+        "Unable to send the message"
 
     }
 
@@ -2850,46 +3051,49 @@ const tr = {
 function updateLanguage(){
 
     const t =
-        tr[lang];
+        translations[language];
+
 
     languageButton.textContent =
-        t.language;
+        t.button;
 
-    el("title").textContent =
+    title.textContent =
         t.title;
 
-    el("subtitle").textContent =
+    subtitle.textContent =
         t.subtitle;
 
-    el("usersTitle").childNodes[0].textContent =
+    usersHeader.childNodes[0]
+        .textContent =
         t.users + " ";
 
-    el("roomName").textContent =
+    roomName.textContent =
         t.room;
 
-    el("roomInfo").textContent =
+    roomInfo.textContent =
         t.info;
 
-    el("welcomeText").innerHTML =
+    welcomeText.innerHTML =
         t.welcome;
 
     nameInput.placeholder =
         t.name;
 
-    join.textContent =
+    joinButton.textContent =
         t.join;
 
-    textInput.placeholder =
+    messageInput.placeholder =
         t.message;
 
     sendButton.textContent =
         t.send;
 
-    status.textContent =
+    connection.textContent =
         t.connected;
 
+
     host.dir =
-        lang === "ar"
+        language === "ar"
         ? "rtl"
         : "ltr";
 
@@ -2899,8 +3103,8 @@ function updateLanguage(){
 languageButton.onclick =
 function(){
 
-    lang =
-        lang === "ar"
+    language =
+        language === "ar"
         ? "en"
         : "ar";
 
@@ -2909,62 +3113,64 @@ function(){
 };
 
 
-
 /* =========================================================
    AUTH
 ========================================================= */
 
 let currentUser =
-    null;
+null;
+
+let nickname =
+"";
+
+let presenceRef =
+null;
+
+
+connection.textContent =
+translations[language].connecting;
 
 
 signInAnonymously(auth)
 
 .then(
-    result => {
+    function(result){
 
         currentUser =
             result.user;
 
-        status.textContent =
-            tr[lang].connected;
+        connection.textContent =
+            translations[
+                language
+            ].connected;
 
-        status.style.color =
+        connection.style.color =
             "#25e58b";
+
+        console.log(
+            "Sakaker Chat Auth OK:",
+            currentUser.uid
+        );
 
     }
 )
 
 .catch(
-    error => {
+    function(error){
 
         console.error(
-            "Firebase Authentication:",
+            "Anonymous Authentication Error:",
             error
         );
 
-        status.textContent =
+        connection.textContent =
             "● Auth Error";
 
-        status.style.color =
+        connection.style.color =
             "#ff5555";
 
     }
 );
-
-
-
-/* =========================================================
-   USER SESSION
-========================================================= */
-
-let nickname =
-    "";
-
-let sessionId =
-    Math.random()
-    .toString(36)
-    .substring(2,12);
 
 
 /* =========================================================
@@ -2973,56 +3179,67 @@ let sessionId =
 
 async function joinChat(){
 
-    const value =
+    const name =
         nameInput.value.trim();
 
 
     if(
-        value.length < 2
+        name.length < 2
     ){
 
         alert(
-            tr[lang].errorName
+            translations[
+                language
+            ].nameError
         );
 
         return;
-
     }
 
 
-    if(!currentUser){
+    if(
+        !currentUser
+    ){
 
         alert(
-            lang === "ar"
-            ?
-            "انتظر لحظة حتى يتم الاتصال..."
-            :
-            "Please wait for the connection..."
+            translations[
+                language
+            ].notReady
         );
 
         return;
-
     }
 
 
     nickname =
-        value;
+        name;
 
 
-    const presenceRef =
+    /*
+      IMPORTANT:
+
+      البنية الموجودة عندك:
+
+      onlineUsers
+          UID
+              name
+              uid
+              joinedAt
+    */
+
+    presenceRef =
         ref(
             db,
             "onlineUsers/" +
-            currentUser.uid +
-            "/" +
-            sessionId
+            currentUser.uid
         );
 
 
     try{
 
         /*
-         أولاً: إعداد onDisconnect
+          إزالة المستخدم تلقائيًا
+          عند انقطاع الاتصال.
         */
 
         await onDisconnect(
@@ -3031,7 +3248,7 @@ async function joinChat(){
 
 
         /*
-         ثانياً: تسجيل الاسم
+          تسجيل المستخدم.
         */
 
         await set(
@@ -3039,45 +3256,38 @@ async function joinChat(){
             {
 
                 name:
-                    nickname,
+                nickname,
 
                 uid:
-                    currentUser.uid,
+                currentUser.uid,
 
                 joinedAt:
-                    Date.now()
+                Date.now()
 
             }
         );
 
 
-        /*
-         نجح التسجيل
-        */
-
-        login.style.display =
+        loginArea.style.display =
             "none";
 
         sendArea.style.display =
             "flex";
 
-        textInput.focus();
+        messageInput.focus();
+
 
     }
 
     catch(error){
 
         console.error(
-            "Presence Error:",
+            "Join Error:",
             error
         );
 
         alert(
-            lang === "ar"
-            ?
-            "تعذر تسجيل ظهورك في قائمة الموجودين."
-            :
-            "Could not join the online users list."
+            "تعذر تسجيل الاسم في قائمة الموجودين"
         );
 
     }
@@ -3085,25 +3295,30 @@ async function joinChat(){
 }
 
 
-join.onclick =
-    joinChat;
+/* =========================================================
+   JOIN BUTTON
+========================================================= */
+
+joinButton.onclick =
+joinChat;
 
 
-nameInput.onkeydown =
-function(e){
+nameInput.addEventListener(
+    "keydown",
+    function(event){
 
-    if(
-        e.key === "Enter"
-    ){
+        if(
+            event.key === "Enter"
+        ){
 
-        e.preventDefault();
+            event.preventDefault();
 
-        joinChat();
+            joinChat();
+
+        }
 
     }
-
-};
-
+);
 
 
 /* =========================================================
@@ -3118,9 +3333,10 @@ const onlineUsersRef =
 
 
 onValue(
+
     onlineUsersRef,
 
-    snapshot => {
+    function(snapshot){
 
         usersList.innerHTML =
             "";
@@ -3130,114 +3346,109 @@ onValue(
 
 
         snapshot.forEach(
-            uidSnapshot => {
+            function(child){
 
-                uidSnapshot.forEach(
-                    sessionSnapshot => {
-
-                        const data =
-                            sessionSnapshot.val();
+                const data =
+                    child.val();
 
 
-                        if(
-                            !data ||
-                            !data.name
-                        ){
+                if(
+                    !data ||
+                    !data.name
+                ){
 
-                            return;
+                    return;
 
-                        }
-
-
-                        total++;
+                }
 
 
-                        const row =
-                            document.createElement(
-                                "div"
-                            );
-
-                        row.className =
-                            "user";
+                total++;
 
 
-                        const dot =
-                            document.createElement(
-                                "span"
-                            );
+                const row =
+                    document.createElement(
+                        "div"
+                    );
 
-                        dot.className =
-                            "dot";
-
-
-                        const username =
-                            document.createElement(
-                                "span"
-                            );
-
-                        username.textContent =
-                            data.name;
+                row.className =
+                    "user";
 
 
-                        row.appendChild(
-                            dot
-                        );
+                const dot =
+                    document.createElement(
+                        "span"
+                    );
 
-                        row.appendChild(
-                            username
-                        );
+                dot.className =
+                    "onlineDot";
 
 
-                        usersList.appendChild(
-                            row
-                        );
+                const userName =
+                    document.createElement(
+                        "span"
+                    );
 
-                    }
+                userName.textContent =
+                    data.name;
+
+
+                row.appendChild(
+                    dot
+                );
+
+                row.appendChild(
+                    userName
+                );
+
+
+                usersList.appendChild(
+                    row
                 );
 
             }
         );
 
 
-        count.textContent =
+        onlineCount.textContent =
             total;
 
     },
 
-    error => {
+    function(error){
 
         console.error(
-            "Online Users:",
+            "Online Users Error:",
             error
         );
 
     }
+
 );
 
 
-
 /* =========================================================
-   MESSAGES
+   PUBLIC CHAT
 ========================================================= */
 
-const messagesRef =
+const publicChatRef =
     ref(
         db,
         "publicChat"
     );
 
 
-const messagesQuery =
+const publicChatQuery =
     query(
-        messagesRef,
+        publicChatRef,
         limitToLast(100)
     );
 
 
 onChildAdded(
-    messagesQuery,
 
-    snapshot => {
+    publicChatQuery,
+
+    function(snapshot){
 
         const data =
             snapshot.val();
@@ -3245,7 +3456,8 @@ onChildAdded(
 
         if(
             !data ||
-            typeof data.text !== "string"
+            typeof data.text !==
+            "string"
         ){
 
             return;
@@ -3279,15 +3491,15 @@ onChildAdded(
             "Visitor";
 
 
-        const message =
+        const text =
             document.createElement(
                 "div"
             );
 
-        message.className =
+        text.className =
             "messageText";
 
-        message.textContent =
+        text.textContent =
             data.text;
 
 
@@ -3296,49 +3508,40 @@ onChildAdded(
         );
 
         box.appendChild(
-            message
+            text
         );
 
 
-        messages.appendChild(
+        messagesBox.appendChild(
             box
         );
 
 
-        messages.scrollTop =
-            messages.scrollHeight;
+        messagesBox.scrollTop =
+            messagesBox.scrollHeight;
 
     },
 
-    error => {
+    function(error){
 
         console.error(
-            "Messages:",
+            "Public Chat Read Error:",
             error
         );
 
     }
-);
 
+);
 
 
 /* =========================================================
    SEND MESSAGE
 ========================================================= */
 
-async function sendMessage(){
+async function sendChatMessage(){
 
-    const message =
-        textInput.value.trim();
-
-
-    if(
-        !nickname
-    ){
-
-        return;
-
-    }
+    const text =
+        messageInput.value.trim();
 
 
     if(
@@ -3346,80 +3549,92 @@ async function sendMessage(){
     ){
 
         return;
-
     }
 
 
     if(
-        !message
+        !nickname
     ){
 
         return;
+    }
 
+
+    if(
+        !text
+    ){
+
+        return;
     }
 
 
     try{
 
         /*
-         إنشاء رسالة جديدة
+          إنشاء ID للرسالة.
         */
 
-        const newMessage =
+        const messageRef =
             push(
-                messagesRef
+                publicChatRef
             );
 
 
         /*
-         حفظ الرسالة
+          البنية الموجودة عندك:
+
+          publicChat
+              MESSAGE_ID
+                  name
+                  text
+                  timestamp
+                  uid
         */
 
         await set(
-            newMessage,
+            messageRef,
             {
 
                 name:
-                    nickname,
+                nickname,
 
                 text:
-                    message,
-
-                uid:
-                    currentUser.uid,
+                text,
 
                 timestamp:
-                    Date.now()
+                Date.now(),
+
+                uid:
+                currentUser.uid
 
             }
         );
 
 
         /*
-         لا نمسح الرسالة من Firebase.
-         فقط نفرغ مربع الكتابة.
+          فقط نفرغ مربع الكتابة.
+          الرسالة نفسها لا تختفي.
         */
 
-        textInput.value =
+        messageInput.value =
             "";
 
-        textInput.focus();
+        messageInput.focus();
+
 
     }
 
     catch(error){
 
         console.error(
-            "Send Message:",
+            "Send Message Error:",
             error
         );
 
         alert(
-            lang === "ar"
-            ?
-            "تعذر إرسال الرسالة."
-            :
-            "Could not send the message."
+            translations[
+                language
+            ].sendError
         );
 
     }
@@ -3427,31 +3642,40 @@ async function sendMessage(){
 }
 
 
+/* =========================================================
+   SEND BUTTON
+========================================================= */
+
 sendButton.onclick =
-    sendMessage;
+sendChatMessage;
 
 
-textInput.onkeydown =
-function(e){
+messageInput.addEventListener(
+    "keydown",
+    function(event){
 
-    if(
-        e.key === "Enter"
-    ){
+        if(
+            event.key === "Enter"
+        ){
 
-        e.preventDefault();
+            event.preventDefault();
 
-        sendMessage();
+            sendChatMessage();
+
+        }
 
     }
-
-};
-
+);
 
 
 /* =========================================================
-   START
+   START LANGUAGE
 ========================================================= */
 
 updateLanguage();
 
+
 </script>
+
+</body>
+</html>
