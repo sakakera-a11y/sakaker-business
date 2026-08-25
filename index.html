@@ -1716,14 +1716,10 @@ e
 </script>
 <!-- =========================================================
      🌊 SAKAKER PUBLIC CHAT
-     Floating CHAT Button + Isolated Chat Window
+     CHAT + ONLINE USERS + REALTIME MESSAGES
 ========================================================= -->
 
 <script type="module">
-
-/* =========================================================
-   FIREBASE
-========================================================= */
 
 import {
     initializeApp
@@ -1738,7 +1734,8 @@ import {
     onChildAdded,
     set,
     onDisconnect,
-    onValue
+    onValue,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 import {
@@ -1748,10 +1745,10 @@ import {
 
 
 /* =========================================================
-   FIREBASE CONFIG
+   FIREBASE
 ========================================================= */
 
-const chatFirebaseConfig = {
+const firebaseConfigChat = {
 
     apiKey:
     "AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
@@ -1777,59 +1774,58 @@ const chatFirebaseConfig = {
 
 
 /* =========================================================
-   FIREBASE INITIALIZE
+   FIREBASE APP
 ========================================================= */
 
-const chatApp =
+const sakakerChatApp =
     initializeApp(
-        chatFirebaseConfig,
-        "sakaker-public-chat"
+        firebaseConfigChat,
+        "SakakerPublicChat"
     );
 
-const chatDB =
-    getDatabase(chatApp);
+const sakakerChatDB =
+    getDatabase(
+        sakakerChatApp
+    );
 
-const chatAuth =
-    getAuth(chatApp);
+const sakakerChatAuth =
+    getAuth(
+        sakakerChatApp
+    );
 
 
 /* =========================================================
-   CREATE ISOLATED HOST
+   ISOLATED HOST
 ========================================================= */
 
-const chatHost =
+const sakakerChatHost =
     document.createElement("div");
 
-chatHost.id =
-    "sakakerPublicChatHost";
-
-chatHost.style.cssText = `
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    z-index:2147483647;
-    pointer-events:none;
+sakakerChatHost.style.cssText = `
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+z-index:2147483647;
+pointer-events:none;
 `;
 
-document.body.appendChild(chatHost);
+document.body.appendChild(
+    sakakerChatHost
+);
 
 
-/* =========================================================
-   SHADOW DOM
-========================================================= */
-
-const chatShadow =
-    chatHost.attachShadow({
+const sakakerChatShadow =
+    sakakerChatHost.attachShadow({
         mode:"open"
     });
 
 
 /* =========================================================
-   CHAT HTML
+   HTML + CSS
 ========================================================= */
 
-chatShadow.innerHTML = `
+sakakerChatShadow.innerHTML = `
 
 <style>
 
@@ -1842,7 +1838,7 @@ chatShadow.innerHTML = `
     position:fixed;
 
     right:25px;
-    bottom:225px;
+    bottom:25px;
 
     width:70px;
     height:70px;
@@ -1860,12 +1856,9 @@ chatShadow.innerHTML = `
         #021923
     );
 
-    color:#ffffff;
+    color:#fff;
 
-    font-family:
-    Arial,
-    Tahoma,
-    sans-serif;
+    font-family:Arial,Tahoma,sans-serif;
 
     font-size:15px;
 
@@ -1880,29 +1873,23 @@ chatShadow.innerHTML = `
     box-shadow:
     0 0 10px
     rgba(255,215,0,.45),
-
     0 0 30px
     rgba(0,180,255,.35);
 
-    transition:
-    transform .25s ease,
-    box-shadow .25s ease;
+    transition:.25s;
 
     z-index:10000;
 }
 
 #chatButton:hover{
 
-    transform:
-    scale(1.08);
+    transform:scale(1.08);
 
     box-shadow:
     0 0 15px
     rgba(255,215,0,.8),
-
     0 0 45px
     rgba(0,190,255,.55);
-
 }
 
 #chatButton span{
@@ -1914,7 +1901,6 @@ chatShadow.innerHTML = `
     margin-top:3px;
 
     color:#78ddff;
-
 }
 
 
@@ -1926,10 +1912,12 @@ chatShadow.innerHTML = `
     bottom:105px;
 
     width:760px;
+
     max-width:
     calc(100vw - 30px);
 
     height:650px;
+
     max-height:
     calc(100vh - 130px);
 
@@ -1951,11 +1939,8 @@ chatShadow.innerHTML = `
     rgba(1,14,24,.96);
 
     box-shadow:
-    0 0 25px
-    rgba(0,0,0,.7),
-
-    0 0 70px
-    rgba(0,160,220,.2);
+    0 0 25px rgba(0,0,0,.7),
+    0 0 70px rgba(0,160,220,.2);
 
     font-family:
     Tahoma,
@@ -1968,9 +1953,7 @@ chatShadow.innerHTML = `
 }
 
 
-/* =========================================
-   SEA BACKGROUND
-========================================= */
+/* البحر */
 
 #seaBackground{
 
@@ -1989,10 +1972,9 @@ chatShadow.innerHTML = `
         #075474 42%,
         #021822 100%
     );
-
 }
 
-#seaBackground::before{
+#seaBackground:before{
 
     content:"";
 
@@ -2013,33 +1995,27 @@ chatShadow.innerHTML = `
         ellipse at center,
         rgba(255,255,255,.2)
         0 2px,
-        transparent
-        3px 22px
+        transparent 3px 22px
     );
 
     animation:
     chatWaves 12s linear infinite;
-
 }
 
 @keyframes chatWaves{
 
     from{
-        transform:
-        translateX(0);
+        transform:translateX(0);
     }
 
     to{
-        transform:
-        translateX(-12%);
+        transform:translateX(-12%);
     }
 
 }
 
 
-/* =========================================
-   HEADER
-========================================= */
+/* الرأس */
 
 #chatHeader{
 
@@ -2055,8 +2031,7 @@ chatShadow.innerHTML = `
 
     justify-content:center;
 
-    padding:
-    10px 65px;
+    padding:10px 65px;
 
     background:
     rgba(0,12,22,.72);
@@ -2065,9 +2040,7 @@ chatShadow.innerHTML = `
     1px solid
     rgba(100,220,255,.2);
 
-    backdrop-filter:
-    blur(12px);
-
+    backdrop-filter:blur(12px);
 }
 
 #chatTitle{
@@ -2083,7 +2056,6 @@ chatShadow.innerHTML = `
     rgba(90,220,255,.7);
 
     text-align:center;
-
 }
 
 #chatSubtitle{
@@ -2095,7 +2067,6 @@ chatShadow.innerHTML = `
     color:#71d7f5;
 
     font-size:10px;
-
 }
 
 #chatClose{
@@ -2107,6 +2078,7 @@ chatShadow.innerHTML = `
     top:15px;
 
     width:40px;
+
     height:40px;
 
     border-radius:50%;
@@ -2123,7 +2095,6 @@ chatShadow.innerHTML = `
     font-size:21px;
 
     cursor:pointer;
-
 }
 
 #chatLanguage{
@@ -2140,8 +2111,7 @@ chatShadow.innerHTML = `
 
     border-radius:20px;
 
-    padding:
-    7px 12px;
+    padding:7px 12px;
 
     background:
     rgba(0,35,55,.7);
@@ -2151,13 +2121,10 @@ chatShadow.innerHTML = `
     cursor:pointer;
 
     font-size:11px;
-
 }
 
 
-/* =========================================
-   BODY
-========================================= */
+/* الجسم */
 
 #chatBody{
 
@@ -2173,13 +2140,10 @@ chatShadow.innerHTML = `
 
     grid-template-columns:
     190px 1fr;
-
 }
 
 
-/* =========================================
-   USERS
-========================================= */
+/* الموجودون */
 
 #chatUsers{
 
@@ -2195,7 +2159,6 @@ chatShadow.innerHTML = `
     border-left:
     1px solid
     rgba(100,220,255,.13);
-
 }
 
 #usersHeader{
@@ -2211,13 +2174,11 @@ chatShadow.innerHTML = `
     border-bottom:
     1px solid
     rgba(100,220,255,.13);
-
 }
 
 #onlineCount{
 
     color:#fff;
-
 }
 
 #usersList{
@@ -2227,7 +2188,6 @@ chatShadow.innerHTML = `
     overflow-y:auto;
 
     padding:8px;
-
 }
 
 .chatUser{
@@ -2248,7 +2208,6 @@ chatShadow.innerHTML = `
     rgba(255,255,255,.04);
 
     font-size:12px;
-
 }
 
 .onlineDot{
@@ -2266,13 +2225,10 @@ chatShadow.innerHTML = `
     box-shadow:
     0 0 9px
     #25e58b;
-
 }
 
 
-/* =========================================
-   CHAT AREA
-========================================= */
+/* منطقة المحادثة */
 
 #chatMain{
 
@@ -2283,7 +2239,6 @@ chatShadow.innerHTML = `
     display:flex;
 
     flex-direction:column;
-
 }
 
 #roomBar{
@@ -2296,7 +2251,6 @@ chatShadow.innerHTML = `
     border-bottom:
     1px solid
     rgba(100,220,255,.1);
-
 }
 
 #roomName{
@@ -2306,7 +2260,6 @@ chatShadow.innerHTML = `
     font-size:13px;
 
     font-weight:bold;
-
 }
 
 #roomInfo{
@@ -2316,7 +2269,6 @@ chatShadow.innerHTML = `
     color:#72bdd1;
 
     font-size:9px;
-
 }
 
 #connection{
@@ -2326,13 +2278,10 @@ chatShadow.innerHTML = `
     color:#25e58b;
 
     font-size:9px;
-
 }
 
 
-/* =========================================
-   MESSAGES
-========================================= */
+/* الرسائل */
 
 #messages{
 
@@ -2349,7 +2298,6 @@ chatShadow.innerHTML = `
     flex-direction:column;
 
     gap:8px;
-
 }
 
 .chatMessage{
@@ -2369,27 +2317,18 @@ chatShadow.innerHTML = `
 
     animation:
     messageAppear .2s ease;
-
 }
 
 @keyframes messageAppear{
 
     from{
-
         opacity:0;
-
-        transform:
-        translateY(5px);
-
+        transform:translateY(5px);
     }
 
     to{
-
         opacity:1;
-
-        transform:
-        translateY(0);
-
+        transform:translateY(0);
     }
 
 }
@@ -2403,7 +2342,6 @@ chatShadow.innerHTML = `
     font-weight:bold;
 
     margin-bottom:3px;
-
 }
 
 .messageText{
@@ -2415,7 +2353,6 @@ chatShadow.innerHTML = `
     line-height:1.6;
 
     word-break:break-word;
-
 }
 
 #welcome{
@@ -2429,7 +2366,6 @@ chatShadow.innerHTML = `
     line-height:2;
 
     font-size:12px;
-
 }
 
 #welcomeIcon{
@@ -2437,13 +2373,10 @@ chatShadow.innerHTML = `
     font-size:45px;
 
     margin-bottom:5px;
-
 }
 
 
-/* =========================================
-   LOGIN / SEND
-========================================= */
+/* الإدخال */
 
 #loginArea,
 #sendArea{
@@ -2460,13 +2393,11 @@ chatShadow.innerHTML = `
 
     background:
     rgba(0,0,0,.25);
-
 }
 
 #sendArea{
 
     display:none;
-
 }
 
 .chatInput{
@@ -2488,14 +2419,12 @@ chatShadow.innerHTML = `
 
     outline:none;
 
-    padding:
-    11px 12px;
+    padding:11px 12px;
 
     font-family:
     Tahoma,
     Arial,
     sans-serif;
-
 }
 
 .chatInput:focus{
@@ -2506,7 +2435,6 @@ chatShadow.innerHTML = `
     box-shadow:
     0 0 10px
     rgba(0,180,255,.12);
-
 }
 
 .chatAction{
@@ -2515,8 +2443,7 @@ chatShadow.innerHTML = `
 
     border-radius:10px;
 
-    padding:
-    0 18px;
+    padding:0 18px;
 
     background:
     linear-gradient(
@@ -2532,20 +2459,10 @@ chatShadow.innerHTML = `
     cursor:pointer;
 
     white-space:nowrap;
-
-}
-
-.chatAction:hover{
-
-    filter:
-    brightness(1.15);
-
 }
 
 
-/* =========================================
-   MOBILE
-========================================= */
+/* الجوال */
 
 @media(max-width:700px){
 
@@ -2560,7 +2477,6 @@ chatShadow.innerHTML = `
         height:62px;
 
         font-size:13px;
-
     }
 
     #chatWindow{
@@ -2580,17 +2496,13 @@ chatShadow.innerHTML = `
         max-height:none;
 
         border-radius:18px;
-
     }
 
     #chatBody{
 
-        grid-template-columns:
-        1fr;
+        grid-template-columns:1fr;
 
-        grid-template-rows:
-        75px 1fr;
-
+        grid-template-rows:75px 1fr;
     }
 
     #chatUsers{
@@ -2600,13 +2512,11 @@ chatShadow.innerHTML = `
         border-bottom:
         1px solid
         rgba(100,220,255,.13);
-
     }
 
     #usersHeader{
 
         padding:7px;
-
     }
 
     #usersList{
@@ -2620,7 +2530,6 @@ chatShadow.innerHTML = `
         overflow-y:hidden;
 
         padding:5px;
-
     }
 
     .chatUser{
@@ -2630,35 +2539,26 @@ chatShadow.innerHTML = `
         margin:0;
 
         padding:7px 9px;
-
     }
 
     #chatTitle{
 
         font-size:17px;
-
     }
 
     #chatHeader{
 
         min-height:62px;
-
     }
 
     .chatMessage{
 
         max-width:92%;
-
     }
-
 }
 
 </style>
 
-
-<!-- =========================================
-     CHAT BUTTON
-========================================= -->
 
 <button id="chatButton">
 
@@ -2669,17 +2569,10 @@ chatShadow.innerHTML = `
 </button>
 
 
-<!-- =========================================
-     CHAT WINDOW
-========================================= -->
-
 <div id="chatWindow">
-
 
     <div id="seaBackground"></div>
 
-
-    <!-- HEADER -->
 
     <div id="chatHeader">
 
@@ -2694,7 +2587,7 @@ chatShadow.innerHTML = `
         <div>
 
             <div id="chatTitle">
-                🌊 دردشة 
+                🌊 دردشة سكاكر
             </div>
 
             <div id="chatSubtitle">
@@ -2706,18 +2599,14 @@ chatShadow.innerHTML = `
     </div>
 
 
-    <!-- BODY -->
-
     <div id="chatBody">
 
-
-        <!-- USERS -->
 
         <aside id="chatUsers">
 
             <div id="usersHeader">
 
-                👥 الموجودون
+                👥 الموجودون الآن
                 (<span id="onlineCount">0</span>)
 
             </div>
@@ -2726,8 +2615,6 @@ chatShadow.innerHTML = `
 
         </aside>
 
-
-        <!-- MAIN -->
 
         <main id="chatMain">
 
@@ -2749,8 +2636,6 @@ chatShadow.innerHTML = `
             </div>
 
 
-            <!-- MESSAGES -->
-
             <div id="messages">
 
                 <div id="welcome">
@@ -2768,8 +2653,6 @@ chatShadow.innerHTML = `
 
             </div>
 
-
-            <!-- LOGIN -->
 
             <div id="loginArea">
 
@@ -2792,8 +2675,6 @@ chatShadow.innerHTML = `
 
             </div>
 
-
-            <!-- SEND -->
 
             <div id="sendArea">
 
@@ -2822,84 +2703,62 @@ chatShadow.innerHTML = `
     </div>
 
 </div>
-
 `;
-
 
 
 /* =========================================================
    ELEMENTS
 ========================================================= */
 
+const $ =
+    id =>
+    sakakerChatShadow.getElementById(id);
+
+
 const chatButton =
-    chatShadow.getElementById(
-        "chatButton"
-    );
+    $("chatButton");
 
 const chatWindow =
-    chatShadow.getElementById(
-        "chatWindow"
-    );
+    $("chatWindow");
 
 const chatClose =
-    chatShadow.getElementById(
-        "chatClose"
-    );
+    $("chatClose");
 
 const chatLanguage =
-    chatShadow.getElementById(
-        "chatLanguage"
-    );
+    $("chatLanguage");
 
 const userNameInput =
-    chatShadow.getElementById(
-        "userName"
-    );
+    $("userName");
 
 const enterChat =
-    chatShadow.getElementById(
-        "enterChat"
-    );
+    $("enterChat");
 
 const loginArea =
-    chatShadow.getElementById(
-        "loginArea"
-    );
+    $("loginArea");
 
 const sendArea =
-    chatShadow.getElementById(
-        "sendArea"
-    );
+    $("sendArea");
 
 const messageInput =
-    chatShadow.getElementById(
-        "messageInput"
-    );
+    $("messageInput");
 
 const sendButton =
-    chatShadow.getElementById(
-        "sendButton"
-    );
+    $("sendButton");
 
 const messages =
-    chatShadow.getElementById(
-        "messages"
-    );
+    $("messages");
 
 const welcome =
-    chatShadow.getElementById(
-        "welcome"
-    );
+    $("welcome");
 
 const usersList =
-    chatShadow.getElementById(
-        "usersList"
-    );
+    $("usersList");
 
 const onlineCount =
-    chatShadow.getElementById(
-        "onlineCount"
-    );
+    $("onlineCount");
+
+const connection =
+    $("connection");
 
 
 
@@ -2907,49 +2766,71 @@ const onlineCount =
    OPEN / CLOSE
 ========================================================= */
 
-chatButton.addEventListener(
-    "click",
-    function(){
+chatButton.onclick =
+function(){
 
-        chatWindow.style.display =
-            "flex";
+    chatWindow.style.display =
+        "flex";
 
-        chatButton.style.display =
-            "none";
+    chatButton.style.display =
+        "none";
 
-        setTimeout(
-            function(){
+};
 
-                if(
-                    sendArea.style.display ===
-                    "flex"
-                ){
 
-                    messageInput.focus();
+chatClose.onclick =
+function(){
 
-                }else{
+    chatWindow.style.display =
+        "none";
 
-                    userNameInput.focus();
+    chatButton.style.display =
+        "block";
 
-                }
+};
 
-            },
-            100
-        );
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+let currentUser =
+    null;
+
+
+signInAnonymously(
+    sakakerChatAuth
+)
+
+.then(
+    result => {
+
+        currentUser =
+            result.user;
+
+        connection.textContent =
+            "● متصل";
+
+        connection.style.color =
+            "#25e58b";
 
     }
-);
+)
 
+.catch(
+    error => {
 
-chatClose.addEventListener(
-    "click",
-    function(){
+        console.error(
+            "Firebase Auth Error:",
+            error
+        );
 
-        chatWindow.style.display =
-            "none";
+        connection.textContent =
+            "● خطأ";
 
-        chatButton.style.display =
-            "block";
+        connection.style.color =
+            "#ff6666";
 
     }
 );
@@ -2960,25 +2841,25 @@ chatClose.addEventListener(
    LANGUAGE
 ========================================================= */
 
-let chatLanguageMode =
+let language =
     "ar";
 
 
-const chatTranslations = {
+const translations = {
 
     ar:{
 
-        button:
+        lang:
         "English",
 
         title:
-        "🌊 دردشة",
+        "🌊 دردشة سكاكر",
 
         subtitle:
         "الدردشة العامة",
 
         users:
-        "👥 الموجودون",
+        "👥 الموجودون الآن",
 
         room:
         "💬 الدردشة العامة",
@@ -2998,7 +2879,7 @@ const chatTranslations = {
         name:
         "اكتب اسمك المستعار",
 
-        enter:
+        join:
         "دخول",
 
         message:
@@ -3007,8 +2888,8 @@ const chatTranslations = {
         send:
         "إرسال",
 
-        needName:
-        "اكتب اسمًا مستعارًا من حرفين على الأقل",
+        nameError:
+        "اكتب اسمًا من حرفين على الأقل",
 
         connecting:
         "جاري الاتصال بالدردشة..."
@@ -3018,17 +2899,17 @@ const chatTranslations = {
 
     en:{
 
-        button:
+        lang:
         "العربية",
 
         title:
-        "🌊  Chat",
+        "🌊 Sakaker Chat",
 
         subtitle:
         "Public Chat",
 
         users:
-        "👥 Online",
+        "👥 Online Users",
 
         room:
         "💬 Public Chat",
@@ -3048,7 +2929,7 @@ const chatTranslations = {
         name:
         "Enter your nickname",
 
-        enter:
+        join:
         "Join",
 
         message:
@@ -3057,8 +2938,8 @@ const chatTranslations = {
         send:
         "Send",
 
-        needName:
-        "Enter a nickname with at least 2 characters",
+        nameError:
+        "Enter a name with at least 2 characters",
 
         connecting:
         "Connecting to chat..."
@@ -3068,79 +2949,58 @@ const chatTranslations = {
 };
 
 
-function updateChatLanguage(){
+function changeLanguage(){
+
+    language =
+        language === "ar"
+        ?
+        "en"
+        :
+        "ar";
+
 
     const t =
-        chatTranslations[
-            chatLanguageMode
-        ];
+        translations[language];
 
 
     chatLanguage.textContent =
-        t.button;
+        t.lang;
 
-
-    chatShadow.getElementById(
-        "chatTitle"
-    ).textContent =
+    $("chatTitle").textContent =
         t.title;
 
-
-    chatShadow.getElementById(
-        "chatSubtitle"
-    ).textContent =
+    $("chatSubtitle").textContent =
         t.subtitle;
 
-
-    chatShadow.getElementById(
-        "usersHeader"
-    ).childNodes[0].textContent =
+    $("usersHeader").childNodes[0].textContent =
         t.users + " ";
 
-
-    chatShadow.getElementById(
-        "roomName"
-    ).textContent =
+    $("roomName").textContent =
         t.room;
 
-
-    chatShadow.getElementById(
-        "roomInfo"
-    ).textContent =
+    $("roomInfo").textContent =
         t.info;
 
-
-    chatShadow.getElementById(
-        "connection"
-    ).textContent =
+    connection.textContent =
         t.connected;
 
-
-    chatShadow.getElementById(
-        "welcomeText"
-    ).innerHTML =
+    $("welcomeText").innerHTML =
         t.welcome;
-
 
     userNameInput.placeholder =
         t.name;
 
-
     enterChat.textContent =
-        t.enter;
-
+        t.join;
 
     messageInput.placeholder =
         t.message;
 
-
     sendButton.textContent =
         t.send;
 
-
-    chatShadow.host.dir =
-        chatLanguageMode ===
-        "ar"
+    sakakerChatHost.dir =
+        language === "ar"
         ?
         "rtl"
         :
@@ -3149,95 +3009,110 @@ function updateChatLanguage(){
 }
 
 
-chatLanguage.addEventListener(
-    "click",
-    function(){
-
-        chatLanguageMode =
-            chatLanguageMode ===
-            "ar"
-            ?
-            "en"
-            :
-            "ar";
-
-        updateChatLanguage();
-
-    }
-);
+chatLanguage.onclick =
+changeLanguage;
 
 
 
 /* =========================================================
-   FIREBASE AUTH
+   ONLINE USER
 ========================================================= */
 
-let chatCurrentUser =
-    null;
-
-
-signInAnonymously(chatAuth)
-
-.then(
-    function(result){
-
-        chatCurrentUser =
-            result.user;
-
-        chatShadow.getElementById(
-            "connection"
-        ).textContent =
-            chatTranslations[
-                chatLanguageMode
-            ].connected;
-
-    }
-)
-
-.catch(
-    function(error){
-
-        console.error(
-            "Sakaker Chat Firebase:",
-            error
-        );
-
-        chatShadow.getElementById(
-            "connection"
-        ).textContent =
-            chatTranslations[
-                chatLanguageMode
-            ].disconnected;
-
-    }
-);
-
-
-
-/* =========================================================
-   USER NAME
-========================================================= */
-
-let chatUserName =
+let myName =
     "";
 
 
+let myUserRef =
+    null;
+
+
+async function registerOnlineUser(){
+
+    if(
+        !currentUser ||
+        !myName
+    ){
+
+        return false;
+
+    }
+
+
+    myUserRef =
+        ref(
+            sakakerChatDB,
+            "onlineUsers/" +
+            currentUser.uid
+        );
+
+
+    try{
+
+        /*
+         تسجيل المستخدم
+        */
+
+        await set(
+            myUserRef,
+            {
+                name:
+                    myName,
+
+                uid:
+                    currentUser.uid,
+
+                joinedAt:
+                    serverTimestamp()
+            }
+        );
+
+
+        /*
+         إزالة المستخدم عند انقطاع الاتصال
+        */
+
+        await onDisconnect(
+            myUserRef
+        ).remove();
+
+
+        return true;
+
+    }
+
+    catch(error){
+
+        console.error(
+            "Online User Error:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+
+
 /* =========================================================
-   ENTER CHAT
+   JOIN
 ========================================================= */
 
-function enterPublicChat(){
+async function joinChat(){
 
     const name =
         userNameInput.value.trim();
 
 
-    if(name.length < 2){
+    if(
+        name.length < 2
+    ){
 
         alert(
-            chatTranslations[
-                chatLanguageMode
-            ].needName
+            translations[
+                language
+            ].nameError
         );
 
         return;
@@ -3245,11 +3120,11 @@ function enterPublicChat(){
     }
 
 
-    if(!chatCurrentUser){
+    if(!currentUser){
 
         alert(
-            chatTranslations[
-                chatLanguageMode
+            translations[
+                language
             ].connecting
         );
 
@@ -3258,95 +3133,58 @@ function enterPublicChat(){
     }
 
 
-    chatUserName =
+    myName =
         name;
 
 
-    loginArea.style.display =
-        "none";
+    const registered =
+        await registerOnlineUser();
 
 
-    sendArea.style.display =
-        "flex";
+    if(!registered){
 
-
-    addOnlineUser();
-
-
-    messageInput.focus();
-
-}
-
-
-enterChat.addEventListener(
-    "click",
-    enterPublicChat
-);
-
-
-userNameInput.addEventListener(
-    "keydown",
-    function(e){
-
-        if(e.key === "Enter"){
-
-            e.preventDefault();
-
-            enterPublicChat();
-
-        }
-
-    }
-);
-
-
-
-/* =========================================================
-   ONLINE USERS
-========================================================= */
-
-function addOnlineUser(){
-
-    if(
-        !chatCurrentUser ||
-        !chatUserName
-    ){
+        alert(
+            language === "ar"
+            ?
+            "تعذر تسجيل ظهورك في قائمة الموجودين."
+            :
+            "Could not register you in the online list."
+        );
 
         return;
 
     }
 
 
-    const myUserRef =
-        ref(
-            chatDB,
-            "onlineUsers/" +
-            chatCurrentUser.uid
-        );
+    loginArea.style.display =
+        "none";
 
+    sendArea.style.display =
+        "flex";
 
-    set(
-        myUserRef,
-        {
-
-            name:
-                chatUserName,
-
-            uid:
-                chatCurrentUser.uid,
-
-            joinedAt:
-                Date.now()
-
-        }
-    );
-
-
-    onDisconnect(
-        myUserRef
-    ).remove();
+    messageInput.focus();
 
 }
+
+
+enterChat.onclick =
+    joinChat;
+
+
+userNameInput.onkeydown =
+function(e){
+
+    if(
+        e.key === "Enter"
+    ){
+
+        e.preventDefault();
+
+        joinChat();
+
+    }
+
+};
 
 
 
@@ -3354,16 +3192,16 @@ function addOnlineUser(){
    ONLINE USERS LIST
 ========================================================= */
 
-const onlineUsersRef =
+const onlineRef =
     ref(
-        chatDB,
+        sakakerChatDB,
         "onlineUsers"
     );
 
 
 onValue(
-    onlineUsersRef,
-    function(snapshot){
+    onlineRef,
+    snapshot => {
 
         usersList.innerHTML =
             "";
@@ -3373,13 +3211,16 @@ onValue(
 
 
         snapshot.forEach(
-            function(child){
+            child => {
 
                 const data =
                     child.val();
 
 
-                if(!data){
+                if(
+                    !data ||
+                    !data.name
+                ){
 
                     return;
 
@@ -3389,12 +3230,12 @@ onValue(
                 count++;
 
 
-                const user =
+                const item =
                     document.createElement(
                         "div"
                     );
 
-                user.className =
+                item.className =
                     "chatUser";
 
 
@@ -3413,21 +3254,20 @@ onValue(
                     );
 
                 name.textContent =
-                    data.name ||
-                    "Visitor";
+                    data.name;
 
 
-                user.appendChild(
+                item.appendChild(
                     dot
                 );
 
-                user.appendChild(
+                item.appendChild(
                     name
                 );
 
 
                 usersList.appendChild(
-                    user
+                    item
                 );
 
             }
@@ -3436,6 +3276,15 @@ onValue(
 
         onlineCount.textContent =
             count;
+
+    },
+
+    error => {
+
+        console.error(
+            "Online users error:",
+            error
+        );
 
     }
 );
@@ -3448,7 +3297,7 @@ onValue(
 
 const publicChatRef =
     ref(
-        chatDB,
+        sakakerChatDB,
         "publicChat"
     );
 
@@ -3460,20 +3309,18 @@ const publicChatQuery =
     );
 
 
-
-/* =========================================================
-   RECEIVE MESSAGES
-========================================================= */
-
 onChildAdded(
     publicChatQuery,
-    function(snapshot){
+    snapshot => {
 
         const data =
             snapshot.val();
 
 
-        if(!data){
+        if(
+            !data ||
+            !data.text
+        ){
 
             return;
 
@@ -3515,8 +3362,7 @@ onChildAdded(
             "messageText";
 
         text.textContent =
-            data.text ||
-            "";
+            data.text;
 
 
         message.appendChild(
@@ -3536,42 +3382,57 @@ onChildAdded(
         messages.scrollTop =
             messages.scrollHeight;
 
+    },
+
+    error => {
+
+        console.error(
+            "Messages error:",
+            error
+        );
+
     }
 );
 
 
 
 /* =========================================================
-   SEND MESSAGE
+   SEND
 ========================================================= */
 
-async function sendPublicMessage(){
+async function sendMessage(){
 
     const text =
         messageInput.value.trim();
 
 
-    if(!chatUserName){
+    if(
+        !myName
+    ){
 
         return;
 
     }
 
 
-    if(!text){
-
-        return;
-
-    }
-
-
-    if(!chatCurrentUser){
+    if(
+        !currentUser
+    ){
 
         alert(
-            chatTranslations[
-                chatLanguageMode
+            translations[
+                language
             ].connecting
         );
+
+        return;
+
+    }
+
+
+    if(
+        !text
+    ){
 
         return;
 
@@ -3585,16 +3446,16 @@ async function sendPublicMessage(){
             {
 
                 name:
-                    chatUserName,
+                    myName,
 
                 text:
                     text,
 
                 uid:
-                    chatCurrentUser.uid,
+                    currentUser.uid,
 
                 timestamp:
-                    Date.now()
+                    serverTimestamp()
 
             }
         );
@@ -3610,12 +3471,16 @@ async function sendPublicMessage(){
     catch(error){
 
         console.error(
-            "Chat send error:",
+            "Send message error:",
             error
         );
 
         alert(
-            error.message
+            language === "ar"
+            ?
+            "تعذر إرسال الرسالة."
+            :
+            "Could not send the message."
         );
 
     }
@@ -3623,32 +3488,30 @@ async function sendPublicMessage(){
 }
 
 
-sendButton.addEventListener(
-    "click",
-    sendPublicMessage
-);
+sendButton.onclick =
+    sendMessage;
 
 
-messageInput.addEventListener(
-    "keydown",
-    function(e){
+messageInput.onkeydown =
+function(e){
 
-        if(e.key === "Enter"){
+    if(
+        e.key === "Enter"
+    ){
 
-            e.preventDefault();
+        e.preventDefault();
 
-            sendPublicMessage();
-
-        }
+        sendMessage();
 
     }
-);
+
+};
 
 
 /* =========================================================
-   INITIAL LANGUAGE
+   DEFAULT LANGUAGE
 ========================================================= */
 
-updateChatLanguage();
+changeLanguage();
 
 </script>
