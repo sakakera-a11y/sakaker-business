@@ -1513,7 +1513,7 @@ console.log("SAKAKER Firebase Ready");
 
   <div class="emPayBox">
 
-    <b>💚 دعم الموقع  </b>
+    <b>💚 اضف اعجابك  </b>
 
     <div id="emPaypalBox"></div>
 
@@ -1714,3 +1714,1569 @@ e
 
 
 </script>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>العامة</title>
+
+<style>
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+}
+
+body{
+
+    font-family:
+    Tahoma,
+    Arial,
+    sans-serif;
+
+    background:
+    radial-gradient(
+        circle at 50% -20%,
+        #15483f 0%,
+        #09251f 28%,
+        #050b0a 62%,
+        #020303 100%
+    );
+
+    color:#fff;
+
+    overflow:hidden;
+}
+
+
+/* =====================================================
+   خلفية زخرفية
+===================================================== */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+
+    radial-gradient(
+        circle at 10% 20%,
+        rgba(0,255,190,.08),
+        transparent 25%
+    ),
+
+    radial-gradient(
+        circle at 90% 80%,
+        rgba(255,215,0,.08),
+        transparent 25%
+    );
+
+}
+
+
+/* =====================================================
+   الصفحة
+===================================================== */
+
+.chat-page{
+
+    position:relative;
+
+    width:100%;
+
+    height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.chat-header{
+
+    position:relative;
+
+    height:82px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+    linear-gradient(
+        180deg,
+        rgba(0,0,0,.75),
+        rgba(0,0,0,.35)
+    );
+
+    border-bottom:
+    1px solid
+    rgba(255,215,0,.28);
+
+    box-shadow:
+    0 5px 30px
+    rgba(0,0,0,.35);
+
+}
+
+
+.logo-area{
+
+    text-align:center;
+
+}
+
+
+.logo{
+
+    font-size:27px;
+
+    font-weight:bold;
+
+    color:#ffd700;
+
+    text-shadow:
+
+    0 0 8px #ffd700,
+
+    0 0 18px rgba(255,215,0,.65),
+
+    0 0 35px rgba(255,215,0,.25);
+
+}
+
+
+.subtitle{
+
+    margin-top:4px;
+
+    font-size:12px;
+
+    color:#00d6a5;
+
+    letter-spacing:1px;
+
+}
+
+
+/* =====================================================
+   حالة الاتصال
+===================================================== */
+
+.connection{
+
+    position:absolute;
+
+    left:25px;
+
+    top:50%;
+
+    transform:
+    translateY(-50%);
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    font-size:12px;
+
+    color:#00e49c;
+
+}
+
+
+.online-dot{
+
+    width:9px;
+
+    height:9px;
+
+    border-radius:50%;
+
+    background:#00e49c;
+
+    box-shadow:
+    0 0 10px #00e49c;
+
+    animation:
+    pulse 1.5s infinite;
+
+}
+
+
+@keyframes pulse{
+
+    0%,100%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.35;
+    }
+
+}
+
+
+/* =====================================================
+   المنطقة الرئيسية
+===================================================== */
+
+.chat-content{
+
+    flex:1;
+
+    min-height:0;
+
+    width:100%;
+
+    max-width:1150px;
+
+    margin:auto;
+
+    padding:20px;
+
+    display:grid;
+
+    grid-template-columns:
+    250px
+    1fr;
+
+    gap:20px;
+
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar{
+
+    min-height:0;
+
+    border:
+    1px solid
+    rgba(255,215,0,.18);
+
+    border-radius:22px;
+
+    background:
+    rgba(5,15,13,.72);
+
+    backdrop-filter:
+    blur(15px);
+
+    box-shadow:
+    0 10px 40px
+    rgba(0,0,0,.25);
+
+    overflow:hidden;
+
+}
+
+
+.sidebar-title{
+
+    padding:18px;
+
+    color:#ffd700;
+
+    font-weight:bold;
+
+    text-align:center;
+
+    border-bottom:
+    1px solid
+    rgba(255,215,0,.15);
+
+}
+
+
+.info{
+
+    padding:20px;
+
+    text-align:center;
+
+}
+
+
+.info-icon{
+
+    font-size:42px;
+
+    margin-bottom:12px;
+
+}
+
+
+.info-title{
+
+    color:#00d6a5;
+
+    font-size:15px;
+
+    margin-bottom:10px;
+
+}
+
+
+.info-text{
+
+    color:#999;
+
+    font-size:12px;
+
+    line-height:1.8;
+
+}
+
+
+/* =====================================================
+   CHAT CARD
+===================================================== */
+
+.chat-card{
+
+    min-width:0;
+
+    min-height:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    border:
+    1px solid
+    rgba(255,215,0,.28);
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    background:
+    rgba(4,10,9,.82);
+
+    backdrop-filter:
+    blur(18px);
+
+    box-shadow:
+
+    0 20px 70px
+    rgba(0,0,0,.45),
+
+    0 0 30px
+    rgba(255,215,0,.05);
+
+}
+
+
+/* =====================================================
+   CHAT TOP
+===================================================== */
+
+.chat-top{
+
+    height:58px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:
+    0 20px;
+
+    border-bottom:
+    1px solid
+    rgba(255,255,255,.07);
+
+}
+
+
+.room-name{
+
+    color:#fff;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+}
+
+
+.room-description{
+
+    color:#777;
+
+    font-size:11px;
+
+    margin-top:3px;
+
+}
+
+
+.room-icon{
+
+    font-size:25px;
+
+}
+
+
+/* =====================================================
+   MESSAGES
+===================================================== */
+
+.messages{
+
+    flex:1;
+
+    min-height:0;
+
+    overflow-y:auto;
+
+    padding:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:11px;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:#6d5a00 transparent;
+
+}
+
+
+.messages::-webkit-scrollbar{
+
+    width:5px;
+
+}
+
+
+.messages::-webkit-scrollbar-thumb{
+
+    background:#806b00;
+
+    border-radius:10px;
+
+}
+
+
+/* =====================================================
+   WELCOME
+===================================================== */
+
+.welcome{
+
+    margin:auto;
+
+    text-align:center;
+
+    color:#777;
+
+    line-height:1.9;
+
+}
+
+
+.welcome-icon{
+
+    font-size:55px;
+
+    margin-bottom:10px;
+
+    filter:
+    drop-shadow(
+        0 0 12px
+        rgba(255,215,0,.3)
+    );
+
+}
+
+
+.welcome-title{
+
+    color:#ffd700;
+
+    font-size:18px;
+
+    margin-bottom:5px;
+
+}
+
+
+.welcome-text{
+
+    font-size:12px;
+
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+.message{
+
+    max-width:80%;
+
+    padding:
+    11px 14px;
+
+    border-radius:15px;
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(255,255,255,.065),
+        rgba(255,255,255,.025)
+    );
+
+    border:
+    1px solid
+    rgba(255,215,0,.09);
+
+    box-shadow:
+    0 4px 15px
+    rgba(0,0,0,.18);
+
+    animation:
+    messageAppear .25s ease;
+
+}
+
+
+@keyframes messageAppear{
+
+    from{
+
+        opacity:0;
+
+        transform:
+        translateY(8px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+        translateY(0);
+
+    }
+
+}
+
+
+.message-name{
+
+    color:#ffd700;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+    margin-bottom:4px;
+
+}
+
+
+.message-text{
+
+    color:#eee;
+
+    font-size:14px;
+
+    line-height:1.65;
+
+    word-break:break-word;
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+.login-area{
+
+    flex-shrink:0;
+
+    padding:14px;
+
+    display:flex;
+
+    gap:9px;
+
+    border-top:
+    1px solid
+    rgba(255,215,0,.14);
+
+    background:
+    rgba(0,0,0,.25);
+
+}
+
+
+.login-input{
+
+    flex:1;
+
+    min-width:0;
+
+    padding:13px 15px;
+
+    border-radius:12px;
+
+    border:
+    1px solid
+    rgba(255,215,0,.25);
+
+    background:
+    rgba(0,0,0,.35);
+
+    color:#fff;
+
+    outline:none;
+
+    font-size:14px;
+
+}
+
+
+.login-input:focus{
+
+    border-color:#ffd700;
+
+    box-shadow:
+    0 0 12px
+    rgba(255,215,0,.12);
+
+}
+
+
+.login-button{
+
+    padding:
+    0 23px;
+
+    border:0;
+
+    border-radius:12px;
+
+    background:
+    linear-gradient(
+        135deg,
+        #ffe44d,
+        #d4a900
+    );
+
+    color:#111;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+.login-button:hover{
+
+    transform:
+    translateY(-1px);
+
+    box-shadow:
+    0 0 18px
+    rgba(255,215,0,.35);
+
+}
+
+
+/* =====================================================
+   SEND
+===================================================== */
+
+.send-area{
+
+    display:none;
+
+    flex-shrink:0;
+
+    padding:14px;
+
+    gap:9px;
+
+    border-top:
+    1px solid
+    rgba(255,215,0,.14);
+
+    background:
+    rgba(0,0,0,.25);
+
+}
+
+
+.message-input{
+
+    flex:1;
+
+    min-width:0;
+
+    padding:13px 15px;
+
+    border-radius:12px;
+
+    border:
+    1px solid
+    rgba(255,215,0,.25);
+
+    background:
+    rgba(0,0,0,.35);
+
+    color:#fff;
+
+    outline:none;
+
+    font-size:14px;
+
+}
+
+
+.message-input:focus{
+
+    border-color:#ffd700;
+
+}
+
+
+.send-button{
+
+    padding:
+    0 22px;
+
+    border:0;
+
+    border-radius:12px;
+
+    background:
+    linear-gradient(
+        135deg,
+        #ffe44d,
+        #d4a900
+    );
+
+    color:#111;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+
+.send-button:hover{
+
+    box-shadow:
+    0 0 18px
+    rgba(255,215,0,.35);
+
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.chat-footer{
+
+    height:35px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#555;
+
+    font-size:10px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:800px){
+
+    body{
+
+        overflow:hidden;
+
+    }
+
+
+    .chat-header{
+
+        height:65px;
+
+    }
+
+
+    .logo{
+
+        font-size:21px;
+
+    }
+
+
+    .subtitle{
+
+        font-size:10px;
+
+    }
+
+
+    .connection{
+
+        left:12px;
+
+        font-size:10px;
+
+    }
+
+
+    .chat-content{
+
+        padding:10px;
+
+        display:block;
+
+    }
+
+
+    .sidebar{
+
+        display:none;
+
+    }
+
+
+    .chat-card{
+
+        width:100%;
+
+        height:calc(100vh - 110px);
+
+        border-radius:18px;
+
+    }
+
+
+    .message{
+
+        max-width:90%;
+
+    }
+
+
+    .login-area,
+    .send-area{
+
+        padding:10px;
+
+    }
+
+
+    .login-button,
+    .send-button{
+
+        padding:
+        0 16px;
+
+    }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media(max-width:400px){
+
+    .connection{
+
+        display:none;
+
+    }
+
+
+    .logo{
+
+        font-size:19px;
+
+    }
+
+
+    .message-input,
+    .login-input{
+
+        font-size:13px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="chat-page">
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="chat-header">
+
+    <div class="logo-area">
+
+        <div class="logo">
+
+            🌙 أبوالقمر زمرد
+
+        </div>
+
+        <div class="subtitle">
+
+            الدردشة العامة
+
+        </div>
+
+    </div>
+
+
+    <div class="connection">
+
+        <span class="online-dot"></span>
+
+        متصل
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     CONTENT
+===================================================== -->
+
+<div class="chat-content">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+
+            💬 غرفة عامة
+
+        </div>
+
+
+        <div class="info">
+
+            <div class="info-icon">
+
+                🌐
+
+            </div>
+
+            <div class="info-title">
+
+                مرحبًا بالجميع
+
+            </div>
+
+            <div class="info-text">
+
+                هذه غرفة دردشة عامة
+                لجميع زوار الموقع.
+
+                <br><br>
+
+                اختر اسمًا مستعارًا
+                وشارك في الحديث مع
+                بقية الزوار.
+
+                <br><br>
+
+                يرجى احترام الجميع
+                وعدم إرسال معلومات
+                شخصية.
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- CHAT -->
+
+    <section class="chat-card">
+
+
+        <!-- CHAT TOP -->
+
+        <div class="chat-top">
+
+            <div>
+
+                <div class="room-name">
+
+                    الدردشة العامة
+
+                </div>
+
+                <div class="room-description">
+
+                    جميع الزوار في غرفة واحدة
+
+                </div>
+
+            </div>
+
+
+            <div class="room-icon">
+
+                💎
+
+            </div>
+
+        </div>
+
+
+
+        <!-- MESSAGES -->
+
+        <div
+            id="messages"
+            class="messages">
+
+            <div
+                id="welcome"
+                class="welcome">
+
+                <div class="welcome-icon">
+
+                    💬
+
+                </div>
+
+                <div class="welcome-title">
+
+                    أهلاً بك
+
+                </div>
+
+                <div class="welcome-text">
+
+                    اختر اسمًا مستعارًا
+                    للانضمام إلى الدردشة
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- LOGIN -->
+
+        <div
+            id="loginArea"
+            class="login-area">
+
+            <input
+                id="userName"
+                class="login-input"
+                type="text"
+                maxlength="20"
+                placeholder="اكتب اسمك المستعار"
+                autocomplete="nickname">
+
+            <button
+                id="enterChat"
+                class="login-button"
+                type="button">
+
+                دخول
+
+            </button>
+
+        </div>
+
+
+
+        <!-- SEND -->
+
+        <div
+            id="sendArea"
+            class="send-area">
+
+            <input
+                id="messageInput"
+                class="message-input"
+                type="text"
+                maxlength="300"
+                placeholder="اكتب رسالتك..."
+                autocomplete="off">
+
+            <button
+                id="sendButton"
+                class="send-button"
+                type="button">
+
+                إرسال
+
+            </button>
+
+        </div>
+
+
+    </section>
+
+</div>
+
+
+
+<footer class="chat-footer">
+
+    Sakaker © 2026
+
+</footer>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     FIREBASE
+===================================================== -->
+
+<script type="module">
+/* =====================================================
+   FIREBASE CHAT - SAKAKER
+   Realtime Database + Anonymous Authentication
+   ===================================================== */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    push,
+    query,
+    limitToLast,
+    onChildAdded,
+    onValue,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import {
+    getAuth,
+    signInAnonymously,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+/* =====================================================
+   FIREBASE CONFIG
+   ===================================================== */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
+    authDomain: "sakaker-basnusse.firebaseapp.com",
+    databaseURL: "https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "sakaker-basnusse",
+    storageBucket: "sakaker-basnusse.firebasestorage.app",
+    messagingSenderId: "369109440957",
+    appId: "1:369109440957:web:a3a460e5ef14c46a0d5ad4",
+    measurementId: "G-FKQFWD7E2Z"
+};
+
+
+/* =====================================================
+   INIT
+   ===================================================== */
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+
+/* =====================================================
+   ELEMENTS
+   ===================================================== */
+
+const messages = document.getElementById("messages");
+const welcome = document.getElementById("welcome");
+
+const userNameInput = document.getElementById("userName");
+const enterChat = document.getElementById("enterChat");
+const loginArea = document.getElementById("loginArea");
+
+const sendArea = document.getElementById("sendArea");
+const messageInput = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+
+const connectionBox = document.querySelector(".connection");
+const connectionDot = document.querySelector(".online-dot");
+
+
+/* =====================================================
+   STATE
+   ===================================================== */
+
+let currentUser = null;
+let firebaseReady = false;
+
+let userName = localStorage.getItem("sakakerChatName") || "";
+
+
+/* =====================================================
+   HELPERS
+   ===================================================== */
+
+function setConnection(online, text) {
+    if (!connectionBox || !connectionDot) return;
+
+    connectionBox.lastChild.textContent = " " + text;
+
+    connectionDot.style.background = online ? "#00e49c" : "#ff4d4d";
+    connectionDot.style.boxShadow = online
+        ? "0 0 10px #00e49c"
+        : "0 0 10px #ff4d4d";
+}
+
+function showChatControls() {
+    if (!userName) return;
+
+    loginArea.style.display = "none";
+    sendArea.style.display = "flex";
+}
+
+function escapeDisplay(value) {
+    return String(value ?? "");
+}
+
+function scrollMessages() {
+    messages.scrollTop = messages.scrollHeight;
+}
+
+
+/* =====================================================
+   RESTORE NAME
+   ===================================================== */
+
+if (userName) {
+    userNameInput.value = userName;
+    showChatControls();
+}
+
+
+/* =====================================================
+   FIREBASE CONNECTION STATUS
+   ===================================================== */
+
+const connectedRef = ref(db, ".info/connected");
+
+onValue(connectedRef, (snapshot) => {
+    const connected = snapshot.val() === true;
+
+    if (connected) {
+        setConnection(true, "متصل");
+    } else {
+        setConnection(false, "غير متصل");
+    }
+}, (error) => {
+    console.error("Connection monitor error:", error);
+    setConnection(false, "خطأ في الاتصال");
+});
+
+
+/* =====================================================
+   AUTHENTICATION
+   ===================================================== */
+
+onAuthStateChanged(auth, (user) => {
+    currentUser = user || null;
+
+    if (currentUser) {
+        firebaseReady = true;
+        console.log("Firebase Auth OK:", currentUser.uid);
+
+        if (userName) {
+            showChatControls();
+            messageInput.focus();
+        }
+    } else {
+        firebaseReady = false;
+    }
+});
+
+try {
+    await signInAnonymously(auth);
+} catch (error) {
+    console.error("Firebase Auth Error:", error);
+
+    firebaseReady = false;
+    setConnection(false, "فشل تسجيل الدخول");
+
+    if (error.code === "auth/operation-not-allowed") {
+        alert(
+            "يجب تفعيل Anonymous Authentication من Firebase Authentication."
+        );
+    } else if (error.code === "auth/unauthorized-domain") {
+        alert(
+            "هذا النطاق غير مضاف إلى Authorized domains في Firebase Authentication."
+        );
+    } else {
+        console.error(error.message);
+    }
+}
+
+
+/* =====================================================
+   ENTER CHAT
+   ===================================================== */
+
+enterChat.addEventListener("click", () => {
+    const name = userNameInput.value.trim();
+
+    if (name.length < 2) {
+        alert("اكتب اسمًا من حرفين على الأقل.");
+        userNameInput.focus();
+        return;
+    }
+
+    if (name.length > 20) {
+        alert("الاسم لا يمكن أن يتجاوز 20 حرفًا.");
+        userNameInput.focus();
+        return;
+    }
+
+    userName = name;
+
+    localStorage.setItem("sakakerChatName", userName);
+
+    showChatControls();
+
+    messageInput.focus();
+});
+
+userNameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        enterChat.click();
+    }
+});
+
+
+/* =====================================================
+   DATABASE
+   ===================================================== */
+
+const chatRef = ref(db, "publicChat");
+
+const chatQuery = query(
+    chatRef,
+    limitToLast(100)
+);
+
+
+/* =====================================================
+   RECEIVE MESSAGES
+   ===================================================== */
+
+onChildAdded(
+    chatQuery,
+    (snapshot) => {
+        const data = snapshot.val();
+
+        if (!data) return;
+
+        if (welcome) {
+            welcome.style.display = "none";
+        }
+
+        const message = document.createElement("div");
+        message.className = "message";
+
+        const name = document.createElement("div");
+        name.className = "message-name";
+        name.textContent = escapeDisplay(data.name || "زائر");
+
+        const text = document.createElement("div");
+        text.className = "message-text";
+        text.textContent = escapeDisplay(data.text || "");
+
+        message.appendChild(name);
+        message.appendChild(text);
+
+        messages.appendChild(message);
+
+        scrollMessages();
+    },
+    (error) => {
+        console.error("Receive Error:", error);
+
+        setConnection(false, "تعذر قراءة الدردشة");
+    }
+);
+
+
+/* =====================================================
+   SEND MESSAGE
+   ===================================================== */
+
+async function sendMessage() {
+    const text = messageInput.value.trim();
+
+    if (!userName) {
+        alert("اختر اسمك أولاً.");
+        return;
+    }
+
+    if (!text) {
+        return;
+    }
+
+    if (text.length > 300) {
+        alert("الحد الأقصى للرسالة 300 حرف.");
+        return;
+    }
+
+    if (!currentUser || !firebaseReady) {
+        alert("لم يتم الاتصال بخدمة الدردشة. انتظر لحظة ثم حاول مرة أخرى.");
+        return;
+    }
+
+    sendButton.disabled = true;
+
+    try {
+        await push(chatRef, {
+            name: userName,
+            text: text,
+            uid: currentUser.uid,
+            timestamp: serverTimestamp()
+        });
+
+        messageInput.value = "";
+        messageInput.focus();
+
+    } catch (error) {
+        console.error("Send Error:", error);
+
+        if (error.code === "PERMISSION_DENIED") {
+            alert(
+                "تم رفض الإرسال من Firebase. تأكد من Security Rules لقاعدة Realtime Database."
+            );
+        } else {
+            alert("تعذر إرسال الرسالة. تحقق من اتصال الإنترنت.");
+        }
+    } finally {
+        sendButton.disabled = false;
+    }
+}
+
+
+/* =====================================================
+   SEND BUTTON
+   ===================================================== */
+
+sendButton.addEventListener("click", sendMessage);
+
+
+/* =====================================================
+   ENTER TO SEND
+   ===================================================== */
+
+messageInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+    }
+});
+
+
+/* =====================================================
+   INITIAL UI
+   ===================================================== */
+
+setConnection(false, "جارٍ الاتصال...");
+</script>
+
+
+</body>
+
+</html>
