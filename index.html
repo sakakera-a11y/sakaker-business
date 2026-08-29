@@ -640,7 +640,7 @@ overflow:hidden;
   /* الأيقونة */
   #mainGamesIcon {
     position: fixed;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
@@ -1714,30 +1714,23 @@ e
 
 
 </script>
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sakaker Public Chat</title>
-
 </head>
 
 <body>
 
-
-<!-- =========================================================
-     SAKAKER PUBLIC CHAT
-========================================================= -->
+<div id="sakaker-public-chat"></div>
 
 <script type="module">
 
 /* =========================================================
-   FIREBASE IMPORTS
+   FIREBASE
 ========================================================= */
 
 import {
@@ -1749,11 +1742,13 @@ import {
     ref,
     push,
     set,
+    remove,
     onValue,
     onChildAdded,
     onDisconnect,
     query,
-    limitToLast
+    limitToLast,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 import {
@@ -1769,76 +1764,62 @@ import {
 const firebaseConfig = {
 
     apiKey:
-    "AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
+    "AIzaSyCltuh24M0X4KBlVpIFi8HXlrTObQRVk_s",
 
     authDomain:
-    "sakaker-basnusse.firebaseapp.com",
+    "general-sakaker.firebaseapp.com",
 
     databaseURL:
-    "https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "https://general-sakaker-default-rtdb.asia-southeast1.firebasedatabase.app",
 
     projectId:
-    "sakaker-basnusse",
+    "general-sakaker",
 
     storageBucket:
-    "sakaker-basnusse.firebasestorage.app",
+    "general-sakaker.firebasestorage.app",
 
     messagingSenderId:
-    "369109440957",
+    "999891768564",
 
     appId:
-    "1:369109440957:web:a3a460e5ef14c46a0d5ad4",
+    "1:999891768564:web:9821008d91378788b93aa1",
 
     measurementId:
-    "G-FKQFWD7E2Z"
+    "G-0LGSW71V74"
 };
 
 
 /* =========================================================
-   FIREBASE APP
+   FIREBASE INITIALIZE
 ========================================================= */
 
-const app = initializeApp(
-    firebaseConfig,
-    "SakakerPublicChat"
-);
+const app =
+    initializeApp(firebaseConfig);
 
-const db = getDatabase(app);
+const db =
+    getDatabase(app);
 
-const auth = getAuth(app);
+const auth =
+    getAuth(app);
 
 
 /* =========================================================
    SHADOW DOM
-   لمنع تعارض الدردشة مع أيقونات الموقع
 ========================================================= */
 
 const host =
-document.createElement("div");
-
-host.id =
-"sakaker-public-chat-host";
-
-host.style.cssText = `
-position:fixed;
-inset:0;
-width:100%;
-height:100%;
-z-index:2147483647;
-pointer-events:none;
-`;
-
-document.body.appendChild(host);
-
+    document.getElementById(
+        "sakaker-public-chat"
+    );
 
 const shadow =
-host.attachShadow({
-    mode:"open"
-});
+    host.attachShadow({
+        mode: "open"
+    });
 
 
 /* =========================================================
-   FULL DESIGN
+   HTML + CSS
 ========================================================= */
 
 shadow.innerHTML = `
@@ -1849,20 +1830,18 @@ shadow.innerHTML = `
     box-sizing:border-box;
 }
 
-
-/* =========================================================
-   CHAT BUTTON
-========================================================= */
-
 #chatButton{
 
     position:fixed;
 
-    right:22px;
-    bottom:222px;
+    left:50%;
+    top:50%;
 
-    width:68px;
-    height:68px;
+    transform:
+    translate(-50%,-50%);
+
+    width:115px;
+    height:115px;
 
     border-radius:50%;
 
@@ -1870,56 +1849,65 @@ shadow.innerHTML = `
     2px solid #ffd700;
 
     background:
-    linear-gradient(
-        145deg,
-        #075878,
-        #021923
+    radial-gradient(
+        circle at 35% 30%,
+        #1689b8,
+        #063b58 45%,
+        #01151f 100%
     );
 
-    color:#ffffff;
+    color:#fff;
 
     font-family:
     Arial,
     Tahoma,
     sans-serif;
 
-    font-size:14px;
+    font-size:18px;
 
     font-weight:bold;
 
     cursor:pointer;
 
-    pointer-events:auto;
+    z-index:999999;
 
     box-shadow:
-    0 0 12px rgba(255,215,0,.65),
-    0 0 35px rgba(0,180,255,.35);
+    0 0 15px rgba(255,215,0,.8),
+    0 0 35px rgba(0,200,255,.5),
+    inset 0 0 20px rgba(255,255,255,.12);
 
     transition:
-    transform .25s,
-    box-shadow .25s;
-
-    z-index:999999;
+    transform .25s ease,
+    box-shadow .25s ease;
 }
 
 #chatButton:hover{
 
-    transform:scale(1.08);
+    transform:
+    translate(-50%,-50%)
+    scale(1.08);
 
     box-shadow:
-    0 0 20px rgba(255,215,0,.95),
-    0 0 50px rgba(0,180,255,.55);
+    0 0 25px rgba(255,215,0,1),
+    0 0 55px rgba(0,200,255,.65);
 }
 
-#chatButton span{
+#chatButton .chatIcon{
 
     display:block;
 
-    margin-top:3px;
+    font-size:38px;
 
-    color:#75e2ff;
+    margin-bottom:4px;
+}
 
-    font-size:12px;
+#chatButton .chatText{
+
+    display:block;
+
+    color:#ffd700;
+
+    letter-spacing:1px;
 }
 
 
@@ -1931,17 +1919,20 @@ shadow.innerHTML = `
 
     position:fixed;
 
-    right:22px;
-    bottom:105px;
+    left:50%;
+    top:50%;
 
-    width:760px;
+    transform:
+    translate(-50%,-50%);
+
+    width:850px;
     height:650px;
 
     max-width:
-    calc(100vw - 30px);
+    calc(100vw - 24px);
 
     max-height:
-    calc(100vh - 125px);
+    calc(100vh - 24px);
 
     display:none;
 
@@ -1949,18 +1940,15 @@ shadow.innerHTML = `
 
     overflow:hidden;
 
-    pointer-events:auto;
-
-    border-radius:22px;
+    border-radius:24px;
 
     border:
     1px solid
-    rgba(100,220,255,.45);
+    rgba(255,215,0,.45);
 
-    background:
-    #031824;
+    background:#021923;
 
-    color:#ffffff;
+    color:#fff;
 
     font-family:
     Tahoma,
@@ -1968,10 +1956,10 @@ shadow.innerHTML = `
     sans-serif;
 
     box-shadow:
-    0 0 40px rgba(0,0,0,.8),
-    0 0 80px rgba(0,150,220,.25);
+    0 0 50px rgba(0,0,0,.9),
+    0 0 100px rgba(0,170,230,.28);
 
-    z-index:999998;
+    z-index:1000000;
 }
 
 
@@ -1985,47 +1973,46 @@ shadow.innerHTML = `
 
     inset:0;
 
-    overflow:hidden;
-
     z-index:0;
+
+    overflow:hidden;
 
     background:
     linear-gradient(
         180deg,
-        #06415f 0%,
-        #075875 45%,
-        #021722 100%
+        #07577a 0%,
+        #064865 38%,
+        #032a3c 70%,
+        #01151f 100%
     );
 }
 
-#sea::before{
+#sea:before{
 
     content:"";
 
     position:absolute;
 
     width:220%;
-
-    height:60%;
+    height:70%;
 
     left:-60%;
-
-    bottom:-25%;
+    bottom:-35%;
 
     background:
     repeating-radial-gradient(
         ellipse at center,
         rgba(255,255,255,.20) 0 2px,
-        transparent 3px 22px
+        transparent 3px 23px
     );
 
-    opacity:.28;
+    opacity:.23;
 
     animation:
-    waves 14s linear infinite;
+    seaMove 15s linear infinite;
 }
 
-@keyframes waves{
+@keyframes seaMove{
 
     0%{
         transform:translateX(0);
@@ -2034,6 +2021,7 @@ shadow.innerHTML = `
     100%{
         transform:translateX(-12%);
     }
+
 }
 
 
@@ -2047,7 +2035,7 @@ shadow.innerHTML = `
 
     z-index:5;
 
-    height:72px;
+    height:75px;
 
     flex-shrink:0;
 
@@ -2058,55 +2046,47 @@ shadow.innerHTML = `
     justify-content:center;
 
     background:
-    rgba(0,10,20,.82);
+    rgba(0,12,20,.82);
 
     border-bottom:
     1px solid
-    rgba(100,220,255,.2);
-
-    backdrop-filter:
-    blur(12px);
+    rgba(255,215,0,.18);
 }
 
 #title{
 
-    text-align:center;
+    color:#fff;
 
-    color:#eaffff;
-
-    font-size:21px;
+    font-size:22px;
 
     font-weight:bold;
 
+    text-align:center;
+
     text-shadow:
-    0 0 12px
-    rgba(90,220,255,.8);
+    0 0 12px #36d7ff;
 }
 
 #subtitle{
 
+    color:#7fd9ee;
+
+    font-size:10px;
+
     margin-top:4px;
 
     text-align:center;
-
-    color:#72d7f5;
-
-    font-size:10px;
 }
-
-
-/* CLOSE */
 
 #closeButton{
 
     position:absolute;
 
     left:14px;
+    top:15px;
 
-    top:14px;
-
-    width:40px;
-    height:40px;
+    width:42px;
+    height:42px;
 
     border-radius:50%;
 
@@ -2117,37 +2097,32 @@ shadow.innerHTML = `
     background:
     rgba(0,0,0,.45);
 
-    color:#ffffff;
+    color:#fff;
 
-    font-size:22px;
+    font-size:25px;
 
     cursor:pointer;
 }
-
-
-/* LANGUAGE */
 
 #languageButton{
 
     position:absolute;
 
     right:14px;
+    top:17px;
 
-    top:14px;
+    padding:7px 13px;
 
-    padding:
-    7px 12px;
-
-    border-radius:20px;
+    border-radius:18px;
 
     border:
     1px solid
-    rgba(100,220,255,.4);
+    rgba(255,215,0,.35);
 
     background:
-    rgba(0,35,55,.85);
+    rgba(0,20,30,.85);
 
-    color:#ffffff;
+    color:#ffd700;
 
     cursor:pointer;
 
@@ -2171,8 +2146,7 @@ shadow.innerHTML = `
 
     display:grid;
 
-    grid-template-columns:
-    190px 1fr;
+    grid-template-columns:200px 1fr;
 }
 
 
@@ -2189,33 +2163,33 @@ shadow.innerHTML = `
     flex-direction:column;
 
     background:
-    rgba(0,10,20,.55);
+    rgba(0,8,15,.58);
 
     border-left:
     1px solid
-    rgba(100,220,255,.15);
+    rgba(255,255,255,.10);
 }
 
 #usersHeader{
 
     flex-shrink:0;
 
-    padding:14px 5px;
+    padding:15px 5px;
 
     text-align:center;
 
-    color:#8de8ff;
+    color:#8deaff;
 
     font-size:13px;
 
     border-bottom:
     1px solid
-    rgba(100,220,255,.15);
+    rgba(255,255,255,.10);
 }
 
 #onlineCount{
 
-    color:#ffffff;
+    color:#ffd700;
 
     font-weight:bold;
 }
@@ -2228,10 +2202,10 @@ shadow.innerHTML = `
 
     overflow-y:auto;
 
-    padding:8px;
+    padding:9px;
 }
 
-.user{
+.chatUser{
 
     display:flex;
 
@@ -2239,16 +2213,16 @@ shadow.innerHTML = `
 
     gap:8px;
 
-    padding:9px;
+    padding:10px;
 
-    margin-bottom:5px;
+    margin-bottom:6px;
 
-    border-radius:9px;
+    border-radius:10px;
 
     background:
-    rgba(255,255,255,.06);
+    rgba(255,255,255,.07);
 
-    color:#ffffff;
+    color:#fff;
 
     font-size:12px;
 }
@@ -2256,17 +2230,14 @@ shadow.innerHTML = `
 .onlineDot{
 
     width:8px;
-
     height:8px;
-
-    flex-shrink:0;
 
     border-radius:50%;
 
-    background:#22e58b;
+    background:#21e58a;
 
     box-shadow:
-    0 0 10px #22e58b;
+    0 0 10px #21e58a;
 }
 
 
@@ -2277,16 +2248,12 @@ shadow.innerHTML = `
 #main{
 
     min-width:0;
-
     min-height:0;
 
     display:flex;
 
     flex-direction:column;
 }
-
-
-/* ROOM */
 
 #room{
 
@@ -2295,16 +2262,16 @@ shadow.innerHTML = `
     padding:10px 15px;
 
     background:
-    rgba(0,0,0,.22);
+    rgba(0,0,0,.20);
 
     border-bottom:
     1px solid
-    rgba(100,220,255,.12);
+    rgba(255,255,255,.08);
 }
 
 #roomName{
 
-    color:#e7fbff;
+    color:#fff;
 
     font-size:13px;
 
@@ -2315,7 +2282,7 @@ shadow.innerHTML = `
 
     margin-top:3px;
 
-    color:#72bdd1;
+    color:#7eb5c4;
 
     font-size:9px;
 }
@@ -2324,7 +2291,7 @@ shadow.innerHTML = `
 
     float:left;
 
-    color:#25e58b;
+    color:#ffd700;
 
     font-size:9px;
 }
@@ -2348,23 +2315,23 @@ shadow.innerHTML = `
 
     flex-direction:column;
 
-    gap:8px;
+    gap:9px;
 }
 
-.message{
+.chatMessage{
 
     max-width:82%;
 
-    padding:9px 12px;
+    padding:10px 13px;
 
-    border-radius:13px;
+    border-radius:14px;
 
     background:
-    rgba(255,255,255,.07);
+    rgba(255,255,255,.08);
 
     border:
     1px solid
-    rgba(100,220,255,.12);
+    rgba(100,220,255,.13);
 
     animation:
     messageIn .2s ease;
@@ -2381,13 +2348,14 @@ shadow.innerHTML = `
         opacity:1;
         transform:translateY(0);
     }
+
 }
 
-.messageName{
+.messageUser{
 
-    margin-bottom:3px;
+    margin-bottom:4px;
 
-    color:#73ddfb;
+    color:#67ddff;
 
     font-size:10px;
 
@@ -2396,11 +2364,11 @@ shadow.innerHTML = `
 
 .messageText{
 
-    color:#ffffff;
+    color:#fff;
 
     font-size:13px;
 
-    line-height:1.6;
+    line-height:1.65;
 
     white-space:pre-wrap;
 
@@ -2413,7 +2381,7 @@ shadow.innerHTML = `
 
     text-align:center;
 
-    color:#80a9b8;
+    color:#8ab2bf;
 
     font-size:12px;
 
@@ -2427,7 +2395,7 @@ shadow.innerHTML = `
 
 
 /* =========================================================
-   LOGIN / SEND
+   INPUT
 ========================================================= */
 
 #loginArea,
@@ -2439,14 +2407,14 @@ shadow.innerHTML = `
 
     gap:7px;
 
-    padding:10px;
+    padding:11px;
+
+    background:
+    rgba(0,0,0,.35);
 
     border-top:
     1px solid
-    rgba(100,220,255,.13);
-
-    background:
-    rgba(0,0,0,.30);
+    rgba(255,255,255,.10);
 }
 
 #sendArea{
@@ -2454,13 +2422,13 @@ shadow.innerHTML = `
     display:none;
 }
 
-.input{
+.chatInput{
 
     flex:1;
 
     min-width:0;
 
-    padding:11px 12px;
+    padding:11px 13px;
 
     border-radius:10px;
 
@@ -2468,33 +2436,31 @@ shadow.innerHTML = `
     1px solid
     rgba(100,220,255,.3);
 
-    background:
-    rgba(0,8,15,.82);
-
-    color:#ffffff;
-
     outline:none;
+
+    background:
+    rgba(0,8,15,.9);
+
+    color:#fff;
 
     font-family:
     Tahoma,
     Arial,
     sans-serif;
+
+    font-size:13px;
 }
 
-.input:focus{
+.chatInput:focus{
 
     border-color:
-    rgba(100,220,255,.75);
-
-    box-shadow:
-    0 0 10px
-    rgba(0,180,255,.2);
+    rgba(100,220,255,.8);
 }
 
 .actionButton{
 
     padding:
-    0 18px;
+    0 20px;
 
     border:none;
 
@@ -2503,17 +2469,22 @@ shadow.innerHTML = `
     background:
     linear-gradient(
         135deg,
-        #42d8ff,
-        #126ea8
+        #18aeda,
+        #07547e
     );
 
-    color:#ffffff;
+    color:#fff;
 
     font-weight:bold;
 
     cursor:pointer;
+}
 
-    white-space:nowrap;
+.actionButton:disabled{
+
+    opacity:.55;
+
+    cursor:wait;
 }
 
 
@@ -2525,38 +2496,50 @@ shadow.innerHTML = `
 
     #chatButton{
 
-        right:14px;
+        width:100px;
+        height:100px;
+    }
 
-        bottom:14px;
+    #chatButton .chatIcon{
 
-        width:62px;
-        height:62px;
+        font-size:32px;
+    }
+
+    #chatButton .chatText{
+
+        font-size:14px;
     }
 
     #chatWindow{
 
-        right:7px;
-
-        bottom:85px;
-
         width:
-        calc(100vw - 14px);
-
-        max-width:none;
+        calc(100vw - 12px);
 
         height:
-        calc(100vh - 100px);
+        calc(100vh - 12px);
+
+        max-width:none;
 
         max-height:none;
 
         border-radius:18px;
     }
 
+    #header{
+
+        height:64px;
+    }
+
+    #title{
+
+        font-size:17px;
+    }
+
     #body{
 
         grid-template-columns:1fr;
 
-        grid-template-rows:78px 1fr;
+        grid-template-rows:82px 1fr;
     }
 
     #usersPanel{
@@ -2565,19 +2548,19 @@ shadow.innerHTML = `
 
         border-bottom:
         1px solid
-        rgba(100,220,255,.15);
+        rgba(255,255,255,.10);
     }
 
     #usersHeader{
 
-        padding:7px;
+        padding:6px;
     }
 
     #usersList{
 
         display:flex;
 
-        gap:5px;
+        gap:6px;
 
         overflow-x:auto;
 
@@ -2586,28 +2569,70 @@ shadow.innerHTML = `
         padding:5px;
     }
 
-    .user{
+    .chatUser{
 
         white-space:nowrap;
 
         margin:0;
 
-        padding:7px 9px;
+        padding:7px 10px;
+    }
+
+    .chatMessage{
+
+        max-width:92%;
+    }
+
+    .actionButton{
+
+        padding:
+        0 14px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media(max-width:420px){
+
+    #languageButton{
+
+        right:8px;
+
+        padding:6px 8px;
+
+        font-size:9px;
+    }
+
+    #closeButton{
+
+        left:8px;
+
+        width:36px;
+        height:36px;
+
+        font-size:20px;
     }
 
     #title{
 
-        font-size:17px;
+        font-size:15px;
     }
 
-    #header{
+    .chatInput{
 
-        height:62px;
+        font-size:12px;
     }
 
-    .message{
+    .actionButton{
 
-        max-width:92%;
+        padding:
+        0 11px;
+
+        font-size:11px;
     }
 
 }
@@ -2617,28 +2642,29 @@ shadow.innerHTML = `
 
 <!-- =======================================================
      CHAT BUTTON
-======================================================= -->
+======================================================== -->
 
 <button id="chatButton">
 
-    CHAT
+    <span class="chatIcon">
+        💬
+    </span>
 
-    <span>💬</span>
+    <span class="chatText">
+        CHAT
+    </span>
 
 </button>
 
 
 <!-- =======================================================
      CHAT WINDOW
-======================================================= -->
+======================================================== -->
 
 <div id="chatWindow">
 
-
     <div id="sea"></div>
 
-
-    <!-- HEADER -->
 
     <div id="header">
 
@@ -2665,8 +2691,6 @@ shadow.innerHTML = `
     </div>
 
 
-    <!-- BODY -->
-
     <div id="body">
 
 
@@ -2690,7 +2714,6 @@ shadow.innerHTML = `
 
         <main id="main">
 
-
             <div id="room">
 
                 <span id="roomName">
@@ -2698,11 +2721,11 @@ shadow.innerHTML = `
                 </span>
 
                 <span id="connection">
-                    ● متصل
+                    ● جاري الاتصال
                 </span>
 
                 <div id="roomInfo">
-                    تحدث مع جميع الزوار
+                    الرسائل تختفي بعد 5 دقائق
                 </div>
 
             </div>
@@ -2733,16 +2756,15 @@ shadow.innerHTML = `
             <div id="loginArea">
 
                 <input
-                    id="chatName"
-                    class="input"
+                    id="userNameInput"
+                    class="chatInput"
                     type="text"
                     maxlength="20"
                     autocomplete="off"
-                    placeholder="اكتب اسمك المستعار"
-                >
+                    placeholder="اكتب اسمك المستعار">
 
                 <button
-                    id="joinChat"
+                    id="enterChat"
                     class="actionButton">
 
                     دخول
@@ -2757,16 +2779,15 @@ shadow.innerHTML = `
             <div id="sendArea">
 
                 <input
-                    id="chatMessage"
-                    class="input"
+                    id="messageInput"
+                    class="chatInput"
                     type="text"
                     maxlength="300"
                     autocomplete="off"
-                    placeholder="اكتب رسالتك..."
-                >
+                    placeholder="اكتب رسالتك... 20 كلمة كحد أقصى">
 
                 <button
-                    id="sendMessage"
+                    id="sendButton"
                     class="actionButton">
 
                     إرسال
@@ -2774,7 +2795,6 @@ shadow.innerHTML = `
                 </button>
 
             </div>
-
 
         </main>
 
@@ -2788,110 +2808,300 @@ shadow.innerHTML = `
    ELEMENTS
 ========================================================= */
 
+const $ =
+    id => shadow.getElementById(id);
+
 const chatButton =
-    shadow.getElementById(
-        "chatButton"
-    );
+    $("chatButton");
 
 const chatWindow =
-    shadow.getElementById(
-        "chatWindow"
-    );
+    $("chatWindow");
 
 const closeButton =
-    shadow.getElementById(
-        "closeButton"
-    );
+    $("closeButton");
 
 const languageButton =
-    shadow.getElementById(
-        "languageButton"
-    );
+    $("languageButton");
 
-const nameInput =
-    shadow.getElementById(
-        "chatName"
-    );
+const userNameInput =
+    $("userNameInput");
 
-const joinButton =
-    shadow.getElementById(
-        "joinChat"
-    );
-
-const loginArea =
-    shadow.getElementById(
-        "loginArea"
-    );
-
-const sendArea =
-    shadow.getElementById(
-        "sendArea"
-    );
+const enterChat =
+    $("enterChat");
 
 const messageInput =
-    shadow.getElementById(
-        "chatMessage"
-    );
+    $("messageInput");
 
 const sendButton =
-    shadow.getElementById(
-        "sendMessage"
-    );
+    $("sendButton");
 
-const messagesBox =
-    shadow.getElementById(
-        "messages"
-    );
+const loginArea =
+    $("loginArea");
+
+const sendArea =
+    $("sendArea");
+
+const messages =
+    $("messages");
 
 const welcome =
-    shadow.getElementById(
-        "welcome"
-    );
+    $("welcome");
 
 const usersList =
-    shadow.getElementById(
-        "usersList"
-    );
+    $("usersList");
 
 const onlineCount =
-    shadow.getElementById(
-        "onlineCount"
-    );
+    $("onlineCount");
 
 const connection =
-    shadow.getElementById(
-        "connection"
-    );
+    $("connection");
 
-const title =
-    shadow.getElementById(
-        "title"
-    );
 
-const subtitle =
-    shadow.getElementById(
-        "subtitle"
-    );
+/* =========================================================
+   SETTINGS
+========================================================= */
 
-const roomName =
-    shadow.getElementById(
-        "roomName"
-    );
+const MESSAGE_LIFETIME =
+    5 * 60 * 1000;
 
-const roomInfo =
-    shadow.getElementById(
-        "roomInfo"
-    );
+const MAX_WORDS =
+    20;
 
-const welcomeText =
-    shadow.getElementById(
-        "welcomeText"
-    );
 
-const usersHeader =
-    shadow.getElementById(
-        "usersHeader"
-    );
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentUser =
+    null;
+
+let myName =
+    "";
+
+let myUserRef =
+    null;
+
+let language =
+    "ar";
+
+let listenersStarted =
+    false;
+
+
+/* =========================================================
+   TRANSLATIONS
+========================================================= */
+
+const translations = {
+
+    ar: {
+
+        lang:
+        "English",
+
+        title:
+        "🌊 دردشة سكاكر",
+
+        subtitle:
+        "الدردشة العامة",
+
+        users:
+        "👥 الموجودون الآن",
+
+        room:
+        "💬 الدردشة العامة",
+
+        info:
+        "الرسائل تختفي بعد 5 دقائق",
+
+        welcome:
+        "أهلاً بك في الدردشة العامة<br>اكتب اسمًا مستعارًا للانضمام",
+
+        name:
+        "اكتب اسمك المستعار",
+
+        join:
+        "دخول",
+
+        joining:
+        "جاري الدخول...",
+
+        message:
+        "اكتب رسالتك... 20 كلمة كحد أقصى",
+
+        send:
+        "إرسال",
+
+        sending:
+        "إرسال...",
+
+        connected:
+        "● متصل",
+
+        disconnected:
+        "● غير متصل",
+
+        connecting:
+        "● جاري الاتصال",
+
+        nameError:
+        "اكتب اسمًا من حرفين على الأقل",
+
+        wait:
+        "انتظر حتى يتم الاتصال بالدردشة",
+
+        onlineError:
+        "تعذر تسجيل الاسم في قائمة الموجودين",
+
+        sendError:
+        "تعذر إرسال الرسالة",
+
+        maxWords:
+        "الرسالة يجب ألا تتجاوز 20 كلمة",
+
+        empty:
+        "اكتب رسالة أولًا"
+
+    },
+
+    en: {
+
+        lang:
+        "العربية",
+
+        title:
+        "🌊 Sakaker Chat",
+
+        subtitle:
+        "Public Chat",
+
+        users:
+        "👥 Online Users",
+
+        room:
+        "💬 Public Chat",
+
+        info:
+        "Messages disappear after 5 minutes",
+
+        welcome:
+        "Welcome to the public chat<br>Enter a nickname to join",
+
+        name:
+        "Enter your nickname",
+
+        join:
+        "Join",
+
+        joining:
+        "Joining...",
+
+        message:
+        "Write your message... Max 20 words",
+
+        send:
+        "Send",
+
+        sending:
+        "Sending...",
+
+        connected:
+        "● Connected",
+
+        disconnected:
+        "● Disconnected",
+
+        connecting:
+        "● Connecting",
+
+        nameError:
+        "Enter a name with at least 2 characters",
+
+        wait:
+        "Please wait for the chat connection",
+
+        onlineError:
+        "Unable to register your name",
+
+        sendError:
+        "Unable to send the message",
+
+        maxWords:
+        "The message cannot exceed 20 words",
+
+        empty:
+        "Write a message first"
+
+    }
+
+};
+
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+function applyLanguage(){
+
+    const t =
+        translations[language];
+
+    languageButton.textContent =
+        t.lang;
+
+    $("title").textContent =
+        t.title;
+
+    $("subtitle").textContent =
+        t.subtitle;
+
+    $("usersHeader").childNodes[0]
+        .textContent =
+        t.users + " ";
+
+    $("roomName").textContent =
+        t.room;
+
+    $("roomInfo").textContent =
+        t.info;
+
+    $("welcomeText").innerHTML =
+        t.welcome;
+
+    userNameInput.placeholder =
+        t.name;
+
+    messageInput.placeholder =
+        t.message;
+
+    enterChat.textContent =
+        t.join;
+
+    sendButton.textContent =
+        t.send;
+
+    connection.textContent =
+        currentUser
+        ? t.connected
+        : t.connecting;
+
+    host.dir =
+        language === "ar"
+        ? "rtl"
+        : "ltr";
+}
+
+languageButton.onclick =
+function(){
+
+    language =
+        language === "ar"
+        ? "en"
+        : "ar";
+
+    applyLanguage();
+
+};
 
 
 /* =========================================================
@@ -2908,11 +3118,7 @@ function(){
         "none";
 
     setTimeout(
-        function(){
-
-            nameInput.focus();
-
-        },
+        () => userNameInput.focus(),
         100
     );
 
@@ -2932,255 +3138,441 @@ function(){
 
 
 /* =========================================================
-   LANGUAGE
+   WORD COUNT
 ========================================================= */
 
-let language =
-"ar";
+function getWordCount(text){
 
-
-const translations = {
-
-    ar:{
-
-        button:
-        "English",
-
-        title:
-        "🌊 دردشة سكاكر",
-
-        subtitle:
-        "الدردشة العامة",
-
-        users:
-        "👥 الموجودون الآن",
-
-        room:
-        "💬 الدردشة العامة",
-
-        info:
-        "تحدث مع جميع الزوار",
-
-        welcome:
-        "أهلاً بك في الدردشة العامة<br>اكتب اسمًا مستعارًا للانضمام",
-
-        name:
-        "اكتب اسمك المستعار",
-
-        join:
-        "دخول",
-
-        message:
-        "اكتب رسالتك...",
-
-        send:
-        "إرسال",
-
-        connected:
-        "● متصل",
-
-        connecting:
-        "● جاري الاتصال",
-
-        nameError:
-        "اكتب اسمًا من حرفين على الأقل",
-
-        notReady:
-        "انتظر حتى يتم الاتصال بالدردشة",
-
-        sendError:
-        "تعذر إرسال الرسالة"
-
-    },
-
-    en:{
-
-        button:
-        "العربية",
-
-        title:
-        "🌊 Sakaker Chat",
-
-        subtitle:
-        "Public Chat",
-
-        users:
-        "👥 Online Users",
-
-        room:
-        "💬 Public Chat",
-
-        info:
-        "Chat with all visitors",
-
-        welcome:
-        "Welcome to the public chat<br>Enter a nickname to join",
-
-        name:
-        "Enter your nickname",
-
-        join:
-        "Join",
-
-        message:
-        "Write your message...",
-
-        send:
-        "Send",
-
-        connected:
-        "● Connected",
-
-        connecting:
-        "● Connecting",
-
-        nameError:
-        "Enter a name with at least 2 characters",
-
-        notReady:
-        "Please wait for the chat connection",
-
-        sendError:
-        "Unable to send the message"
-
-    }
-
-};
-
-
-function updateLanguage(){
-
-    const t =
-        translations[language];
-
-
-    languageButton.textContent =
-        t.button;
-
-    title.textContent =
-        t.title;
-
-    subtitle.textContent =
-        t.subtitle;
-
-    usersHeader.childNodes[0]
-        .textContent =
-        t.users + " ";
-
-    roomName.textContent =
-        t.room;
-
-    roomInfo.textContent =
-        t.info;
-
-    welcomeText.innerHTML =
-        t.welcome;
-
-    nameInput.placeholder =
-        t.name;
-
-    joinButton.textContent =
-        t.join;
-
-    messageInput.placeholder =
-        t.message;
-
-    sendButton.textContent =
-        t.send;
-
-    connection.textContent =
-        t.connected;
-
-
-    host.dir =
-        language === "ar"
-        ? "rtl"
-        : "ltr";
+    return text
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .length;
 
 }
 
 
-languageButton.onclick =
-function(){
-
-    language =
-        language === "ar"
-        ? "en"
-        : "ar";
-
-    updateLanguage();
-
-};
-
-
 /* =========================================================
-   AUTH
+   FIREBASE LOGIN
 ========================================================= */
-
-let currentUser =
-null;
-
-let nickname =
-"";
-
-let presenceRef =
-null;
-
-
-connection.textContent =
-translations[language].connecting;
-
 
 signInAnonymously(auth)
 
-.then(
-    function(result){
+.then(result => {
 
-        currentUser =
-            result.user;
+    currentUser =
+        result.user;
 
-        connection.textContent =
-            translations[
-                language
-            ].connected;
+    connection.textContent =
+        translations[
+            language
+        ].connected;
 
-        connection.style.color =
-            "#25e58b";
+    connection.style.color =
+        "#21e58a";
 
-        console.log(
-            "Sakaker Chat Auth OK:",
-            currentUser.uid
-        );
+    console.log(
+        "Firebase UID:",
+        currentUser.uid
+    );
 
-    }
-)
+    startRealtimeListeners();
 
-.catch(
-    function(error){
+})
 
-        console.error(
-            "Anonymous Authentication Error:",
-            error
-        );
+.catch(error => {
 
-        connection.textContent =
-            "● Auth Error";
+    console.error(
+        "Firebase Authentication Error:",
+        error
+    );
 
-        connection.style.color =
-            "#ff5555";
+    connection.textContent =
+        translations[
+            language
+        ].disconnected;
 
-    }
-);
+    connection.style.color =
+        "#ff6666";
+
+});
 
 
 /* =========================================================
-   JOIN
+   LISTENERS
 ========================================================= */
 
-async function joinChat(){
+function startRealtimeListeners(){
+
+    if(listenersStarted){
+
+        return;
+
+    }
+
+    listenersStarted =
+        true;
+
+
+    onValue(
+
+        ref(
+            db,
+            "onlineUsers"
+        ),
+
+        renderOnlineUsers,
+
+        error => {
+
+            console.error(
+                "Online users error:",
+                error
+            );
+
+        }
+
+    );
+
+
+    onChildAdded(
+
+        query(
+            ref(
+                db,
+                "publicChat"
+            ),
+
+            limitToLast(100)
+
+        ),
+
+        renderMessage,
+
+        error => {
+
+            console.error(
+                "Public chat error:",
+                error
+            );
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   USERS
+========================================================= */
+
+function renderOnlineUsers(snapshot){
+
+    usersList.replaceChildren();
+
+    let count =
+        0;
+
+
+    snapshot.forEach(
+        child => {
+
+            const data =
+                child.val();
+
+            if(
+                !data ||
+                typeof data.name !==
+                "string"
+            ){
+
+                return;
+
+            }
+
+
+            count++;
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "chatUser";
+
+
+            const dot =
+                document.createElement(
+                    "span"
+                );
+
+            dot.className =
+                "onlineDot";
+
+
+            const name =
+                document.createElement(
+                    "span"
+                );
+
+            name.textContent =
+                data.name;
+
+
+            item.append(
+                dot,
+                name
+            );
+
+            usersList.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    onlineCount.textContent =
+        count;
+
+}
+
+
+/* =========================================================
+   MESSAGE RENDER
+========================================================= */
+
+function renderMessage(snapshot){
+
+    const data =
+        snapshot.val();
+
+
+    if(
+        !data ||
+        typeof data.text !==
+        "string"
+    ){
+
+        return;
+
+    }
+
+
+    /*
+       إذا كانت الرسالة انتهت
+       نحاول حذفها مباشرة.
+    */
+
+    if(
+        data.expiresAt &&
+        Date.now() >=
+        Number(data.expiresAt)
+    ){
+
+        remove(snapshot.ref)
+        .catch(
+            error =>
+            console.error(
+                "Expired message:",
+                error
+            )
+        );
+
+        return;
+
+    }
+
+
+    welcome.style.display =
+        "none";
+
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+    message.className =
+        "chatMessage";
+
+
+    const username =
+        document.createElement(
+            "div"
+        );
+
+    username.className =
+        "messageUser";
+
+    username.textContent =
+        data.name ||
+        "Visitor";
+
+
+    const text =
+        document.createElement(
+            "div"
+        );
+
+    text.className =
+        "messageText";
+
+    text.textContent =
+        data.text;
+
+
+    message.append(
+        username,
+        text
+    );
+
+
+    messages.appendChild(
+        message
+    );
+
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
+
+    /*
+       حذف الرسالة من الواجهة
+       بعد انتهاء الخمس دقائق.
+    */
+
+    if(data.expiresAt){
+
+        const remaining =
+            Number(data.expiresAt) -
+            Date.now();
+
+
+        if(remaining > 0){
+
+            setTimeout(
+                async () => {
+
+                    try{
+
+                        await remove(
+                            snapshot.ref
+                        );
+
+                        if(
+                            message.parentNode
+                        ){
+
+                            message.remove();
+
+                        }
+
+                    }catch(error){
+
+                        console.error(
+                            "Message expiration:",
+                            error
+                        );
+
+                    }
+
+                },
+                remaining
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   REGISTER USER
+========================================================= */
+
+async function registerOnlineUser(){
+
+    if(
+        !currentUser ||
+        !myName
+    ){
+
+        return false;
+
+    }
+
+
+    myUserRef =
+        ref(
+            db,
+            `onlineUsers/${currentUser.uid}`
+        );
+
+
+    try{
+
+        /*
+           نسجل المستخدم أولًا.
+        */
+
+        await set(
+            myUserRef,
+            {
+
+                name:
+                myName,
+
+                uid:
+                currentUser.uid,
+
+                joinedAt:
+                Date.now()
+
+            }
+        );
+
+
+        /*
+           ثم نحدد أن Firebase
+           يحذف المستخدم عند
+           انقطاع الاتصال.
+        */
+
+        await onDisconnect(
+            myUserRef
+        ).remove();
+
+
+        return true;
+
+
+    }catch(error){
+
+        console.error(
+            "Register Online User Error:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   ENTER CHAT
+========================================================= */
+
+async function enterPublicChat(){
 
     const name =
-        nameInput.value.trim();
+        userNameInput.value.trim();
 
 
     if(
@@ -3194,6 +3586,7 @@ async function joinChat(){
         );
 
         return;
+
     }
 
 
@@ -3204,108 +3597,72 @@ async function joinChat(){
         alert(
             translations[
                 language
-            ].notReady
+            ].wait
         );
 
         return;
+
     }
 
 
-    nickname =
+    myName =
         name;
 
 
-    /*
-      IMPORTANT:
+    enterChat.disabled =
+        true;
 
-      البنية الموجودة عندك:
-
-      onlineUsers
-          UID
-              name
-              uid
-              joinedAt
-    */
-
-    presenceRef =
-        ref(
-            db,
-            "onlineUsers/" +
-            currentUser.uid
-        );
+    enterChat.textContent =
+        translations[
+            language
+        ].joining;
 
 
-    try{
-
-        /*
-          إزالة المستخدم تلقائيًا
-          عند انقطاع الاتصال.
-        */
-
-        await onDisconnect(
-            presenceRef
-        ).remove();
+    const success =
+        await registerOnlineUser();
 
 
-        /*
-          تسجيل المستخدم.
-        */
-
-        await set(
-            presenceRef,
-            {
-
-                name:
-                nickname,
-
-                uid:
-                currentUser.uid,
-
-                joinedAt:
-                Date.now()
-
-            }
-        );
+    enterChat.disabled =
+        false;
 
 
-        loginArea.style.display =
-            "none";
+    if(!success){
 
-        sendArea.style.display =
-            "flex";
-
-        messageInput.focus();
-
-
-    }
-
-    catch(error){
-
-        console.error(
-            "Join Error:",
-            error
-        );
+        enterChat.textContent =
+            translations[
+                language
+            ].join;
 
         alert(
-            "تعذر تسجيل الاسم في قائمة الموجودين"
+            translations[
+                language
+            ].onlineError
         );
 
+        return;
+
     }
+
+
+    loginArea.style.display =
+        "none";
+
+    sendArea.style.display =
+        "flex";
+
+
+    messageInput.focus();
 
 }
 
 
-/* =========================================================
-   JOIN BUTTON
-========================================================= */
-
-joinButton.onclick =
-joinChat;
+enterChat.onclick =
+enterPublicChat;
 
 
-nameInput.addEventListener(
+userNameInput.addEventListener(
     "keydown",
-    function(event){
+    event => {
 
         if(
             event.key === "Enter"
@@ -3313,224 +3670,11 @@ nameInput.addEventListener(
 
             event.preventDefault();
 
-            joinChat();
+            enterPublicChat();
 
         }
 
     }
-);
-
-
-/* =========================================================
-   ONLINE USERS
-========================================================= */
-
-const onlineUsersRef =
-    ref(
-        db,
-        "onlineUsers"
-    );
-
-
-onValue(
-
-    onlineUsersRef,
-
-    function(snapshot){
-
-        usersList.innerHTML =
-            "";
-
-        let total =
-            0;
-
-
-        snapshot.forEach(
-            function(child){
-
-                const data =
-                    child.val();
-
-
-                if(
-                    !data ||
-                    !data.name
-                ){
-
-                    return;
-
-                }
-
-
-                total++;
-
-
-                const row =
-                    document.createElement(
-                        "div"
-                    );
-
-                row.className =
-                    "user";
-
-
-                const dot =
-                    document.createElement(
-                        "span"
-                    );
-
-                dot.className =
-                    "onlineDot";
-
-
-                const userName =
-                    document.createElement(
-                        "span"
-                    );
-
-                userName.textContent =
-                    data.name;
-
-
-                row.appendChild(
-                    dot
-                );
-
-                row.appendChild(
-                    userName
-                );
-
-
-                usersList.appendChild(
-                    row
-                );
-
-            }
-        );
-
-
-        onlineCount.textContent =
-            total;
-
-    },
-
-    function(error){
-
-        console.error(
-            "Online Users Error:",
-            error
-        );
-
-    }
-
-);
-
-
-/* =========================================================
-   PUBLIC CHAT
-========================================================= */
-
-const publicChatRef =
-    ref(
-        db,
-        "publicChat"
-    );
-
-
-const publicChatQuery =
-    query(
-        publicChatRef,
-        limitToLast(100)
-    );
-
-
-onChildAdded(
-
-    publicChatQuery,
-
-    function(snapshot){
-
-        const data =
-            snapshot.val();
-
-
-        if(
-            !data ||
-            typeof data.text !==
-            "string"
-        ){
-
-            return;
-
-        }
-
-
-        welcome.style.display =
-            "none";
-
-
-        const box =
-            document.createElement(
-                "div"
-            );
-
-        box.className =
-            "message";
-
-
-        const user =
-            document.createElement(
-                "div"
-            );
-
-        user.className =
-            "messageName";
-
-        user.textContent =
-            data.name ||
-            "Visitor";
-
-
-        const text =
-            document.createElement(
-                "div"
-            );
-
-        text.className =
-            "messageText";
-
-        text.textContent =
-            data.text;
-
-
-        box.appendChild(
-            user
-        );
-
-        box.appendChild(
-            text
-        );
-
-
-        messagesBox.appendChild(
-            box
-        );
-
-
-        messagesBox.scrollTop =
-            messagesBox.scrollHeight;
-
-    },
-
-    function(error){
-
-        console.error(
-            "Public Chat Read Error:",
-            error
-        );
-
-    }
-
 );
 
 
@@ -3538,71 +3682,98 @@ onChildAdded(
    SEND MESSAGE
 ========================================================= */
 
-async function sendChatMessage(){
+async function sendPublicMessage(){
 
     const text =
         messageInput.value.trim();
 
 
-    if(
-        !currentUser
-    ){
+    if(!text){
+
+        alert(
+            translations[
+                language
+            ].empty
+        );
 
         return;
+
+    }
+
+
+    const words =
+        getWordCount(text);
+
+
+    if(
+        words > MAX_WORDS
+    ){
+
+        alert(
+            translations[
+                language
+            ].maxWords
+        );
+
+        return;
+
     }
 
 
     if(
-        !nickname
+        !currentUser ||
+        !myName
     ){
 
         return;
+
     }
 
 
-    if(
-        !text
-    ){
+    sendButton.disabled =
+        true;
 
-        return;
-    }
+    sendButton.textContent =
+        translations[
+            language
+        ].sending;
 
 
     try{
 
-        /*
-          إنشاء ID للرسالة.
-        */
-
         const messageRef =
             push(
-                publicChatRef
+                ref(
+                    db,
+                    "publicChat"
+                )
             );
 
 
         /*
-          البنية الموجودة عندك:
-
-          publicChat
-              MESSAGE_ID
-                  name
-                  text
-                  timestamp
-                  uid
+           الرسالة تنتهي بعد 5 دقائق.
         */
+
+        const expiresAt =
+            Date.now() +
+            MESSAGE_LIFETIME;
+
 
         await set(
             messageRef,
             {
 
                 name:
-                nickname,
+                myName,
 
                 text:
                 text,
 
                 timestamp:
-                Date.now(),
+                serverTimestamp(),
+
+                expiresAt:
+                expiresAt,
 
                 uid:
                 currentUser.uid
@@ -3611,20 +3782,11 @@ async function sendChatMessage(){
         );
 
 
-        /*
-          فقط نفرغ مربع الكتابة.
-          الرسالة نفسها لا تختفي.
-        */
-
         messageInput.value =
             "";
 
-        messageInput.focus();
 
-
-    }
-
-    catch(error){
+    }catch(error){
 
         console.error(
             "Send Message Error:",
@@ -3639,20 +3801,27 @@ async function sendChatMessage(){
 
     }
 
+
+    sendButton.disabled =
+        false;
+
+    sendButton.textContent =
+        translations[
+            language
+        ].send;
+
+    messageInput.focus();
+
 }
 
 
-/* =========================================================
-   SEND BUTTON
-========================================================= */
-
 sendButton.onclick =
-sendChatMessage;
+sendPublicMessage;
 
 
 messageInput.addEventListener(
     "keydown",
-    function(event){
+    event => {
 
         if(
             event.key === "Enter"
@@ -3660,7 +3829,7 @@ messageInput.addEventListener(
 
             event.preventDefault();
 
-            sendChatMessage();
+            sendPublicMessage();
 
         }
 
@@ -3669,13 +3838,13 @@ messageInput.addEventListener(
 
 
 /* =========================================================
-   START LANGUAGE
+   START
 ========================================================= */
 
-updateLanguage();
-
+applyLanguage();
 
 </script>
 
 </body>
 </html>
+```
