@@ -263,7 +263,6 @@ from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
 
 
 
-
 const firebaseConfig = {
 
 apiKey:"AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
@@ -295,7 +294,6 @@ const db=getFirestore(app);
 const storage=getStorage(app);
 
 
-
 window.firebaseApp=app;
 
 window.firebaseAuth=auth;
@@ -305,12 +303,10 @@ window.firebaseDB=db;
 window.firebaseStorage=storage;
 
 
-
 await setPersistence(
 auth,
 browserLocalPersistence
 );
-
 
 
 const overlay=document.getElementById("loginOverlay");
@@ -325,24 +321,9 @@ const paymentContinue=document.getElementById("paymentContinue");
 const paymentMessage=document.getElementById("paymentMessage");
 const PAYMENT_KEY="sakaker_business_paid_v1";
 
-// Local paid marker (session only) to avoid unnecessary server calls
-window._sakakerPaid = false;
-
-async function checkPaymentForEmail(emailAddr){
-  try{
-    const resp = await fetch('/payments/check?email='+encodeURIComponent(emailAddr));
-    if(!resp.ok) return false;
-    const j = await resp.json();
-    return !!j.paid;
-  }catch(e){
-    console.error('checkPaymentForEmail error', e);
-    return false;
-  }
-}
-
 function hasPaid(){
-  // Prefer server-validated status stored in session variable
-  return !!window._sakakerPaid;
+  /* لا نعتمد على localStorage كإثبات دفع */
+  return false;
 }
 
 function showPaymentGate(){
@@ -380,80 +361,22 @@ if(paymentContinue){
   };
 }
 
-// Load PayPal SDK dynamically (placeholder client-id to be replaced by workflow or manually)
-async function loadPayPalSdk(clientId){
-  if(window.paypal) return window.paypal;
-  return new Promise((resolve, reject)=>{
-    const s = document.createElement('script');
-    s.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
-    s.async = true;
-    s.onload = ()=> resolve(window.paypal);
-    s.onerror = (e)=> reject(e);
-    document.head.appendChild(s);
-  });
-}
 
-// Render PayPal buttons into #paymentArea
-async function renderPayPalButtons(){
-  const CLIENT_ID_PLACEHOLDER = 'YOUR_PAYPAL_CLIENT_ID';
-  try{
-    const paypal = await loadPayPalSdk(CLIENT_ID_PLACEHOLDER);
-    paypal.Buttons({
-      style: { layout: 'vertical', color: 'gold', shape: 'pill', label: 'pay' },
-      createOrder: async function(data, actions){
-        // create order on server
-        const res = await fetch('/paypal/create-order',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ amount: '4.99', currency: 'USD' })
-        });
-        const j = await res.json();
-        return j.id; // orderID
-      },
-      onApprove: async function(data, actions){
-        // capture on server
-        const resp = await fetch('/paypal/capture-order',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ orderID: data.orderID, email: document.getElementById('emailInput')?.value || null })
-        });
-        const body = await resp.json();
-        if(body.ok){
-          paymentMessage.textContent = '✅ تم الدفع بنجاح — التحقق آمن.';
-          paymentContinue.disabled = false;
-          paymentContinue.style.opacity = '1';
-          paymentContinue.style.cursor = 'pointer';
-          // mark session as paid
-          window._sakakerPaid = true;
-        }else{
-          paymentMessage.textContent = '❌ فشل التحقق من الدفع.';
-        }
-      },
-      onError: function(err){
-        paymentMessage.textContent = '❌ خطأ في معالجة الدفع';
-        console.error(err);
-      }
-    }).render('#paymentArea');
-  }catch(e){
-    console.error('Failed to load PayPal SDK or render buttons', e);
-    document.getElementById('paymentArea').textContent = 'تعذر تحميل بوابة الدفع، حاول لاحقًا.';
-  }
-}
-
-// render PayPal buttons immediately so user sees them
-renderPayPalButtons();
 
 /* دخول */
 
 document.getElementById("loginButton").onclick=async()=>{
 
+
 try{
+
 
 await signInWithEmailAndPassword(
 auth,
 email.value,
 pass.value
 );
+
 
 }catch(e){
 
@@ -524,24 +447,21 @@ error.textContent="❌ "+e.message;
 
 onAuthStateChanged(auth,async(user)=>{
 
-  if(user){
-    // check server-side payment state for this email
-    const paid = await checkPaymentForEmail(user.email);
-    if(paid){
-      window._sakakerPaid = true;
-      paymentGate.style.display="none";
-      overlay.style.display="none";
-      document.body.classList.remove("locked");
+  if(user && hasPaid()){
 
-      document.getElementById("userProfile").style.display="flex";
-      document.getElementById("userName").textContent = user.displayName || user.email;
-      document.getElementById("userPhoto").src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-    }else{
-      // not paid: sign out and show payment gate
-      try{ await signOut(auth); }catch(e){}
-      showPaymentGate();
-      document.getElementById("userProfile").style.display="none";
-    }
+    paymentGate.style.display="none";
+    overlay.style.display="none";
+    document.body.classList.remove("locked");
+
+    document.getElementById("userProfile").style.display="flex";
+    document.getElementById("userName").textContent = user.displayName || user.email;
+    document.getElementById("userPhoto").src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  }else if(user && !hasPaid()){
+
+    try{ await signOut(auth); }catch(e){}
+    showPaymentGate();
+    document.getElementById("userProfile").style.display="none";
 
   }else{
 
@@ -670,406 +590,4 @@ z-index:1;
 ">
 </iframe>
 
-<!-- =========================================================
-     🔹 الشاشة الرئيسية
-========================================================= -->
-
-<div id="pongGame-menu" style="
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:min(430px,90%);
-max-height:90vh;
-overflow:auto;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:10px;
-background:rgba(0,0,0,.78);
-padding:22px;
-border-radius:20px;
-color:#fff;
-z-index:10;
-box-sizing:border-box;
-">
-
-<h2 style="
-margin:0 0 5px;
-color:#ffd700;
-text-shadow:0 0 15px gold;
-">
-🏓 PONG
-</h2>
-
-<div id="pongOnline-status" style="
-font-size:13px;
-color:#9cffd0;
-min-height:18px;
-text-align:center;
-">
-جاري الاتصال...
-</div>
-
-<!-- الاسم -->
-<div id="pongOnline-nameBox" style="
-width:100%;
-display:flex;
-flex-direction:column;
-gap:7px;
-">
-
-<input
-id="pongOnline-name"
-maxlength="30"
-placeholder="اكتب اسمك المستعار"
-style="
-width:100%;
-box-sizing:border-box;
-padding:11px;
-border:none;
-border-radius:10px;
-text-align:center;
-font-size:16px;
-outline:none;
-">
-
-<button id="pongOnline-enter" style="
-padding:10px;
-border:none;
-border-radius:10px;
-background:#00cfa3;
-color:#fff;
-font-weight:bold;
-cursor:pointer;
-">
-دخول
-</button>
-
-</div>
-
-<!-- المتواجدون -->
-<div style="
-width:100%;
-background:rgba(255,255,255,.08);
-border:1px solid rgba(255,215,0,.25);
-border-radius:12px;
-padding:10px;
-box-sizing:border-box;
-">
-
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-color:#ffd700;
-font-weight:bold;
-margin-bottom:7px;
-">
-
-<span>👥 المتواجدون</span>
-
-<span id="pongOnline-count"
-style="
-background:#00a878;
-padding:2px 8px;
-border-radius:20px;
-font-size:12px;
-">
-0
-</span>
-
-</div>
-
-<div id="pongOnline-users" style="
-max-height:110px;
-overflow:auto;
-font-size:14px;
-">
-لا يوجد لاعبون حاليًا
-</div>
-
-</div>
-
-<!-- إعدادات اللعبة -->
-<div id="pongGame-settings" style="
-width:100%;
-display:flex;
-flex-direction:column;
-gap:8px;
-">
-
-<label>
-🎨 المضرب 1:
-<input id="pongGame-p1Color" type="color" value="#FFD700">
-</label>
-
-<label>
-🎨 المضرب 2:
-<input id="pongGame-p2Color" type="color" value="#00BFFF">
-</label>
-
-<label>
-⚪ الكرة:
-<input id="pongGame-ballColor" type="color" value="#FFFFFF">
-</label>
-
-<label>
-🎯 المستوى:
-
-<select id="pongGame-level"
-style="padding:5px;border-radius:6px;">
-<option value="easy">سهل</option>
-<option value="hard">صعب</option>
-<option value="harder">أصعب</option>
-<option value="impossible">مستحيل</option>
-</select>
-
-</label>
-
-</div>
-
-<!-- أزرار اللعب -->
-<div style="
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:8px;
-">
-
-<button id="pongOnline-computer" style="
-padding:9px 15px;
-border:none;
-border-radius:8px;
-background:#00bfff;
-cursor:pointer;
-font-weight:bold;
-">
-🤖 كمبيوتر
-</button>
-
-<button id="pongOnline-player" style="
-padding:9px 15px;
-border:none;
-border-radius:8px;
-background:#ffd700;
-cursor:pointer;
-font-weight:bold;
-">
-🎮 لاعبان
-</button>
-
-<button id="pongOnline-online" style="
-padding:9px 15px;
-border:none;
-border-radius:8px;
-background:#00cfa3;
-color:#fff;
-cursor:pointer;
-font-weight:bold;
-">
-🌐 أونلاين
-</button>
-
-</div>
-
-<!-- =========================================================
-     🔹 غرفة الأونلاين
-========================================================= -->
-
-<div id="pongOnline-roomPanel" style="
-display:none;
-width:100%;
-background:rgba(0,0,0,.55);
-border:1px solid rgba(0,207,163,.4);
-border-radius:15px;
-padding:14px;
-box-sizing:border-box;
-">
-
-<h3 style="
-margin:0 0 10px;
-text-align:center;
-color:#00cfa3;
-">
-🌐 غرفة اللاعبين
-</h3>
-
-<button id="pongOnline-createRoom" style="
-width:100%;
-padding:10px;
-border:none;
-border-radius:9px;
-background:#ffd700;
-font-weight:bold;
-cursor:pointer;
-margin-bottom:8px;
-">
-🏠 إنشاء غرفة
-</button>
-
-<div id="pongOnline-rooms" style="
-display:flex;
-flex-direction:column;
-gap:7px;
-">
-لا توجد غرف مفتوحة
-</div>
-
-</div>
-
-<button id="pongGame-back" style="
-margin-top:5px;
-padding:8px 20px;
-border:none;
-border-radius:8px;
-background:#555;
-color:#fff;
-cursor:pointer;
-">
-🔙 رجوع
-</button>
-
-</div>
-
-<!-- =========================================================
-     🔹 لوحة اللعبة
-========================================================= -->
-
-<canvas id="pongGame-canvas" style="
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:4;
-cursor:none;
-">
-</canvas>
-
-<!-- إغلاق -->
-<button id="pongGame-close" style="
-position:absolute;
-top:10px;
-right:15px;
-font-size:24px;
-background:rgba(0,0,0,.5);
-border:none;
-border-radius:50%;
-width:42px;
-height:42px;
-color:#fff;
-cursor:pointer;
-z-index:20;
-">
-✖
-</button>
-
-<!-- معلومات الأونلاين -->
-<div id="pongOnline-gameInfo" style="
-display:none;
-position:absolute;
-top:12px;
-left:50%;
-transform:translateX(-50%);
-z-index:20;
-background:rgba(0,0,0,.7);
-color:#fff;
-padding:7px 14px;
-border-radius:20px;
-font-size:13px;
-">
-🌐 أونلاين
-</div>
-
-<!-- التحكم -->
-<div style="
-position:absolute;
-bottom:10px;
-right:10px;
-display:flex;
-gap:8px;
-z-index:20;
-">
-
-<button id="pongGame-play" style="
-padding:7px 11px;
-border:none;
-border-radius:7px;
-background:#333;
-color:#fff;
-cursor:pointer;
-">
-⏸
-</button>
-
-<button id="pongGame-mute" style="
-padding:7px 11px;
-border:none;
-border-radius:7px;
-background:#333;
-color:#fff;
-cursor:pointer;
-">
-🔇
-</button>
-
-</div>
-
-</div>
-
-
-<!-- =========================================================
-     🔥 FIREBASE + PONG
-========================================================= -->
-
-<script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
-import {
-  getDatabase,
-  ref,
-  set,
-  update,
-  remove,
-  onValue,
-  onChildAdded,
-  onDisconnect,
-  push,
-  serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-
-import {
-  getAuth,
-  signInAnonymously,
-  onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-
-/* =========================================================
-   🔥 إعداد Firebase
-========================================================= */
-
-const firebaseConfig = {
-
-  apiKey:
-  "AIzaSyCltuh24M0X4KBlVpIFi8HXlrTObQRVk_s",
-
-  authDomain:
-  "general-sakaker.firebaseapp.com",
-
-  databaseURL:
-  "https://general-sakaker-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-  projectId:
-  "general-sakaker",
-
-  storageBucket:
-  "general-sakaker.firebasestorage.app",
-
-  messagingSenderId:
-[...]
+... (truncated for brevity)
