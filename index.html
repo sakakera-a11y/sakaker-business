@@ -1,3 +1,27 @@
+<style id="sakaker-site-background">
+html,body{
+    margin:0;
+    padding:0;
+    min-height:100%;
+}
+body{
+    background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+}
+#loginOverlay{
+    background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png") !important;
+    background-size:cover !important;
+    background-position:center !important;
+    background-repeat:no-repeat !important;
+}
+@media(max-width:768px){
+    body{background-attachment:scroll;}
+}
+</style>
+
   
 
 <!-- 🔒 منع ظهور محتوى الموقع قبل تسجيل الدخول -->
@@ -21,7 +45,7 @@ height:100%;
 display:flex;
 align-items:center;
 justify-content:center;
-z-index:2147483646;
+z-index:2147483647;
 background:linear-gradient(rgba(0,0,0,.48),rgba(0,0,0,.72)),url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png") center/cover no-repeat;
 font-family:Tajawal,Tahoma,Arial,sans-serif;
 ">
@@ -43,7 +67,7 @@ font-family:Tajawal,Tahoma,Arial,sans-serif;
     <h2 style="margin:6px 0;color:#00ffd5">مرحبًا بك في Sakaker Business</h2>
     <p style="line-height:1.7;margin:8px 0 16px;color:#eee">
       لإتاحة الدخول إلى الموقع، يرجى إتمام أي دفعة عبر PayPal أولًا.
-      بعد إتمام الدفع يمكنك تسجيل الدخول أو إنشاء حساب، وبعدها لن تُطلب منك دفعة أخرى على هذا المتصفح.
+      بعد إتمام الدفع يجب التحقق من نجاح العملية أولاً. لا يمكن فتح تسجيل الدخول بمجرد الضغط على زر المتابعة.
     </p>
     <div id="paymentArea" style="margin:12px auto"></div>
     <button id="paymentContinue" type="button" style="
@@ -62,7 +86,10 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png") center/cover no-repeat;
+background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -299,7 +326,8 @@ const paymentMessage=document.getElementById("paymentMessage");
 const PAYMENT_KEY="sakaker_business_paid_v1";
 
 function hasPaid(){
-  return localStorage.getItem(PAYMENT_KEY)==="1";
+  /* لا نعتمد على localStorage كإثبات دفع */
+  return false;
 }
 
 function showPaymentGate(){
@@ -321,11 +349,21 @@ if(hasPaid()){
   showPaymentGate();
 }
 
-paymentContinue.onclick=()=>{
-  localStorage.setItem(PAYMENT_KEY,"1");
-  paymentMessage.textContent="تم تسجيل حالة الدفع على هذا المتصفح. يمكنك الآن تسجيل الدخول.";
-  showLoginGate();
-};
+/* =========================================================
+   🔐 الدفع: لا يتم اعتبار الدفع مؤكداً من المتصفح.
+   زر "أتممت الدفع" لا يفتح تسجيل الدخول.
+   يجب أن تأتي حالة الدفع من جهة موثوقة/خادم PayPal ثم تُحفظ
+   في Firebase قبل السماح بالدخول.
+========================================================= */
+if(paymentContinue){
+  paymentContinue.textContent="🔒 التحقق من الدفع مطلوب";
+  paymentContinue.disabled=true;
+  paymentContinue.style.opacity=".55";
+  paymentContinue.style.cursor="not-allowed";
+  paymentContinue.onclick=()=>{
+    paymentMessage.textContent="⛔ لا يمكن فتح تسجيل الدخول قبل التحقق من نجاح الدفع.";
+  };
+}
 
 
 
