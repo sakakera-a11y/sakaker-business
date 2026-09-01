@@ -26,7 +26,7 @@ body{
 
 <!-- 🔒 منع ظهور محتوى الموقع قبل تسجيل الدخول -->
 <style>
-body.locked > *:not(#loginOverlay):not(#paymentGate){
+body.locked > *:not(#loginOverlay){
 visibility:hidden;
 }
 </style>
@@ -36,163 +36,120 @@ document.body.classList.add("locked");
 </script>
 
 
-<!-- 💳 بوابة الدفع قبل تسجيل الدخول -->
-<div id="paymentGate" style="
-position:fixed;
-inset:0;
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:2147483647;
-background:linear-gradient(rgba(0,0,0,.48),rgba(0,0,0,.72)),url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png") center/cover no-repeat;
-font-family:Tajawal,Tahoma,Arial,sans-serif;
-">
-  <div id="paymentCard" style="
-  width:min(92%,460px);
-  max-height:92vh;
-  overflow:auto;
-  padding:24px;
-  border-radius:22px;
+<!-- 🔒 بوابة تسجيل الدخول الاحترافية — المحتوى مخفي حتى نجاح الدخول -->
+<style id="sakaker-login-system">
+html,body{margin:0;padding:0;min-height:100%;}
+body.locked{overflow:hidden !important;}
+/* إخفاء كل محتوى الموقع أثناء شاشة الدخول */
+body.locked > *:not(#loginOverlay){
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+#loginOverlay{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  min-height:100vh !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  z-index:2147483647 !important;
+  overflow:auto !important;
+  box-sizing:border-box !important;
+  padding:20px !important;
+  background-image:
+    linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.62)),
+    url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png") !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  font-family:Tajawal,Tahoma,Arial,sans-serif !important;
+  direction:rtl;
+}
+.login-shell{
+  width:min(430px,94vw);
+  box-sizing:border-box;
+  padding:30px 26px 24px;
+  border-radius:26px;
   text-align:center;
   color:#fff;
-  background:rgba(0,8,12,.82);
-  border:1px solid #00ffd5;
-  box-shadow:0 0 35px rgba(0,255,213,.55),inset 0 0 25px rgba(0,255,213,.08);
-  backdrop-filter:blur(14px);
-  box-sizing:border-box;
-  ">
-    <div style="font-size:44px;filter:drop-shadow(0 0 12px #00ffd5)">💎</div>
-    <h2 style="margin:6px 0;color:#00ffd5">مرحبًا بك في Sakaker Business</h2>
-    <p style="line-height:1.7;margin:8px 0 16px;color:#eee">
-      لإتاحة الدخول إلى الموقع، يرجى إتمام أي دفعة عبر PayPal أولًايجب دفع اي مبلغ لمعاينه الموقع وممكن يحسب اشتراك دائم على نفس اي بي الجهاز الخاص بكA fee must be paid for the site inspection; this can also be applied as a permanent subscription linked to your device's IP address..
-    </p>
-    <div id="paymentArea" style="margin:12px auto"></div>
-    <button id="paymentContinue" type="button" style="
-      width:100%;padding:13px;margin-top:12px;border:0;border-radius:12px;
-      background:linear-gradient(90deg,#00ffd5,#00a878);color:#00110d;
-      font-weight:bold;font-size:16px;cursor:pointer;box-shadow:0 0 18px rgba(0,255,213,.35);
-    ">✅ أتممت الدفع — متابعة إلى تسجيل الدخول</button>
-    <div id="paymentMessage" style="min-height:22px;margin-top:10px;color:#ffd700;font-size:13px"></div>
+  background:rgba(4,12,15,.82);
+  border:1px solid rgba(0,255,213,.55);
+  box-shadow:0 0 45px rgba(0,255,213,.30),inset 0 0 28px rgba(0,255,213,.07);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.login-logo{
+  width:76px;height:76px;margin:0 auto 12px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  border:1px solid rgba(0,255,213,.65);
+  background:rgba(0,255,213,.08);
+  box-shadow:0 0 28px rgba(0,255,213,.45);
+  font-size:38px;
+}
+.login-title{margin:4px 0;color:#00ffd5;font-size:25px;text-shadow:0 0 14px rgba(0,255,213,.5);}
+.login-subtitle{margin:5px 0 20px;color:#d9ffff;font-size:13px;line-height:1.7;}
+.login-field{
+  width:100%;box-sizing:border-box;padding:13px 14px;margin:7px 0;
+  border-radius:12px;border:1px solid rgba(255,255,255,.14);
+  outline:none;background:rgba(255,255,255,.08);color:#fff;
+  font-size:15px;font-family:inherit;
+  transition:.2s;
+}
+.login-field:focus{border-color:#00ffd5;box-shadow:0 0 14px rgba(0,255,213,.18);background:rgba(255,255,255,.11);}
+.login-field::placeholder{color:#cce8e7;}
+.login-primary,.login-google,.login-signup{
+  width:100%;padding:13px;margin-top:9px;border-radius:12px;
+  font-family:inherit;font-size:15px;font-weight:bold;cursor:pointer;
+  transition:transform .15s,box-shadow .15s,opacity .15s;
+}
+.login-primary{border:0;background:linear-gradient(90deg,#00ffd5,#00b889);color:#00110d;box-shadow:0 0 20px rgba(0,255,213,.25);}
+.login-google{border:1px solid rgba(255,255,255,.18);background:rgba(66,133,244,.92);color:#fff;}
+.login-signup{border:1px solid rgba(0,255,213,.55);background:rgba(255,255,255,.05);color:#fff;}
+.login-primary:hover,.login-google:hover,.login-signup:hover{transform:translateY(-1px);box-shadow:0 0 18px rgba(0,255,213,.22);}
+.login-primary:disabled,.login-google:disabled,.login-signup:disabled{opacity:.55;cursor:wait;transform:none;}
+#loginError{min-height:22px;margin:11px 0 3px;color:#ff9b9b;font-size:13px;line-height:1.5;}
+.login-language{display:flex;justify-content:center;gap:8px;margin-top:16px;}
+.login-language button{
+  border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 13px;
+  background:rgba(255,255,255,.06);color:#dff;cursor:pointer;font-family:inherit;font-size:12px;
+}
+.login-language button.active{border-color:#00ffd5;color:#00ffd5;box-shadow:0 0 10px rgba(0,255,213,.18);}
+.login-footer{margin-top:14px;color:#9fb7b6;font-size:11px;}
+@media(max-width:600px){
+  #loginOverlay{padding:14px !important;}
+  .login-shell{padding:24px 18px 19px;border-radius:22px;}
+  .login-logo{width:66px;height:66px;font-size:32px;}
+  .login-title{font-size:22px;}
+}
+</style>
+
+<div id="loginOverlay" aria-modal="true" role="dialog">
+  <div class="login-shell">
+    <div class="login-logo">💎</div>
+    <h2 class="login-title" id="loginTitle">🔐 تسجيل الدخول</h2>
+    <div class="login-subtitle" id="loginSubtitle">أهلاً بك في Sakaker Business<br>يرجى تسجيل الدخول للمتابعة إلى الموقع</div>
+
+    <input id="emailInput" class="login-field" type="email" autocomplete="email" placeholder="📧 البريد الإلكتروني">
+    <input id="passwordInput" class="login-field" type="password" autocomplete="current-password" placeholder="🔒 كلمة المرور">
+
+    <button id="loginButton" class="login-primary" type="button">دخول</button>
+    <button id="googleButton" class="login-google" type="button">🔵 الدخول بواسطة Google</button>
+
+    <div id="loginError" role="alert"></div>
+
+    <button id="signupButton" class="login-signup" type="button">📝 إنشاء حساب جديد</button>
+
+    <div class="login-language">
+      <button id="langAR" class="active" type="button">العربية</button>
+      <button id="langEN" type="button">English</button>
+    </div>
+
+    <div class="login-footer" id="loginFooter">الوصول إلى محتوى الموقع محمي بتسجيل الدخول</div>
   </div>
 </div>
-
-<!-- 🔒 نافذة الدخول -->
-<div id="loginOverlay" style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png");
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:999999;
-backdrop-filter:blur(5px);
-">
-
-<div style="
-background:rgba(0,0,0,.8);
-padding:25px;
-width:90%;
-max-width:420px;
-border-radius:18px;
-text-align:center;
-color:white;
-font-family:Tajawal;
-box-shadow:0 0 30px #00ffcc;
-">
-
-
-<h2 style="color:#00ffcc">
-🔐 تسجيل الدخول
-</h2>
-
-
-<input id="emailInput"
-type="email"
-placeholder="📧 البريد الإلكتروني"
-style="
-width:100%;
-padding:12px;
-margin:8px 0;
-border-radius:10px;
-border:none;
-background:#ffffff22;
-color:white;
-">
-
-
-<input id="passwordInput"
-type="password"
-placeholder="🔒 كلمة المرور"
-style="
-width:100%;
-padding:12px;
-margin:8px 0;
-border-radius:10px;
-border:none;
-background:#ffffff22;
-color:white;
-">
-
-
-<button id="loginButton" style="
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:10px;
-background:#00ffcc;
-font-weight:bold;
-cursor:pointer;
-">
-دخول
-</button>
-
-
-<button id="googleButton" style="
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:10px;
-background:#4285F4;
-color:white;
-font-weight:bold;
-cursor:pointer;
-">
-🔵 الدخول بواسطة Google
-</button>
-
-
-<div id="loginError"
-style="color:#ff8888;margin:10px">
-</div>
-
-
-<button id="signupButton" style="
-width:100%;
-padding:12px;
-border-radius:10px;
-background:#ffffff22;
-color:white;
-border:1px solid #00ffcc;
-cursor:pointer;
-">
-📝 إنشاء حساب جديد
-</button>
-
-
-</div>
-</div>
-
-
 
 <!-- 👤 بيانات المستخدم -->
 <div id="userProfile" style="
@@ -313,61 +270,22 @@ browserLocalPersistence
 
 
 const overlay=document.getElementById("loginOverlay");
-
 const email=document.getElementById("emailInput");
-
 const pass=document.getElementById("passwordInput");
-
 const error=document.getElementById("loginError");
-const paymentGate=document.getElementById("paymentGate");
-const paymentContinue=document.getElementById("paymentContinue");
-const paymentMessage=document.getElementById("paymentMessage");
-const PAYMENT_KEY="sakaker_business_paid_v1";
 
-function hasPaid(){
-  /* 
-     تنبيه: التحقق الحقيقي من PayPal يجب أن يتم من خادم موثوق.
-     هذه الدالة لا تفترض نجاح الدفع من المتصفح.
-  */
-  return false;
-}
-
-function showPaymentGate(){
-  paymentGate.style.display="flex";
-  overlay.style.display="none";
-  document.body.classList.add("locked");
-}
-
+/* لا توجد بوابة دفع حاليًا. الاشتراك يضاف لاحقًا دون تغيير نظام الدخول. */
 function showLoginGate(){
-  paymentGate.style.display="none";
   overlay.style.display="flex";
   document.body.classList.add("locked");
 }
 
-if(hasPaid()){
-  paymentGate.style.display="none";
-  overlay.style.display="flex";
-}else{
-  showPaymentGate();
+function openSiteAfterLogin(){
+  overlay.style.display="none";
+  document.body.classList.remove("locked");
 }
 
-/* =========================================================
-   🔐 الدفع: لا يتم اعتبار الدفع مؤكداً من المتصفح.
-   زر "أتممت الدفع" لا يفتح تسجيل الدخول.
-   يجب أن تأتي حالة الدفع من جهة موثوقة/خادم PayPal ثم تُحفظ
-   في Firebase قبل السماح بالدخول.
-========================================================= */
-if(paymentContinue){
-  paymentContinue.textContent="🔒 التحقق من الدفع مطلوب";
-  paymentContinue.disabled=true;
-  paymentContinue.style.opacity=".55";
-  paymentContinue.style.cursor="not-allowed";
-  paymentContinue.onclick=()=>{
-    paymentMessage.textContent="⛔ لا يمكن فتح تسجيل الدخول قبل التحقق من نجاح الدفع.";
-  };
-}
-
-
+showLoginGate();
 
 /* دخول */
 
@@ -453,39 +371,16 @@ error.textContent="❌ "+e.message;
 /* مراقبة الدخول */
 
 onAuthStateChanged(auth,async(user)=>{
-
-  if(user && hasPaid()){
-
-    paymentGate.style.display="none";
-    overlay.style.display="none";
-    document.body.classList.remove("locked");
-
+  if(user){
+    openSiteAfterLogin();
     document.getElementById("userProfile").style.display="flex";
-    document.getElementById("userName").textContent = user.displayName || user.email;
+    document.getElementById("userName").textContent = user.displayName || user.email || "User";
     document.getElementById("userPhoto").src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-
-  }else if(user && !hasPaid()){
-
-    try{ await signOut(auth); }catch(e){}
-    showPaymentGate();
-    document.getElementById("userProfile").style.display="none";
-
   }else{
-
     document.getElementById("userProfile").style.display="none";
-
-    if(hasPaid()){
-      showLoginGate();
-    }else{
-      showPaymentGate();
-    }
+    showLoginGate();
   }
-
 });
-
-
-
-
 
 /* خروج */
 
@@ -500,7 +395,44 @@ await signOut(auth);
 console.log("SAKAKER Firebase Ready");
 
 </script>
-  <!-- ================= خلفية موقع ================= -->
+  <script>
+(function(){
+  const ar=document.getElementById("langAR");
+  const en=document.getElementById("langEN");
+  const title=document.getElementById("loginTitle");
+  const subtitle=document.getElementById("loginSubtitle");
+  const email=document.getElementById("emailInput");
+  const pass=document.getElementById("passwordInput");
+  const login=document.getElementById("loginButton");
+  const google=document.getElementById("googleButton");
+  const signup=document.getElementById("signupButton");
+  const footer=document.getElementById("loginFooter");
+  const err=document.getElementById("loginError");
+
+  function setLang(lang){
+    const isAR=lang!=="en";
+    document.documentElement.lang=isAR?"ar":"en";
+    document.documentElement.dir=isAR?"rtl":"ltr";
+    document.body.dir=isAR?"rtl":"ltr";
+    title.textContent=isAR?"🔐 تسجيل الدخول":"🔐 Sign in";
+    subtitle.innerHTML=isAR?"أهلاً بك في Sakaker Business<br>يرجى تسجيل الدخول للمتابعة إلى الموقع":"Welcome to Sakaker Business<br>Please sign in to continue";
+    email.placeholder=isAR?"📧 البريد الإلكتروني":"📧 Email address";
+    pass.placeholder=isAR?"🔒 كلمة المرور":"🔒 Password";
+    login.textContent=isAR?"دخول":"Sign in";
+    google.textContent=isAR?"🔵 الدخول بواسطة Google":"🔵 Continue with Google";
+    signup.textContent=isAR?"📝 إنشاء حساب جديد":"📝 Create a new account";
+    footer.textContent=isAR?"الوصول إلى محتوى الموقع محمي بتسجيل الدخول":"Access to the site content is protected by sign-in";
+    ar.classList.toggle("active",isAR); en.classList.toggle("active",!isAR);
+    if(err.dataset.system!="1") err.textContent="";
+  }
+  ar.onclick=()=>setLang("ar");
+  en.onclick=()=>setLang("en");
+  window.sakakerLoginLanguage={setLang};
+  setLang("ar");
+})();
+</script>
+
+<!-- ================= خلفية موقع ================= -->
 <style>
 html,
 body{
@@ -973,20 +905,6 @@ emOpenBtn.onclick=()=>{
   `;
   emeraldHost.appendChild(p);
 
- /* PayPal render */
-function renderPay(){
-  try{
-    if(window.paypal && paypal.HostedButtons){
-      paypal.HostedButtons({hostedButtonId:"S9YLL5P5H47P4"}).render("#emPaypalBox");
-    }
-  }catch(e){ console.log("PayPal error:", e); }
-}
-
-
-  // قد يتأخر تحميل SDK
-  setTimeout(renderPay, 0);
-  setTimeout(renderPay, 900);
-
   /* عناصر */
   const closeBtn = p.querySelector(".emClose");
   const cam = p.querySelector("#emCam");
@@ -1190,252 +1108,7 @@ window.firebaseStorage = storage;
 
 console.log("SAKAKER Firebase Ready");
 </script>
-<!-- 💚 صندوق دعم PayPal -->
-<div id="paypalSupportBox">
-
-  <div class="emPayBox">
-
-    <b>💚   </b>
-
-    <div id="emPaypalBox"></div>
-
-  </div>
-
-</div>
-
-
-
-<style>
-
-/* 💚 PayPal أسفل يسار الشاشة */
-
-#paypalSupportBox{
-
-position:fixed;
-
-left:15px;
-
-bottom:215px;
-
-z-index:99998;
-
-}
-
-
-
-#paypalSupportBox .emPayBox{
-
-width:min(240px,85vw);
-
-background:rgba(0,0,0,.75);
-
-border:1px solid #00ffd5;
-
-border-radius:12px;
-
-padding:8px;
-
-font-size:11px;
-
-box-shadow:
-0 0 15px rgba(0,255,213,.55);
-
-text-align:center;
-
-font-family:Tajawal,Tahoma;
-
-}
-
-
-
-#paypalSupportBox .emPayBox b{
-
-color:#ffd700;
-
-display:block;
-
-margin-bottom:6px;
-
-}
-
-
-
-#paypalSupportBox #emPaypalBox{
-
-background:
-
-border-radius:10px;
-
-padding:3px;
-
-transform:scale(.85);
-
-transform-origin:center;
-
-}
-
-
-
-/* 📱 للجوال */
-
-@media(max-width:600px){
-
-#paypalSupportBox{
-
-left:8px;
-
-bottom:8px;
-
-}
-
-
-#paypalSupportBox .emPayBox{
-
-width:210px;
-
-}
-
-}
-
-
-</style>
-
-
-
-
-<!-- 💳 تحميل PayPal -->
-
-<script>
-
-(function(){
-
-
-if(window.paypal){
-
-renderPay();
-
-return;
-
-}
-
-
-var s=document.createElement("script");
-
-
-s.src=
-"https://www.paypal.com/sdk/js?client-id=BAAQAE5C8rFrqoJpWqxpYluOT09waMhuzhF4ug2QGvJm76YmqiCmzkP31wl8xZq9W5WkJSvAx6ZoujIBFw&components=hosted-buttons&disable-funding=venmo&currency=USD";
-
-
-
-s.onload=function(){
-
-console.log("PayPal Ready");
-
-renderPay();
-
-};
-
-
-
-s.onerror=function(){
-
-console.log("PayPal Load Error");
-
-};
-
-
-
-document.head.appendChild(s);
-
-
-
-})();
-
-
-
-
-
-// 💙 إنشاء زر الدفع
-
-function renderPay(){
-
-
-try{
-
-
-if(window.paypal && paypal.HostedButtons){
-
-
-paypal.HostedButtons({
-
-hostedButtonId:"S9YLL5P5H47P4"
-
-
-}).render("#emPaypalBox");
-
-
-console.log("PayPal Button Loaded");
-
-
-}
-
-
-}catch(e){
-
-
-console.log(
-"PayPal error:",
-e
-);
-
-
-}
-
-
-}
-
-
-</script>
-
-<!-- =========================================================
-     💳 نقل PayPal إلى بوابة الدخول وإخفاؤه من الموقع بعد الدفع
-========================================================= -->
-<style>
-#paymentGate #paypalSupportBox{
-  position:static !important;
-  left:auto !important;
-  bottom:auto !important;
-  z-index:auto !important;
-  width:100% !important;
-  visibility:visible !important;
-}
-#paymentGate #paypalSupportBox .emPayBox{
-  width:min(320px,100%) !important;
-  margin:0 auto !important;
-  background:rgba(0,0,0,.35) !important;
-  border:1px solid rgba(0,255,213,.55) !important;
-  box-shadow:0 0 18px rgba(0,255,213,.25) !important;
-}
-#paymentGate #paypalSupportBox #emPaypalBox{
-  transform:none !important;
-  width:100% !important;
-}
-</style>
-<script>
-(function(){
-  function movePayPal(){
-    const box=document.getElementById("paypalSupportBox");
-    const target=document.getElementById("paymentArea");
-    if(box && target && box.parentElement!==target){
-      target.appendChild(box);
-    }
-  }
-  movePayPal();
-  window.addEventListener("load",movePayPal);
-  setTimeout(movePayPal,500);
-  setTimeout(movePayPal,1500);
-})();
-</script> <!-- ================= خلفية موقع ================= -->
+<!-- ================= خلفية موقع ================= -->
 <style>
 html,
 body{
