@@ -1,4 +1,3 @@
-
 <style id="sakaker-site-background">
 html,body{
     margin:0;
@@ -433,6 +432,7 @@ console.log("SAKAKER Firebase Ready");
   setLang("ar");
 })();
 </script>
+
 <!-- ================= خلفية موقع ================= -->
 <style>
 html,
@@ -475,7 +475,12 @@ body>*{
 
 <!-- Emerald Music Overlay START -->
 <div id="emeraldMusicHost">
-  <div id="emOpenBtn">🎹 💎</div>
+  <div id="emOpenBtn" title="Musical Instruments">
+  <span class="emCoinInner">
+    <span class="emCoinIcon">♫</span>
+    <span class="emCoinText">MUSICAL<br>INSTRUMENTS</span>
+  </span>
+</div>
 </div>
 
 <style>
@@ -493,11 +498,58 @@ body>*{
 /* زر الفتح */
 #emeraldMusicHost #emOpenBtn{
   pointer-events:auto;
-  position:fixed;bottom:300px;right:50px;width:78px;height:78px;border-radius:50%;
-  background:rgba(255,255,255,.08);border:2px solid var(--em);
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;cursor:pointer;box-shadow:0 0 18px var(--em);
+  position:fixed;
+  bottom:200px;
+  right:180px;
+  width:92px;
+  height:92px;
+  border-radius:50%;
+  padding:5px;
+  cursor:pointer;
   z-index:2147483646;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#3b2500;
+  border:2px solid #ffe98a;
+  background:
+    radial-gradient(circle at 32% 28%,#fff4a8 0 7%,#ffd85a 18%,#c98a08 52%,#7d4b00 78%,#f3c13b 100%);
+  box-shadow:
+    inset 0 0 0 3px #9a6100,
+    inset 0 0 0 6px #f8da63,
+    inset 0 0 18px rgba(255,255,255,.55),
+    0 0 9px #ffd700,
+    0 0 24px rgba(255,190,0,.85);
+  text-shadow:0 1px 0 rgba(255,255,255,.55);
+  transition:transform .18s ease,filter .18s ease;
+}
+#emeraldMusicHost #emOpenBtn:hover{
+  transform:scale(1.07) rotate(-3deg);
+  filter:brightness(1.12);
+}
+#emeraldMusicHost #emOpenBtn:active{transform:scale(.96)}
+#emeraldMusicHost .emCoinInner{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  border:1px dashed rgba(91,51,0,.8);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+}
+#emeraldMusicHost .emCoinIcon{
+  font-size:24px;
+  font-weight:900;
+  margin-bottom:3px;
+}
+#emeraldMusicHost .emCoinText{
+  font-family:Georgia,"Times New Roman",serif;
+  font-weight:900;
+  font-size:8px;
+  letter-spacing:.45px;
+  text-align:center;
 }
 
 /* الغطاء */
@@ -555,6 +607,99 @@ body>*{
   box-shadow:0 0 22px var(--em);
 }
 #emeraldMusicHost .emCamBox video{width:100%;display:block;background:#000}
+
+/* دردشة Firebase Business في الجهة المقابلة للكاميرا */
+#emeraldMusicHost .emChatBox{
+  width:min(360px,92%);
+  height:205px;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid rgba(255,215,0,.55);
+  background:rgba(2,18,18,.88);
+  box-shadow:0 0 22px rgba(255,215,0,.45);
+  display:flex;
+  flex-direction:column;
+  direction:rtl;
+}
+#emeraldMusicHost .emChatHead{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:6px 10px;
+  color:#ffe77a;
+  font-size:12px;
+  font-weight:800;
+  background:linear-gradient(90deg,rgba(104,68,0,.45),rgba(0,255,213,.09));
+  border-bottom:1px solid rgba(255,215,0,.28);
+}
+#emeraldMusicHost .emChatState{font-size:10px;color:#bff;opacity:.9}
+#emeraldMusicHost .emChatMessages{
+  flex:1;
+  overflow:auto;
+  padding:7px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  scrollbar-width:thin;
+}
+#emeraldMusicHost .emChatMsg{
+  max-width:88%;
+  padding:6px 8px;
+  border-radius:10px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(0,255,213,.18);
+  color:#efffff;
+  font-size:11px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+#emeraldMusicHost .emChatMsg.me{
+  align-self:flex-start;
+  border-color:rgba(255,215,0,.45);
+  background:rgba(255,215,0,.09);
+}
+#emeraldMusicHost .emChatName{color:#ffd95a;font-size:9px;font-weight:800;margin-bottom:2px}
+#emeraldMusicHost .emChatComposer{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:6px;
+  border-top:1px solid rgba(0,255,213,.2);
+}
+#emeraldMusicHost .emChatInput{
+  flex:1;
+  min-width:0;
+  height:30px;
+  border-radius:999px;
+  border:1px solid rgba(0,255,213,.38);
+  background:#071719;
+  color:#fff;
+  padding:0 10px;
+  outline:none;
+  font-size:11px;
+}
+#emeraldMusicHost .emEmojiBtn,#emeraldMusicHost .emSendBtn{
+  width:32px;height:30px;border-radius:50%;border:1px solid rgba(255,215,0,.45);
+  background:#121c1d;color:#ffe367;cursor:pointer;
+}
+#emeraldMusicHost .emEmojiPanel{
+  display:none;
+  flex-wrap:wrap;
+  gap:4px;
+  padding:6px;
+  background:#061214;
+  border-top:1px solid rgba(255,215,0,.22);
+}
+#emeraldMusicHost .emEmojiPanel.show{display:flex}
+#emeraldMusicHost .emEmojiPanel button{
+  border:0;background:transparent;cursor:pointer;font-size:18px;padding:2px;
+}
+#emeraldMusicHost .emAudioStatus{
+  color:#ffe477;
+  border-color:rgba(255,215,0,.45);
+}
 
 /* صفوف وأزرار (أسماء خاصة لتفادي تعارض موقعك) */
 #emeraldMusicHost .emRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
@@ -625,8 +770,10 @@ body>*{
 
 /* للجوال */
 @media (max-width: 720px){
+  #emeraldMusicHost #emOpenBtn{right:18px;bottom:120px;width:78px;height:78px}
+  #emeraldMusicHost .emCoinText{font-size:7px}
   #emeraldMusicHost .emTopbar{flex-direction:column; align-items:stretch}
-  #emeraldMusicHost .emPayBox, #emeraldMusicHost .emCamBox{width:100%}
+  #emeraldMusicHost .emPayBox, #emeraldMusicHost .emCamBox, #emeraldMusicHost .emChatBox{width:100%}
 }
 </style>
 
@@ -818,6 +965,58 @@ function stopCamRecording(recBtn, pauseBtn, camToggleBtn, micToggleBtn){
   micToggleBtn.style.display="none";
 }
 
+/* ================== تسجيل صوت مستقل بدون ملحقات ================== */
+let emAudioStream=null, emAudioRecorder=null, emAudioChunks=[], emAudioPaused=false;
+
+async function startAudioRecording(recBtn,pauseBtn,statusEl){
+  try{
+    emAudioStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    emAudioChunks=[];
+
+    let mime="";
+    if(window.MediaRecorder && MediaRecorder.isTypeSupported("audio/webm;codecs=opus")){
+      mime="audio/webm;codecs=opus";
+    }else if(window.MediaRecorder && MediaRecorder.isTypeSupported("audio/webm")){
+      mime="audio/webm";
+    }
+
+    emAudioRecorder = mime ? new MediaRecorder(emAudioStream,{mimeType:mime}) : new MediaRecorder(emAudioStream);
+    emAudioRecorder.ondataavailable=e=>{
+      if(e.data && e.data.size) emAudioChunks.push(e.data);
+    };
+    emAudioRecorder.onstop=()=>{
+      const type=emAudioRecorder?.mimeType || "audio/webm";
+      const blob=new Blob(emAudioChunks,{type});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url;
+      a.download="musical-instruments-audio.webm";
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+    };
+
+    emAudioRecorder.start();
+    emAudioPaused=false;
+    recBtn.textContent="⏹ Stop Audio";
+    pauseBtn.style.display="inline-block";
+    pauseBtn.textContent="⏸ Pause Audio";
+    statusEl.textContent="🔴 Audio Recording";
+  }catch(e){
+    alert("تعذر تشغيل تسجيل الصوت.\nتأكد من HTTPS ومنح صلاحية الميكروفون.\n\n"+(e?.message||e));
+  }
+}
+
+function stopAudioRecording(recBtn,pauseBtn,statusEl){
+  try{if(emAudioRecorder && emAudioRecorder.state!=="inactive") emAudioRecorder.stop();}catch(_){}
+  try{if(emAudioStream) emAudioStream.getTracks().forEach(t=>t.stop());}catch(_){}
+  emAudioStream=null;
+  emAudioRecorder=null;
+  emAudioPaused=false;
+  recBtn.textContent="🎙 Record Audio";
+  pauseBtn.style.display="none";
+  statusEl.textContent="🎙 Audio Ready";
+}
+
 /* ================== فتح اللوحة ================== */
 emOpenBtn.onclick=()=>{
   if(document.getElementById("emPanel")) return;
@@ -833,8 +1032,19 @@ emOpenBtn.onclick=()=>{
         <div class="emClose">✖</div>
 
         <div class="emTopbar">
-          <div class="emPayBox">
-          </div>  
+          <div class="emChatBox">
+            <div class="emChatHead">
+              <span>💬 Firebase Business Chat</span>
+              <span class="emChatState" id="emChatState">Connecting...</span>
+            </div>
+            <div class="emChatMessages" id="emChatMessages"></div>
+            <div class="emEmojiPanel" id="emEmojiPanel"></div>
+            <div class="emChatComposer">
+              <button class="emEmojiBtn" id="emEmojiBtn" type="button" title="Emoji">😊</button>
+              <input class="emChatInput" id="emChatInput" maxlength="500" placeholder="اكتب رسالتك...">
+              <button class="emSendBtn" id="emChatSend" type="button" title="Send">➤</button>
+            </div>
+          </div>
 
           <div class="emCamBox">
             <video id="emCam" autoplay muted playsinline></video>
@@ -846,6 +1056,12 @@ emOpenBtn.onclick=()=>{
           <button class="emBtn" id="emCamPause" style="display:none">⏸ Pause</button>
           <button class="emBtn emWarn" id="emCamToggle" style="display:none">📷 Camera: ON</button>
           <button class="emBtn emWarn" id="emMicToggle" style="display:none">🎙 Mic: ON</button>
+        </div>
+
+        <div class="emRow">
+          <button class="emBtn" id="emAudioRec">🎙 Record Audio</button>
+          <button class="emBtn" id="emAudioPause" style="display:none">⏸ Pause Audio</button>
+          <span class="emBadge emAudioStatus" id="emAudioStatus">🎙 Audio Ready</span>
         </div>
 
         <div class="emRow">
@@ -914,6 +1130,17 @@ emOpenBtn.onclick=()=>{
   const camToggle = p.querySelector("#emCamToggle");
   const micToggle = p.querySelector("#emMicToggle");
 
+  const audioRec = p.querySelector("#emAudioRec");
+  const audioPause = p.querySelector("#emAudioPause");
+  const audioStatus = p.querySelector("#emAudioStatus");
+
+  const chatMessages = p.querySelector("#emChatMessages");
+  const chatState = p.querySelector("#emChatState");
+  const chatInput = p.querySelector("#emChatInput");
+  const chatSend = p.querySelector("#emChatSend");
+  const emojiBtn = p.querySelector("#emEmojiBtn");
+  const emojiPanel = p.querySelector("#emEmojiPanel");
+
   const notesBtn = p.querySelector("#emNotesBtn");
   const notesModal = p.querySelector("#emNotesModal");
   const notesClose = p.querySelector(".emNotesClose");
@@ -922,10 +1149,108 @@ emOpenBtn.onclick=()=>{
   notesClose.onclick=()=>{ notesModal.style.display="none"; };
   notesModal.addEventListener("click",(e)=>{ if(e.target===notesModal) notesModal.style.display="none"; });
 
+  /* ================== الرموز التعبيرية ================== */
+  const emEmojis=["😀","😂","😍","🥰","😎","🤩","😊","😉","😭","😢","😡","👍","👏","❤️","💚","💛","✨","🔥","🎵","🎶","🎹","🎸","🎻","🎺","🎷","🥁","🎤","🪕"];
+  emojiPanel.innerHTML=emEmojis.map(x=>`<button type="button">${x}</button>`).join("");
+  emojiBtn.onclick=()=>emojiPanel.classList.toggle("show");
+  emojiPanel.querySelectorAll("button").forEach(b=>{
+    b.onclick=()=>{
+      chatInput.value += b.textContent;
+      chatInput.focus();
+    };
+  });
+
+  /* ================== Firebase Business Chat ================== */
+  let emUnsubscribeChat=null;
+  const escHtml=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+  const currentChatUser=()=>{
+    const u=window.firebaseAuth?.currentUser;
+    return {
+      uid:u?.uid || "guest",
+      name:u?.displayName || u?.email || "Guest"
+    };
+  };
+
+  async function initBusinessChat(){
+    const api=window.emFirebaseChatAPI;
+    if(!api || !window.firebaseDB){
+      chatState.textContent="Firebase loading...";
+      setTimeout(initBusinessChat,700);
+      return;
+    }
+
+    chatState.textContent="Online";
+    const q=api.query(
+      api.collection(window.firebaseDB,"emeraldMusicChat"),
+      api.orderBy("createdAt","desc"),
+      api.limit(80)
+    );
+
+    emUnsubscribeChat=api.onSnapshot(q,snap=>{
+      const me=currentChatUser();
+      const rows=[];
+      snap.forEach(doc=>{
+        const d=doc.data()||{};
+        rows.push(d);
+      });
+      rows.reverse();
+      chatMessages.innerHTML=rows.map(d=>{
+        const mine=(d.uid && me.uid!=="guest" && d.uid===me.uid);
+        return `<div class="emChatMsg ${mine?"me":""}">
+          <div class="emChatName">${escHtml(d.name||"Guest")}</div>
+          <div>${escHtml(d.text||"")}</div>
+        </div>`;
+      }).join("");
+      chatMessages.scrollTop=chatMessages.scrollHeight;
+    },err=>{
+      console.error("Firebase chat:",err);
+      chatState.textContent="Check Firestore rules";
+    });
+  }
+
+  async function sendChat(){
+    const value=chatInput.value.trim();
+    if(!value) return;
+    const api=window.emFirebaseChatAPI;
+    if(!api || !window.firebaseDB){
+      chatState.textContent="Firebase not ready";
+      return;
+    }
+    const me=currentChatUser();
+    chatSend.disabled=true;
+    try{
+      await api.addDoc(api.collection(window.firebaseDB,"emeraldMusicChat"),{
+        text:value.slice(0,500),
+        uid:me.uid,
+        name:me.name,
+        createdAt:api.serverTimestamp()
+      });
+      chatInput.value="";
+      emojiPanel.classList.remove("show");
+    }catch(err){
+      console.error("Send chat:",err);
+      chatState.textContent="Send denied";
+    }finally{
+      chatSend.disabled=false;
+      chatInput.focus();
+    }
+  }
+
+  chatSend.onclick=sendChat;
+  chatInput.addEventListener("keydown",e=>{
+    if(e.key==="Enter" && !e.shiftKey){
+      e.preventDefault();
+      sendChat();
+    }
+  });
+  initBusinessChat();
+
   closeBtn.onclick=()=>{
     stopMelody();
     notesModal.style.display="none";
     try{ if(mediaRecorder){ stopCamRecording(camRec, camPause, camToggle, micToggle); } }catch(_){}
+    try{ if(emAudioRecorder){ stopAudioRecording(audioRec,audioPause,audioStatus); } }catch(_){}
+    try{ if(emUnsubscribeChat) emUnsubscribeChat(); }catch(_){}
     Object.keys(activeHold).forEach(id=>stopHold(id));
     p.remove();
     document.documentElement.style.overflow = prevOverflow;
@@ -1015,6 +1340,29 @@ emOpenBtn.onclick=()=>{
     micToggle.classList.toggle("emWarn", !micTrack.enabled);
   };
 
+  audioRec.onclick=async()=>{
+    if(!emAudioRecorder){
+      await startAudioRecording(audioRec,audioPause,audioStatus);
+    }else{
+      stopAudioRecording(audioRec,audioPause,audioStatus);
+    }
+  };
+
+  audioPause.onclick=()=>{
+    if(!emAudioRecorder) return;
+    if(!emAudioPaused){
+      try{emAudioRecorder.pause();}catch(_){}
+      emAudioPaused=true;
+      audioPause.textContent="▶ Resume Audio";
+      audioStatus.textContent="⏸ Audio Paused";
+    }else{
+      try{emAudioRecorder.resume();}catch(_){}
+      emAudioPaused=false;
+      audioPause.textContent="⏸ Pause Audio";
+      audioStatus.textContent="🔴 Audio Recording";
+    }
+  };
+
   /* مفاتيح */
   const keysWrap=p.querySelector("#emKeys");
   const r1=document.createElement("div");
@@ -1079,7 +1427,7 @@ window.addEventListener("keyup",(e)=>{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -1106,6 +1454,15 @@ window.firebaseApp = app;
 window.firebaseAuth = auth;
 window.firebaseDB = db;
 window.firebaseStorage = storage;
+window.emFirebaseChatAPI = {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+  limit
+};
 
 console.log("SAKAKER Firebase Ready");
 </script>
