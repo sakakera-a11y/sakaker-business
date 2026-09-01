@@ -1504,3 +1504,210 @@ body>*{
     z-index:1;
 }
 </style>
+<!-- =========================================================
+     🧹 Emerald Music Chat
+     إخفاء الرسائل بعد 5 دقائق من واجهة الدردشة
+     لا يحذف الرسائل من Firestore
+     ========================================================= -->
+
+<script type="module">
+
+import {
+  getFirestore,
+  collection,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+const CHAT_MAX_AGE = 5 * 60 * 1000; // 5 دقائق
+const CHAT_COLLECTION = "emeraldMusicChat";
+
+let chatCleanupStarted = false;
+
+/* البحث عن نافذة الرسائل */
+function getChatContainer() {
+  return (
+    document.getElementById("chatMessages") ||
+    document.querySelector(".chatMessages") ||
+    document.querySelector(".emChatMessages")
+  );
+}
+
+/* تحويل createdAt إلى milliseconds */
+function getCreatedTime(createdAt) {
+
+  if (!createdAt) return 0;
+
+  if (typeof createdAt.toMillis === "function") {
+    return createdAt.toMillis();
+  }
+
+  if (createdAt.seconds) {
+    return createdAt.seconds * 1000;
+  }
+
+  if (createdAt instanceof Date) {
+    return createdAt.getTime();
+  }
+
+  if (typeof createdAt === "number") {
+    return createdAt;
+  }
+
+  return 0;
+}
+
+/* تنظيف الرسائل القديمة من الشاشة */
+function hideExpiredMessages(messages) {
+
+  const container = getChatContainer();
+
+  if (!container) return;
+
+  const now = Date.now();
+
+  const expired = messages.filter(msg => {
+
+    const created = getCreatedTime(msg.createdAt);
+
+    return created > 0 && (now - created >= CHAT_MAX_AGE);
+
+  });
+
+  if (!expired.length) return;
+
+  const elements = container.querySelectorAll(".emChatMsg");
+
+  elements.forEach(element => {
+
+    const text = element.innerText || "";
+
+    expired.forEach(msg => {
+
+      const name = String(msg.name || "").trim();
+      const messageText = String(msg.text || "").trim();
+
+      /*
+        نطابق الاسم والنص الموجودين في الرسالة
+      */
+
+      if (
+        name &&
+        messageText &&
+        text.includes(name) &&
+        text.includes(messageText)
+      ) {
+
+        element.style.display = "none";
+        element.dataset.expiredChat = "true";
+
+      }
+
+    });
+
+  });
+}
+
+
+/* تشغيل النظام */
+function startChatExpiry() {
+
+  if (chatCleanupStarted) return;
+
+  if (!window.firebaseApp) {
+
+    setTimeout(startChatExpiry, 1000);
+
+    return;
+  }
+
+  chatCleanupStarted = true;
+
+  try {
+
+    const db = getFirestore(window.firebaseApp);
+
+    const chatRef = collection(db, CHAT_COLLECTION);
+
+    onSnapshot(chatRef, snapshot => {
+
+      const messages = [];
+
+      snapshot.forEach(doc => {
+
+        const data = doc.data();
+
+        messages.push({
+          id: doc.id,
+          ...data
+        });
+
+      });
+
+      hideExpiredMessages(messages);
+
+      /*
+        إعادة الفحص كلما تغيرت الدردشة
+      */
+
+      setTimeout(() => {
+        hideExpiredMessages(messages);
+      }, 1000);
+
+    }, error => {
+
+      console.error(
+        "Emerald Chat Expiry Error:",
+        error
+      );
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Emerald Chat Expiry Start Error:",
+      error
+    );
+
+  }
+
+}
+
+
+/*
+  ننتظر حتى يكون Firebase جاهزًا
+*/
+
+if (window.firebaseApp) {
+
+  startChatExpiry();
+
+} else {
+
+  window.addEventListener(
+    "firebase-ready",
+    startChatExpiry,
+    { once: true }
+  );
+
+}
+
+
+/*
+  فحص كل 10 ثوانٍ
+  حتى تختفي الرسالة قريبًا من لحظة مرور 5 دقائق
+*/
+
+setInterval(() => {
+
+  /*
+    إعادة تشغيل الفحص إذا أصبحت الدردشة موجودة
+  */
+
+  if (!chatCleanupStarted) {
+    startChatExpiry();
+  }
+
+}, 10000);
+
+</script>
