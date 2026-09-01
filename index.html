@@ -45,6 +45,7 @@ body.locked > *:not(#loginOverlay){
   visibility:hidden !important;
   pointer-events:none !important;
 }
+body:not(.locked) #loginOverlay{display:none !important;}
 #loginOverlay{
   position:fixed !important;
   inset:0 !important;
