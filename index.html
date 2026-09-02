@@ -119,17 +119,71 @@ body:not(.locked) #loginOverlay{display:none !important;}
 }
 .login-language button.active{border-color:#00ffd5;color:#00ffd5;box-shadow:0 0 10px rgba(0,255,213,.18);}
 .login-footer{margin-top:14px;color:#9fb7b6;font-size:11px;}
+#loginPaypalBar{
+  position:absolute;
+  left:20%;
+  bottom:16px;
+  transform:translateX(-50%);
+  width:min(430px,88vw);
+  min-height:72px;
+  padding:7px 12px 5px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  direction:ltr;
+  border:1px solid rgba(255,215,0,.72);
+  border-radius:16px;
+  background:linear-gradient(90deg,rgba(0,38,35,.82),rgba(4,12,15,.76),rgba(58,40,0,.58));
+  box-shadow:0 0 18px rgba(0,255,213,.20),0 0 16px rgba(255,215,0,.18);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+  overflow:hidden;
+}
+.loginPaypalTitle{
+  flex:0 0 auto;
+  color:#ffe27a;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+  text-shadow:0 0 8px rgba(255,215,0,.35);
+}
+#loginPaypalInner{
+  width:250px;
+  height:52px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 0 10px rgba(0,255,213,.18);
+}
+#loginPaypalInner #emPaypalBox{
+  width:420px;
+  min-height:82px;
+  transform:scale(.58);
+  transform-origin:center center;
+}
+@media(max-width:600px){
+  #loginPaypalBar{width:min(360px,92vw);bottom:8px;min-height:62px;padding:5px 7px;gap:5px;}
+  .loginPaypalTitle{font-size:9px;}
+  #loginPaypalInner{width:205px;height:46px;}
+  #loginPaypalInner #emPaypalBox{transform:scale(.48);}
+}
+
 @media(max-width:600px){
   #loginOverlay{padding:14px !important;}
   .login-shell{padding:24px 18px 19px;border-radius:22px;}
-  .login-logo{width:66px;height:66px;font-size:32px;}
-  .login-title{font-size:22px;}
+  .login-logo{width:46px;height:46px;font-size:22px;}
+  .login-title{font-size:12px;}
 }
 </style>
 
 <div id="loginOverlay" aria-modal="true" role="dialog">
   <div class="login-shell">
-    <div class="login-logo">💎</div>
+    <div class="login-logo">🎵</div>
     <h2 class="login-title" id="loginTitle">🔐 تسجيل الدخول</h2>
     <div class="login-subtitle" id="loginSubtitle">أهلاً بك في Sakaker Business<br>يرجى تسجيل الدخول للمتابعة إلى الموقع</div>
 
@@ -150,6 +204,12 @@ body:not(.locked) #loginOverlay{display:none !important;}
 
     <div class="login-footer" id="loginFooter">الوصول إلى محتوى الموقع محمي بتسجيل الدخول</div>
   </div>
+
+  <!-- 💳 PayPal مستقل أسفل صفحة الدخول -->
+  <div id="loginPaypalBar" aria-label="PayPal">
+    <div class="loginPaypalTitle">💳 <span id="loginPaypalTitleText"> PayPal</span></div>
+    <div id="loginPaypalInner"><div id="emPaypalBox"></div></div>
+  </div>
 </div>
 
 <!-- 👤 بيانات المستخدم -->
@@ -159,7 +219,7 @@ position:fixed;
 top:15px;
 right:15px;
 z-index:99999;
-background:#000c;
+background:
 padding:10px;
 border-radius:15px;
 border:1px solid #00ffcc;
@@ -430,6 +490,29 @@ console.log("SAKAKER Firebase Ready");
   en.onclick=()=>setLang("en");
   window.sakakerLoginLanguage={setLang};
   setLang("ar");
+})();
+</script>
+
+<!-- 💳 PayPal Hosted Button -->
+<script>
+(function(){
+  function renderLoginPayPal(){
+    try{
+      if(window.paypal && paypal.HostedButtons){
+        const box=document.getElementById("emPaypalBox");
+        if(box && !box.dataset.rendered){
+          box.dataset.rendered="1";
+          paypal.HostedButtons({hostedButtonId:"S9YLL5P5H47P4"}).render("#emPaypalBox");
+        }
+      }
+    }catch(e){ console.error("PayPal error:",e); }
+  }
+  if(window.paypal){ renderLoginPayPal(); return; }
+  const s=document.createElement("script");
+  s.src="https://www.paypal.com/sdk/js?client-id=BAAQAE5C8rFrqoJpWqxpYluOT09waMhuzhF4ug2QGvJm76YmqiCmzkP31wl8xZq9W5WkJSvAx6ZoujIBFw&components=hosted-buttons&disable-funding=venmo&currency=USD";
+  s.onload=renderLoginPayPal;
+  s.onerror=()=>console.warn("PayPal SDK could not load");
+  document.head.appendChild(s);
 })();
 </script>
 
