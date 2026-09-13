@@ -181,11 +181,76 @@ body:not(.locked) #loginOverlay{display:none !important;}
 }
 </style>
 
+<!-- ===== PayPal Payment Gate visual override ===== -->
+<style id="sakaker-paypal-gate-ui">
+#loginOverlay{
+  flex-direction:column !important;
+  gap:14px !important;
+}
+#loginOverlay .login-shell{
+  width:min(500px,94vw) !important;
+  padding:24px 24px 20px !important;
+  background:rgba(2,12,15,.70) !important;
+  border:1px solid rgba(255,215,0,.62) !important;
+  box-shadow:0 0 34px rgba(255,215,0,.20),0 0 42px rgba(0,255,213,.24) !important;
+}
+#loginOverlay .login-logo{
+  width:64px !important;height:64px !important;font-size:30px !important;
+  border-color:rgba(255,215,0,.75) !important;
+  box-shadow:0 0 26px rgba(255,215,0,.36) !important;
+}
+#loginOverlay .login-title{color:#ffe36d !important;font-size:22px !important;}
+#loginOverlay .login-subtitle{font-size:14px !important;color:#efffff !important;margin-bottom:10px !important;}
+/* إبقاء عناصر Firebase في DOM لكن إخفاؤها بصريًا */
+#emailInput,#passwordInput,#loginButton,#googleButton,#signupButton,#loginError{
+  display:none !important;
+}
+#loginOverlay .login-language{margin-top:10px !important;}
+#loginOverlay .login-footer{
+  margin-top:12px !important;
+  color:#cfeeed !important;
+  font-size:12px !important;
+}
+#loginPaypalBar{
+  position:relative !important;
+  left:auto !important;
+  bottom:auto !important;
+  transform:none !important;
+  width:min(500px,94vw) !important;
+  min-height:92px !important;
+  padding:10px 14px !important;
+  margin:0 auto !important;
+  flex-direction:column !important;
+  gap:7px !important;
+  background:linear-gradient(135deg,rgba(0,45,40,.90),rgba(8,18,20,.92),rgba(86,59,0,.62)) !important;
+  box-shadow:0 0 25px rgba(255,215,0,.25),0 0 28px rgba(0,255,213,.20) !important;
+}
+.loginPaypalTitle{font-size:13px !important;}
+#loginPaypalInner{
+  width:min(420px,88vw) !important;
+  height:58px !important;
+}
+#loginPaypalInner #emPaypalBox{
+  width:420px !important;
+  min-height:82px !important;
+  transform:scale(.70) !important;
+  transform-origin:center center !important;
+}
+@media(max-width:600px){
+  #loginOverlay .login-shell{width:min(360px,94vw) !important;padding:18px 16px 14px !important;}
+  #loginPaypalBar{width:min(360px,94vw) !important;min-height:82px !important;}
+  #loginPaypalInner{width:300px !important;height:54px !important;}
+  #loginPaypalInner #emPaypalBox{transform:scale(.60) !important;}
+  #loginOverlay .login-title{font-size:18px !important;}
+}
+</style>
+
 <div id="loginOverlay" aria-modal="true" role="dialog">
   <div class="login-shell">
     <div class="login-logo">🎵</div>
-    <h2 class="login-title" id="loginTitle">🔐 تسجيل الدخول</h2>
-    <div class="login-subtitle" id="loginSubtitle">أهلاً بك في Sakaker Business<br>يرجى تسجيل الدخول للمتابعة إلى الموقع</div>
+    <h2 class="login-title" id="loginTitle">💳 الدفع والدخول إلى الموقع</h2>
+    <div class="login-subtitle" id="loginSubtitle">أهلاً بك في Sakaker Business<br>أكمل الدفع عبر PayPal، وبعد تأكيد العملية سيتم فتح الموقع مباشرة</div>
+    <div id="paypalGateStatus" style="margin:6px 0 2px;color:#9fffe9;font-size:12px;">🔒 المحتوى مغلق حتى تأكيد الدفع</div>
 
     <input id="emailInput" class="login-field" type="email" autocomplete="email" placeholder="📧 البريد الإلكتروني">
     <input id="passwordInput" class="login-field" type="password" autocomplete="current-password" placeholder="🔒 كلمة المرور">
@@ -202,12 +267,12 @@ body:not(.locked) #loginOverlay{display:none !important;}
       <button id="langEN" type="button">English</button>
     </div>
 
-    <div class="login-footer" id="loginFooter">الوصول إلى محتوى الموقع محمي بتسجيل الدخول</div>
+    <div class="login-footer" id="loginFooter">سيتم فتح الموقع تلقائيًا بعد تأكيد الدفع عبر PayPal</div>
   </div>
 
   <!-- 💳 PayPal مستقل أسفل صفحة الدخول -->
   <div id="loginPaypalBar" aria-label="PayPal">
-    <div class="loginPaypalTitle">💳 <span id="loginPaypalTitleText"> PayPal</span></div>
+    <div class="loginPaypalTitle">💳 <span id="loginPaypalTitleText"> الدفع الآمن عبر PayPal</span></div>
     <div id="loginPaypalInner"><div id="emPaypalBox"></div></div>
   </div>
 </div>
@@ -335,18 +400,61 @@ const email=document.getElementById("emailInput");
 const pass=document.getElementById("passwordInput");
 const error=document.getElementById("loginError");
 
-/* لا توجد بوابة دفع حاليًا. الاشتراك يضاف لاحقًا دون تغيير نظام الدخول. */
+/* =========================================================
+   بوابة PayPal — فتح الموقع مباشرة بعد رجوع PayPal بنجاح
+   ملاحظة: زر Hosted Button نفسه لا يرسل onApprove للصفحة.
+   يجب ضبط Thank You / Return URL في إعدادات زر PayPal إلى:
+   https://sakaker.co/?paypal=success
+========================================================= */
+const SAKAKER_PAYPAL_ACCESS_KEY="sakaker_paypal_access";
+
+function hasPayPalAccess(){
+  try{return localStorage.getItem(SAKAKER_PAYPAL_ACCESS_KEY)==="approved";}
+  catch(_){return false;}
+}
+
+function grantPayPalAccess(){
+  try{localStorage.setItem(SAKAKER_PAYPAL_ACCESS_KEY,"approved");}catch(_){}
+}
+
 function showLoginGate(){
   overlay.style.display="flex";
   document.body.classList.add("locked");
 }
 
-function openSiteAfterLogin(){
+function openSiteAfterPayment(){
   overlay.style.display="none";
   document.body.classList.remove("locked");
 }
 
-showLoginGate();
+/* توافق مع أي كود قديم يستدعي الاسم السابق */
+function openSiteAfterLogin(){
+  if(hasPayPalAccess()) openSiteAfterPayment();
+  else showLoginGate();
+}
+
+/* إذا أعاد PayPal العميل إلى رابط النجاح، امنح الوصول وافتح الموقع */
+(function handlePayPalReturn(){
+  try{
+    const u=new URL(window.location.href);
+    if(u.searchParams.get("paypal")==="success"){
+      const st=document.getElementById("paypalGateStatus"); if(st) st.textContent="✅ تم تأكيد العودة من PayPal — جارٍ فتح الموقع";
+      grantPayPalAccess();
+      u.searchParams.delete("paypal");
+      history.replaceState({},document.title,u.pathname+u.search+u.hash);
+    }
+  }catch(e){console.warn("PayPal return check:",e);}
+})();
+
+/* إذا تم الدفع في نافذة/تبويب آخر ثم رجع إلى الموقع، افتح الصفحة الأصلية أيضًا */
+window.addEventListener("storage",(e)=>{
+  if(e.key===SAKAKER_PAYPAL_ACCESS_KEY && e.newValue==="approved"){
+    openSiteAfterPayment();
+  }
+});
+
+if(hasPayPalAccess()) openSiteAfterPayment();
+else showLoginGate();
 
 /* دخول */
 
@@ -433,14 +541,16 @@ error.textContent="❌ "+e.message;
 
 onAuthStateChanged(auth,async(user)=>{
   if(user){
-    openSiteAfterLogin();
     document.getElementById("userProfile").style.display="flex";
     document.getElementById("userName").textContent = user.displayName || user.email || "User";
     document.getElementById("userPhoto").src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
   }else{
     document.getElementById("userProfile").style.display="none";
-    showLoginGate();
   }
+
+  /* تسجيل الدخول وحده لا يتجاوز بوابة الدفع */
+  if(hasPayPalAccess()) openSiteAfterPayment();
+  else showLoginGate();
 });
 
 /* خروج */
@@ -475,14 +585,14 @@ console.log("SAKAKER Firebase Ready");
     document.documentElement.lang=isAR?"ar":"en";
     document.documentElement.dir=isAR?"rtl":"ltr";
     document.body.dir=isAR?"rtl":"ltr";
-    title.textContent=isAR?"🔐 تسجيل الدخول":"🔐 Sign in";
-    subtitle.innerHTML=isAR?"أهلاً بك في Sakaker Business<br>يرجى تسجيل الدخول للمتابعة إلى الموقع":"Welcome to Sakaker Business<br>Please sign in to continue";
+    title.textContent=isAR?"💳 الدفع والدخول إلى الموقع":"💳 Pay & Enter";
+    subtitle.innerHTML=isAR?"أهلاً بك في Sakaker Business<br>أكمل الدفع عبر PayPal، وبعد تأكيد العملية سيتم فتح الموقع مباشرة":"Welcome to Sakaker Business<br>Please sign in to continue";
     email.placeholder=isAR?"📧 البريد الإلكتروني":"📧 Email address";
     pass.placeholder=isAR?"🔒 كلمة المرور":"🔒 Password";
     login.textContent=isAR?"دخول":"Sign in";
     google.textContent=isAR?"🔵 الدخول بواسطة Google":"🔵 Continue with Google";
     signup.textContent=isAR?"📝 إنشاء حساب جديد":"📝 Create a new account";
-    footer.textContent=isAR?"الوصول إلى محتوى الموقع محمي بتسجيل الدخول":"Access to the site content is protected by sign-in";
+    footer.textContent=isAR?"سيتم فتح الموقع تلقائيًا بعد تأكيد الدفع عبر PayPal":"The site opens automatically after PayPal confirms the payment";
     ar.classList.toggle("active",isAR); en.classList.toggle("active",!isAR);
     if(err.dataset.system!="1") err.textContent="";
   }
@@ -493,7 +603,11 @@ console.log("SAKAKER Firebase Ready");
 })();
 </script>
 
-<!-- 💳 PayPal Hosted Button -->
+<!-- 💳 PayPal Hosted Button
+     مهم: من حساب PayPal عدّل الزر SD6NRE3SXFC7Q واجعل Thank You / Return URL:
+     https://sakaker.co/?paypal=success
+     عند العودة بهذا الرابط يفتح الموقع مباشرة ويُحفظ الوصول على هذا المتصفح.
+-->
 <script>
 (function(){
   function renderLoginPayPal(){
@@ -502,7 +616,7 @@ console.log("SAKAKER Firebase Ready");
         const box=document.getElementById("emPaypalBox");
         if(box && !box.dataset.rendered){
           box.dataset.rendered="1";
-          paypal.HostedButtons({hostedButtonId:"S9YLL5P5H47P4"}).render("#emPaypalBox");
+          paypal.HostedButtons({hostedButtonId:"SD6NRE3SXFC7Q"}).render("#emPaypalBox");
         }
       }
     }catch(e){ console.error("PayPal error:",e); }
