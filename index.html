@@ -155,26 +155,47 @@ body:not(.locked) #loginOverlay{display:none !important;}
 }
 #loginPaypalInner{
   width:250px;
-  height:52px;
-  overflow:hidden;
+  min-height:112px;
+  height:auto;
+  overflow:visible;
   display:flex;
   align-items:center;
   justify-content:center;
   border-radius:10px;
   background:rgba(255,255,255,.96);
   box-shadow:0 0 10px rgba(0,255,213,.18);
+  position:relative;
+  z-index:2147483646;
+  pointer-events:auto !important;
 }
-#loginPaypalInner #emPaypalBox{
-  width:420px;
-  min-height:82px;
-  transform:scale(.58);
-  transform-origin:center center;
+#loginPaypalInner > div{
+  width:100%;
+  min-height:105px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
+  position:relative;
+  z-index:2147483647;
+  pointer-events:auto !important;
+}
+#loginPaypalInner form,
+#loginPaypalInner input,
+#loginPaypalInner button,
+#loginPaypalInner img,
+#loginPaypalInner section{
+  pointer-events:auto !important;
+}
+#loginPaypalInner form{
+  position:relative;
+  z-index:2147483647;
+  padding:8px 6px;
 }
 @media(max-width:600px){
   #loginPaypalBar{width:min(360px,92vw);bottom:8px;min-height:62px;padding:5px 7px;gap:5px;}
   .loginPaypalTitle{font-size:9px;}
-  #loginPaypalInner{width:205px;height:46px;}
-  #loginPaypalInner #emPaypalBox{transform:scale(.48);}
+  #loginPaypalInner{width:260px;min-height:108px;height:auto;overflow:visible;}
+  #loginPaypalInner form{transform:none;transform-origin:center;}
 }
 
 @media(max-width:600px){
@@ -228,23 +249,37 @@ body:not(.locked) #loginOverlay{display:none !important;}
   gap:7px !important;
   background:linear-gradient(135deg,rgba(0,45,40,.90),rgba(8,18,20,.92),rgba(86,59,0,.62)) !important;
   box-shadow:0 0 25px rgba(255,215,0,.25),0 0 28px rgba(0,255,213,.20) !important;
+  overflow:visible !important;
+  position:relative !important;
+  z-index:2147483645 !important;
+  pointer-events:auto !important;
 }
 .loginPaypalTitle{font-size:13px !important;}
 #loginPaypalInner{
   width:min(420px,88vw) !important;
-  height:58px !important;
+  min-height:118px !important;
+  height:auto !important;
+  overflow:visible !important;
+  position:relative !important;
+  z-index:2147483646 !important;
+  pointer-events:auto !important;
 }
-#loginPaypalInner #emPaypalBox{
-  width:420px !important;
-  min-height:82px !important;
-  transform:scale(.70) !important;
-  transform-origin:center center !important;
+#loginPaypalInner > div{
+  width:100% !important;
+  min-height:108px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:visible !important;
+  position:relative !important;
+  z-index:2147483647 !important;
+  pointer-events:auto !important;
 }
 @media(max-width:600px){
   #loginOverlay .login-shell{width:min(360px,94vw) !important;padding:18px 16px 14px !important;}
   #loginPaypalBar{width:min(360px,94vw) !important;min-height:82px !important;}
-  #loginPaypalInner{width:300px !important;height:54px !important;}
-  #loginPaypalInner #emPaypalBox{transform:scale(.60) !important;}
+  #loginPaypalInner{width:min(330px,88vw) !important;min-height:112px !important;height:auto !important;overflow:visible !important;}
+  #loginPaypalInner form{transform:none !important;transform-origin:center !important;}
   #loginOverlay .login-title{font-size:18px !important;}
 }
 </style>
@@ -274,10 +309,19 @@ body:not(.locked) #loginOverlay{display:none !important;}
     <div class="login-footer" id="loginFooter">سيتم فتح الموقع تلقائيًا بعد تأكيد الدفع عبر PayPal</div>
   </div>
 
-  <!-- 💳 PayPal مستقل أسفل صفحة الدخول -->
+  <!-- 💳 PayPal — الزر الرسمي الجديد -->
   <div id="loginPaypalBar" aria-label="PayPal">
-    <div class="loginPaypalTitle">💳 <span id="loginPaypalTitleText"> الدفع الآمن عبر PayPal</span></div>
-    <div id="loginPaypalInner"><div id="emPaypalBox"></div></div>
+    <div class="loginPaypalTitle">💳 <span id="loginPaypalTitleText">الدفع الآمن عبر PayPal</span></div>
+    <div id="loginPaypalInner">
+      <div>
+        <style>.pp-SD6NRE3SXFC7Q{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
+        <form action="https://www.paypal.com/ncp/payment/SD6NRE3SXFC7Q" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
+          <input class="pp-SD6NRE3SXFC7Q" type="submit" value="شراء الآن" />
+          <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
+          <section style="font-size:0.75rem;">مدعوم من <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/></section>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -621,32 +665,11 @@ console.log("SAKAKER Firebase Ready");
 })();
 </script>
 
-<!-- 💳 PayPal Hosted Button
-     مهم: من حساب PayPal عدّل الزر SD6NRE3SXFC7Q واجعل Thank You / Return URL:
+<!-- 💳 PayPal NCP Button
+     يستخدم نموذج PayPal الرسمي المضمّن أعلاه.
+     ملاحظة: فتح الموقع تلقائيًا بعد الدفع يحتاج إعداد Return URL في PayPal إلى:
      https://sakaker.co/?paypal=success
-     عند العودة بهذا الرابط يفتح الموقع مباشرة ويُحفظ الوصول على هذا المتصفح.
 -->
-<script>
-(function(){
-  function renderLoginPayPal(){
-    try{
-      if(window.paypal && paypal.HostedButtons){
-        const box=document.getElementById("emPaypalBox");
-        if(box && !box.dataset.rendered){
-          box.dataset.rendered="1";
-          paypal.HostedButtons({hostedButtonId:"SD6NRE3SXFC7Q"}).render("#emPaypalBox");
-        }
-      }
-    }catch(e){ console.error("PayPal error:",e); }
-  }
-  if(window.paypal){ renderLoginPayPal(); return; }
-  const s=document.createElement("script");
-  s.src="https://www.paypal.com/sdk/js?client-id=BAAQAE5C8rFrqoJpWqxpYluOT09waMhuzhF4ug2QGvJm76YmqiCmzkP31wl8xZq9W5WkJSvAx6ZoujIBFw&components=hosted-buttons&disable-funding=venmo&currency=USD";
-  s.onload=renderLoginPayPal;
-  s.onerror=()=>console.warn("PayPal SDK could not load");
-  document.head.appendChild(s);
-})();
-</script>
 
 <!-- =========================================================
      END 01 — LOGIN + PAYMENT + FIREBASE
@@ -2233,3 +2256,53 @@ setInterval(() => {
 }, 10000);
 
 </script>
+
+
+<!-- =========================================================
+     CONTACT FOOTER — ثابت وواضح أسفل الصفحة
+     ========================================================= -->
+<footer id="sakakerContactFooter" aria-label="Contact" style="
+  position:fixed !important;
+  left:50% !important;
+  bottom:10px !important;
+  transform:translateX(-50%) !important;
+  width:min(760px,94vw) !important;
+  box-sizing:border-box !important;
+  padding:9px 14px !important;
+  text-align:center !important;
+  direction:rtl !important;
+  font-family:Tajawal,Arial,sans-serif !important;
+  color:#efffff !important;
+  background:rgba(2,18,18,.92) !important;
+  border:1px solid rgba(0,255,213,.60) !important;
+  border-radius:999px !important;
+  box-shadow:0 0 18px rgba(0,255,213,.32),0 0 12px rgba(255,215,0,.18) !important;
+  z-index:2147483000 !important;
+  pointer-events:auto !important;
+  line-height:1.55 !important;
+  font-size:13px !important;
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+">
+  <span>للاستفسار والطلبات والملاحظات التواصل على البريد: </span>
+  <a href="mailto:sakaker@outlook.com" style="
+    color:#ffe36d !important;
+    font-weight:900 !important;
+    text-decoration:none !important;
+    direction:ltr !important;
+    display:inline-block !important;
+    pointer-events:auto !important;
+  ">sakaker@outlook.com</a>
+</footer>
+<style>
+@media(max-width:600px){
+  #sakakerContactFooter{
+    bottom:6px !important;
+    width:96vw !important;
+    border-radius:18px !important;
+    font-size:11px !important;
+    padding:7px 9px !important;
+  }
+}
+</style>
+<!-- ==================== END CONTACT FOOTER ==================== -->
