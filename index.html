@@ -1,3 +1,7 @@
+<!-- =========================================================
+     01 — LOGIN + PAYMENT + FIREBASE
+     هذا القسم في أول الملف. يمكنك قصّه أو تعديله مستقلًا.
+========================================================= -->
 <style id="sakaker-site-background">
 html,body{
     margin:0;
@@ -336,7 +340,11 @@ signOut
 from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 
-import { getFirestore }
+import {
+getFirestore,
+collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, limit,
+doc, setDoc, updateDoc, getDoc, deleteDoc
+}
 from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
@@ -386,7 +394,17 @@ window.firebaseDB=db;
 
 window.firebaseStorage=storage;
 
-
+/* واجهة Firebase مشتركة للموسيقى والدردشة وبونج أونلاين */
+window.emFirebaseChatAPI={collection,addDoc,query,orderBy,onSnapshot,serverTimestamp,limit};
+window.sakakerFirestoreAPI={collection,addDoc,query,orderBy,onSnapshot,serverTimestamp,limit,doc,setDoc,updateDoc,getDoc,deleteDoc};
+window.sakakerSignInGoogleForGames=async function(){
+  const current=auth.currentUser;
+  if(current) return current;
+  const provider=new GoogleAuthProvider();
+  const result=await signInWithPopup(auth,provider);
+  return result.user||null;
+};
+window.dispatchEvent(new Event("firebase-ready"));
 
 await setPersistence(
 auth,
@@ -630,6 +648,14 @@ console.log("SAKAKER Firebase Ready");
 })();
 </script>
 
+<!-- =========================================================
+     END 01 — LOGIN + PAYMENT + FIREBASE
+========================================================= -->
+
+<!-- =========================================================
+     02 — PAGE CONTENT START
+     من هنا يبدأ محتوى الصفحة الذي يمكنك تعديله بحرية.
+========================================================= -->
 <!-- ================= خلفية موقع ================= -->
 <style>
 html,
@@ -1618,51 +1644,350 @@ window.addEventListener("keyup",(e)=>{
 </script>
 
 <!-- Emerald Music Overlay END -->
+<!-- =========================================================
+     03 — SAKAKER MEDIA HUB
+     أيقونة القنوات + الفيديو — مستقلة عن بقية الصفحة
+     ملاحظة: لا يتم فك تشفير القنوات المدفوعة. استخدم الروابط الرسمية فقط.
+========================================================= -->
+<div id="sakakerMediaHost">
+  <button id="sakakerMediaOpen" class="sakakerGoldCoin" type="button" title="القنوات والفيديو" aria-label="القنوات والفيديو">
+    <span class="sakakerCoinInner">
+      <span class="sakakerCoinIcon">📺</span>
+      <span class="sakakerCoinText">WORLD<br>MEDIA</span>
+    </span>
+  </button>
+</div>
+
+<!-- =========================================================
+     04 — SAKAKER PONG
+     بونج محلي + لاعبان + أونلاين عبر Firebase Firestore
+========================================================= -->
+<div id="sakakerPongHost">
+  <button id="sakakerPongOpen" class="sakakerGoldCoin" type="button" title="Pong" aria-label="Pong">
+    <span class="sakakerCoinInner">
+      <span class="sakakerCoinIcon">🏓</span>
+      <span class="sakakerCoinText">PONG<br>ONLINE</span>
+    </span>
+  </button>
+</div>
+
+<style id="sakaker-media-pong-style">
+#sakakerMediaHost,#sakakerPongHost{
+  position:fixed;inset:0;pointer-events:none;z-index:2147483000;
+  font-family:"Tajawal",Tahoma,Arial,sans-serif;
+}
+#sakakerMediaHost *,#sakakerPongHost *{box-sizing:border-box}
+.sakakerGoldCoin{
+  pointer-events:auto;position:fixed;width:92px;height:92px;border-radius:50%;padding:5px;
+  cursor:pointer;color:#3b2500;border:2px solid #ffe98a;
+  background:radial-gradient(circle at 32% 28%,#fff4a8 0 7%,#ffd85a 18%,#c98a08 52%,#7d4b00 78%,#f3c13b 100%);
+  box-shadow:inset 0 0 0 3px #9a6100,inset 0 0 0 6px #f8da63,inset 0 0 18px rgba(255,255,255,.55),0 0 9px #ffd700,0 0 24px rgba(255,190,0,.85);
+  transition:transform .18s ease,filter .18s ease;text-shadow:0 1px 0 rgba(255,255,255,.55);
+}
+.sakakerGoldCoin:hover{transform:scale(1.07) rotate(-3deg);filter:brightness(1.12)}
+.sakakerGoldCoin:active{transform:scale(.96)}
+.sakakerCoinInner{width:100%;height:100%;border-radius:50%;border:1px dashed rgba(91,51,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.sakakerCoinIcon{font-size:24px;font-weight:900;margin-bottom:3px}
+.sakakerCoinText{font-family:Georgia,"Times New Roman",serif;font-weight:900;font-size:8px;letter-spacing:.45px;text-align:center}
+#sakakerMediaOpen{right:285px;bottom:200px}
+#sakakerPongOpen{right:390px;bottom:200px}
+
+.sakakerOverlay{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);pointer-events:auto}
+.sakakerPanel{position:relative;width:min(1120px,96vw);max-height:94vh;overflow:auto;border-radius:22px;padding:16px;background:linear-gradient(145deg,rgba(3,18,20,.97),rgba(0,8,12,.97));border:1px solid #00ffd5;box-shadow:0 0 34px rgba(0,255,213,.48),0 0 25px rgba(255,215,0,.24);color:#efffff}
+.sakakerClose{position:sticky;top:0;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;border:1px solid #00ffd5;background:#061a1d;color:#00ffd5;font-size:21px;cursor:pointer;z-index:5;box-shadow:0 0 15px rgba(0,255,213,.45)}
+.sakakerTitle{text-align:center;margin:2px 0 12px;color:#ffe36d;text-shadow:0 0 12px rgba(255,215,0,.45)}
+.sakakerTabs,.sakakerActions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:9px 0}
+.sakakerTab,.sakakerAction{border:1px solid rgba(0,255,213,.45);border-radius:999px;background:#0a1b1f;color:#eaffff;padding:8px 14px;cursor:pointer;font-family:inherit}
+.sakakerTab.active,.sakakerAction.active{background:#00ffd5;color:#00110d;box-shadow:0 0 16px rgba(0,255,213,.45)}
+.sakakerNotice{margin:10px auto;padding:9px 12px;max-width:900px;border-radius:12px;border:1px solid rgba(255,215,0,.35);background:rgba(255,215,0,.07);font-size:12px;line-height:1.7;color:#fff3bd;text-align:center}
+.sakakerMediaSearch{display:block;width:min(600px,94%);margin:10px auto;padding:10px 13px;border-radius:999px;border:1px solid rgba(0,255,213,.38);background:#06171a;color:white;outline:none}
+.sakakerMediaGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.sakakerMediaCard{border:1px solid rgba(0,255,213,.25);background:rgba(255,255,255,.055);border-radius:14px;padding:12px;min-height:90px;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.sakakerMediaCard b{color:#ffe36d;font-size:13px}.sakakerMediaCard small{opacity:.75;font-size:10px}
+.sakakerMediaCard button{border:1px solid rgba(255,215,0,.42);background:#112225;color:#fff;border-radius:10px;padding:7px;cursor:pointer}
+.sakakerPlayer{display:none;margin:12px auto 0;width:min(900px,100%);aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid #00ffd5;box-shadow:0 0 22px rgba(0,255,213,.3);background:#000}
+.sakakerPlayer iframe{width:100%;height:100%;border:0;display:block}
+
+#sakakerPongCanvas{display:block;width:min(860px,100%);height:auto;aspect-ratio:12/7;margin:10px auto;border-radius:16px;border:1px solid #00ffd5;background:#02090c;box-shadow:0 0 25px rgba(0,255,213,.32);touch-action:none}
+.sakakerPongStatus{text-align:center;min-height:24px;margin:7px;color:#bff;font-size:13px}
+.sakakerPongRoom{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:8px auto}
+.sakakerPongRoom input{width:170px;padding:9px 12px;border-radius:999px;border:1px solid rgba(0,255,213,.4);background:#071719;color:#fff;text-transform:uppercase;text-align:center;outline:none}
+.sakakerPongHelp{text-align:center;font-size:11px;line-height:1.7;opacity:.86;margin:8px}
+
+@media(max-width:720px){
+  .sakakerGoldCoin{width:74px;height:74px}
+  .sakakerCoinIcon{font-size:20px}.sakakerCoinText{font-size:6px}
+  #sakakerMediaOpen{right:102px;bottom:120px}
+  #sakakerPongOpen{right:186px;bottom:120px}
+  .sakakerPanel{padding:10px}
+}
+</style>
+
+<script id="sakaker-media-pong-script">
+(function(){
+  /* -------------------------
+     MEDIA HUB DATA
+     أضف أو احذف العناصر هنا بسهولة.
+     id = معرف فيديو YouTube، وليس رابطًا كاملاً.
+  ------------------------- */
+  const LIVE_CHANNELS=[
+    {name:"Live 01",country:"World",id:"AGkp2AL8e7o"},
+    {name:"Live 02",country:"World",id:"n7eQejkXbnM"},
+    {name:"Live 03",country:"World",id:"J2TXKYeBUi4"},
+    {name:"Live 04",country:"World",id:"0FBiyFpV__g"},
+    {name:"Live 05",country:"World",id:"HfgIFGbdGJ0"},
+    {name:"Live 06",country:"World",id:"LuKwFajn37U"}
+  ];
+  const VIDEO_LIBRARY=[
+    {name:"فيديو 01",category:"مختارات",id:"R4TZ6r_af8A"},
+    {name:"فيديو 02",category:"مختارات",id:"qxAXFYcbOpU"},
+    {name:"فيديو 03",category:"مختارات",id:"LqHLkqqIukQ"},
+    {name:"فيديو 04",category:"مختارات",id:"2p55ymDVH5Y"},
+    {name:"فيديو 05",category:"مختارات",id:"anMBqlPFCwU"},
+    {name:"فيديو 06",category:"مختارات",id:"aznfIFN7cyo"},
+    {name:"وثائقي 01",category:"وثائقي",id:"R62QVvz1Aso"},
+    {name:"وثائقي 02",category:"وثائقي",id:"23jGQdwSRJs"},
+    {name:"وثائقي 03",category:"وثائقي",id:"DNE6YbGO6-M"},
+    {name:"رياضة 01",category:"رياضة",id:"X7ByhZIGEjI"},
+    {name:"رياضة 02",category:"رياضة",id:"NYTo6KB7IqQ"},
+    {name:"مطبخ",category:"مطبخ",id:"bW_nnH2EAMM"},
+    {name:"كرتون",category:"كرتون",id:"U5sBC9Fr0fA"}
+  ];
+
+  const mediaHost=document.getElementById("sakakerMediaHost");
+  const mediaOpen=document.getElementById("sakakerMediaOpen");
+  function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
+  function openMedia(){
+    if(document.getElementById("sakakerMediaPanel")) return;
+    const wrap=document.createElement("div");
+    wrap.id="sakakerMediaPanel";
+    wrap.className="sakakerOverlay";
+    wrap.innerHTML=`<div class="sakakerPanel" dir="rtl">
+      <button class="sakakerClose" type="button">✕</button>
+      <h2 class="sakakerTitle">📺 قنوات العالم والفيديو</h2>
+      <div class="sakakerTabs">
+        <button class="sakakerTab active" data-tab="live" type="button">📡 قنوات مباشرة</button>
+        <button class="sakakerTab" data-tab="video" type="button">🎬 فيديو</button>
+      </div>
+      <div class="sakakerNotice">القنوات المشفّرة أو المدفوعة لا يتم فك تشفيرها هنا. أضف فقط البث العام أو الرابط الرسمي الذي تملك حق استخدامه. يمكنك إضافة أي قناة أو فيديو جديد من قائمتي <b>LIVE_CHANNELS</b> و <b>VIDEO_LIBRARY</b> داخل هذا القسم.</div>
+      <input class="sakakerMediaSearch" id="sakakerMediaSearch" placeholder="🔎 ابحث بالاسم أو التصنيف...">
+      <div class="sakakerMediaGrid" id="sakakerMediaGrid"></div>
+      <div class="sakakerPlayer" id="sakakerMediaPlayer"><iframe id="sakakerMediaFrame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+    </div>`;
+    mediaHost.appendChild(wrap);
+    const grid=wrap.querySelector("#sakakerMediaGrid");
+    const search=wrap.querySelector("#sakakerMediaSearch");
+    const frame=wrap.querySelector("#sakakerMediaFrame");
+    const player=wrap.querySelector("#sakakerMediaPlayer");
+    let tab="live";
+    const render=()=>{
+      const src=tab==="live"?LIVE_CHANNELS:VIDEO_LIBRARY;
+      const q=(search.value||"").trim().toLowerCase();
+      const rows=src.filter(x=>`${x.name} ${x.country||""} ${x.category||""}`.toLowerCase().includes(q));
+      grid.innerHTML=rows.map((x,i)=>`<div class="sakakerMediaCard"><b>${esc(x.name)}</b><small>${esc(x.country||x.category||"")}</small><button type="button" data-play="${i}">▶ تشغيل</button></div>`).join("") || `<div class="sakakerNotice">لا توجد نتيجة.</div>`;
+      grid.querySelectorAll("[data-play]").forEach(btn=>btn.onclick=()=>{
+        const item=rows[Number(btn.dataset.play)];
+        if(!item) return;
+        frame.src=`https://www.youtube.com/embed/${encodeURIComponent(item.id)}?autoplay=1&playsinline=1`;
+        player.style.display="block";
+        player.scrollIntoView({behavior:"smooth",block:"nearest"});
+      });
+    };
+    wrap.querySelectorAll(".sakakerTab").forEach(b=>b.onclick=()=>{
+      tab=b.dataset.tab;
+      wrap.querySelectorAll(".sakakerTab").forEach(x=>x.classList.toggle("active",x===b));
+      frame.src="";player.style.display="none";render();
+    });
+    search.oninput=render;
+    wrap.querySelector(".sakakerClose").onclick=()=>{frame.src="";wrap.remove();};
+    wrap.addEventListener("click",e=>{if(e.target===wrap){frame.src="";wrap.remove();}});
+    render();
+  }
+  mediaOpen.onclick=openMedia;
+
+  /* -------------------------
+     PONG GAME
+     local-ai / local-2p / online
+  ------------------------- */
+  const pongHost=document.getElementById("sakakerPongHost");
+  const pongOpen=document.getElementById("sakakerPongOpen");
+  let pongRAF=0;
+  let onlineUnsub=null;
+  let onlineRef=null;
+  let onlineRole="";
+  let onlineRoom="";
+  let lastOnlineWrite=0;
+
+  function randomRoom(){return Math.random().toString(36).slice(2,7).toUpperCase();}
+  async function requireFirebaseUser(status){
+    let u=window.firebaseAuth?.currentUser||null;
+    if(u) return u;
+    status.textContent="🔐 يلزم تسجيل الدخول بحساب Google للعب أونلاين...";
+    try{
+      if(typeof window.sakakerSignInGoogleForGames==="function"){
+        u=await window.sakakerSignInGoogleForGames();
+        return u||null;
+      }
+    }catch(e){console.error(e);}
+    status.textContent="❌ تعذر تسجيل الدخول. تأكد من تفعيل Google Sign-In في Firebase.";
+    return null;
+  }
+
+  function openPong(){
+    if(document.getElementById("sakakerPongPanel")) return;
+    const wrap=document.createElement("div");
+    wrap.id="sakakerPongPanel";wrap.className="sakakerOverlay";
+    wrap.innerHTML=`<div class="sakakerPanel" dir="rtl">
+      <button class="sakakerClose" type="button">✕</button>
+      <h2 class="sakakerTitle">🏓 SAKAKER PONG</h2>
+      <div class="sakakerActions">
+        <button class="sakakerAction active" data-mode="ai" type="button">🤖 ضد الكمبيوتر</button>
+        <button class="sakakerAction" data-mode="local" type="button">👥 لاعبان محليان</button>
+        <button class="sakakerAction" data-mode="online" type="button">🌐 لعب أونلاين</button>
+      </div>
+      <div class="sakakerPongRoom" id="sakakerPongRoomBox" style="display:none">
+        <input id="sakakerRoomCode" maxlength="8" placeholder="رمز الغرفة">
+        <button class="sakakerAction" id="sakakerCreateRoom" type="button">➕ إنشاء غرفة</button>
+        <button class="sakakerAction" id="sakakerJoinRoom" type="button">🔗 انضمام</button>
+      </div>
+      <div class="sakakerPongStatus" id="sakakerPongStatus">جاهز — استخدم W/S للتحكم.</div>
+      <canvas id="sakakerPongCanvas" width="840" height="490"></canvas>
+      <div class="sakakerPongHelp">W / S للاعب الأيسر — ↑ / ↓ للاعب الأيمن في وضع لاعبين. في الأونلاين: منشئ الغرفة هو اليسار، والمنضم هو اليمين. تعمل اللمس/الماوس على نصف الشاشة الخاص بك.</div>
+    </div>`;
+    pongHost.appendChild(wrap);
+    const canvas=wrap.querySelector("#sakakerPongCanvas");
+    const ctx=canvas.getContext("2d");
+    const status=wrap.querySelector("#sakakerPongStatus");
+    const roomBox=wrap.querySelector("#sakakerPongRoomBox");
+    const roomInput=wrap.querySelector("#sakakerRoomCode");
+    let mode="ai",closed=false;
+    const keys={};
+    const st={p1:.5,p2:.5,bx:.5,by:.5,vx:.0062,vy:.0042,s1:0,s2:0,last:performance.now()};
+    const paddleH=.22,paddleW=.018,ballR=.014;
+
+    const resetBall=(dir=1)=>{st.bx=.5;st.by=.5;st.vx=.0062*dir;st.vy=(Math.random()>.5?1:-1)*(.0035+Math.random()*.0025)};
+    function draw(){
+      const w=canvas.width,h=canvas.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle="#02090c";ctx.fillRect(0,0,w,h);
+      ctx.strokeStyle="rgba(0,255,213,.28)";ctx.setLineDash([10,12]);ctx.beginPath();ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle="#dfffff";
+      ctx.fillRect(w*.035,(st.p1-paddleH/2)*h,paddleW*w,paddleH*h);
+      ctx.fillRect(w*(.965-paddleW),(st.p2-paddleH/2)*h,paddleW*w,paddleH*h);
+      ctx.beginPath();ctx.arc(st.bx*w,st.by*h,ballR*Math.min(w,h),0,Math.PI*2);ctx.fillStyle="#ffe36d";ctx.fill();
+      ctx.font="bold 34px Arial";ctx.fillStyle="rgba(255,255,255,.8)";ctx.textAlign="center";ctx.fillText(`${st.s1}   ${st.s2}`,w/2,42);
+    }
+    function clampP(v){return Math.max(paddleH/2,Math.min(1-paddleH/2,v));}
+    function localInput(){
+      const speed=.014;
+      if(keys.KeyW) st.p1=clampP(st.p1-speed);if(keys.KeyS) st.p1=clampP(st.p1+speed);
+      if(mode==="local"){if(keys.ArrowUp) st.p2=clampP(st.p2-speed);if(keys.ArrowDown) st.p2=clampP(st.p2+speed);}
+      if(mode==="ai") st.p2=clampP(st.p2+Math.sign(st.by-st.p2)*Math.min(.009,Math.abs(st.by-st.p2)));
+      if(mode==="online"){
+        if(onlineRole==="host"){if(keys.KeyW) st.p1=clampP(st.p1-speed);if(keys.KeyS) st.p1=clampP(st.p1+speed);}
+        if(onlineRole==="guest"){if(keys.ArrowUp||keys.KeyW) st.p2=clampP(st.p2-speed);if(keys.ArrowDown||keys.KeyS) st.p2=clampP(st.p2+speed);}
+      }
+    }
+    function simulate(){
+      st.bx+=st.vx;st.by+=st.vy;
+      if(st.by<=ballR||st.by>=1-ballR){st.vy*=-1;st.by=Math.max(ballR,Math.min(1-ballR,st.by));}
+      const p1x=.035+paddleW,p2x=.965-paddleW;
+      if(st.vx<0 && st.bx-ballR<=p1x && st.bx>.02 && Math.abs(st.by-st.p1)<=paddleH/2+.025){st.vx=Math.abs(st.vx)*1.025;st.vy+=(st.by-st.p1)*.012;st.bx=p1x+ballR;}
+      if(st.vx>0 && st.bx+ballR>=p2x && st.bx<.98 && Math.abs(st.by-st.p2)<=paddleH/2+.025){st.vx=-Math.abs(st.vx)*1.025;st.vy+=(st.by-st.p2)*.012;st.bx=p2x-ballR;}
+      if(st.bx<-.03){st.s2++;resetBall(1);}else if(st.bx>1.03){st.s1++;resetBall(-1);}
+    }
+    async function onlineWrite(){
+      const now=Date.now();if(!onlineRef||now-lastOnlineWrite<90) return;lastOnlineWrite=now;
+      const api=window.sakakerFirestoreAPI;if(!api) return;
+      try{
+        if(onlineRole==="host"){
+          await api.updateDoc(onlineRef,{p1:st.p1,p2:st.p2,bx:st.bx,by:st.by,vx:st.vx,vy:st.vy,s1:st.s1,s2:st.s2,updatedAt:api.serverTimestamp()});
+        }else if(onlineRole==="guest"){
+          await api.updateDoc(onlineRef,{p2:st.p2,updatedAt:api.serverTimestamp()});
+        }
+      }catch(e){console.warn("Pong sync:",e);}
+    }
+    function loop(){
+      if(closed)return;
+      localInput();
+      if(mode!=="online"||onlineRole==="host") simulate();
+      if(mode==="online") onlineWrite();
+      draw();pongRAF=requestAnimationFrame(loop);
+    }
+    window.addEventListener("keydown",onKeyDown);window.addEventListener("keyup",onKeyUp);
+    function onKeyDown(e){if(["ArrowUp","ArrowDown","KeyW","KeyS"].includes(e.code)){keys[e.code]=true;e.preventDefault();}}
+    function onKeyUp(e){keys[e.code]=false;}
+    function pointerControl(e){
+      const r=canvas.getBoundingClientRect();const y=(e.clientY-r.top)/r.height;
+      if(mode==="online"){
+        if(onlineRole==="host") st.p1=clampP(y);else if(onlineRole==="guest") st.p2=clampP(y);
+      }else if(mode==="local"){
+        const x=(e.clientX-r.left)/r.width;if(x<.5)st.p1=clampP(y);else st.p2=clampP(y);
+      }else st.p1=clampP(y);
+    }
+    canvas.addEventListener("pointermove",e=>{if(e.buttons||e.pointerType==="touch")pointerControl(e)});canvas.addEventListener("pointerdown",pointerControl);
+
+    async function leaveOnline(){
+      if(onlineUnsub){try{onlineUnsub();}catch(_){}onlineUnsub=null;}onlineRef=null;onlineRole="";onlineRoom="";
+    }
+    async function subscribeRoom(ref,role){
+      const api=window.sakakerFirestoreAPI;
+      if(onlineUnsub)onlineUnsub();
+      onlineUnsub=api.onSnapshot(ref,snap=>{
+        if(!snap.exists()){status.textContent="❌ الغرفة غير موجودة أو أغلقت.";return;}
+        const d=snap.data()||{};
+        if(role==="guest"){
+          ["p1","bx","by","vx","vy","s1","s2"].forEach(k=>{if(typeof d[k]==="number")st[k]=d[k];});
+        }else if(role==="host" && typeof d.p2==="number") st.p2=d.p2;
+        const h=d.hostName||"Host",g=d.guestName||"بانتظار لاعب";
+        status.textContent=`🌐 الغرفة ${onlineRoom} — ${h} × ${g}`;
+      },e=>{console.error(e);status.textContent="❌ تعذر مزامنة الغرفة. راجع قواعد Firestore.";});
+    }
+    wrap.querySelector("#sakakerCreateRoom").onclick=async()=>{
+      const api=window.sakakerFirestoreAPI;if(!api){status.textContent="Firebase لم يجهز بعد";return;}
+      const user=await requireFirebaseUser(status);if(!user)return;
+      onlineRoom=(roomInput.value.trim().toUpperCase()||randomRoom()).replace(/[^A-Z0-9_-]/g,"").slice(0,8);roomInput.value=onlineRoom;
+      onlineRef=api.doc(window.firebaseDB,"sakakerPongRooms",onlineRoom);onlineRole="host";
+      resetBall(1);st.s1=st.s2=0;st.p1=st.p2=.5;
+      try{
+        await api.setDoc(onlineRef,{hostUid:user.uid,hostName:user.displayName||user.email||"Host",guestUid:null,guestName:null,status:"waiting",p1:st.p1,p2:st.p2,bx:st.bx,by:st.by,vx:st.vx,vy:st.vy,s1:0,s2:0,createdAt:api.serverTimestamp(),updatedAt:api.serverTimestamp()});
+        await subscribeRoom(onlineRef,"host");status.textContent=`✅ تم إنشاء الغرفة ${onlineRoom} — أرسل الرمز للاعب الثاني.`;
+      }catch(e){console.error(e);status.textContent="❌ رفض Firebase إنشاء الغرفة. راجع قواعد Firestore.";}
+    };
+    wrap.querySelector("#sakakerJoinRoom").onclick=async()=>{
+      const api=window.sakakerFirestoreAPI;if(!api){status.textContent="Firebase لم يجهز بعد";return;}
+      const user=await requireFirebaseUser(status);if(!user)return;
+      onlineRoom=roomInput.value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,"").slice(0,8);if(!onlineRoom){status.textContent="اكتب رمز الغرفة أولاً";return;}
+      onlineRef=api.doc(window.firebaseDB,"sakakerPongRooms",onlineRoom);onlineRole="guest";
+      try{
+        const snap=await api.getDoc(onlineRef);if(!snap.exists()){status.textContent="❌ الغرفة غير موجودة";return;}
+        const d=snap.data()||{};if(d.guestUid&&d.guestUid!==user.uid){status.textContent="❌ الغرفة مكتملة";return;}
+        await api.updateDoc(onlineRef,{guestUid:user.uid,guestName:user.displayName||user.email||"Guest",status:"playing",updatedAt:api.serverTimestamp()});
+        ["p1","p2","bx","by","vx","vy","s1","s2"].forEach(k=>{if(typeof d[k]==="number")st[k]=d[k];});
+        await subscribeRoom(onlineRef,"guest");status.textContent=`✅ انضممت إلى الغرفة ${onlineRoom}`;
+      }catch(e){console.error(e);status.textContent="❌ تعذر الانضمام. راجع Firebase/القواعد.";}
+    };
+
+    wrap.querySelectorAll("[data-mode]").forEach(b=>b.onclick=async()=>{
+      mode=b.dataset.mode;wrap.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("active",x===b));
+      roomBox.style.display=mode==="online"?"flex":"none";
+      await leaveOnline();resetBall(Math.random()>.5?1:-1);st.s1=st.s2=0;st.p1=st.p2=.5;
+      status.textContent=mode==="ai"?"🤖 ضد الكمبيوتر — W/S أو السحب":mode==="local"?"👥 لاعبان محليان — W/S و ↑/↓":"🌐 أنشئ غرفة أو أدخل رمز غرفة للانضمام";
+    });
+
+    async function close(){closed=true;cancelAnimationFrame(pongRAF);await leaveOnline();window.removeEventListener("keydown",onKeyDown);window.removeEventListener("keyup",onKeyUp);wrap.remove();}
+    wrap.querySelector(".sakakerClose").onclick=close;wrap.addEventListener("click",e=>{if(e.target===wrap)close();});
+    resetBall(1);draw();loop();
+  }
+  pongOpen.onclick=openPong;
+})();
+</script>
+
 
  
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBXqge71Xec5iNNZuYVvODJPgXZltojVCA",
-  authDomain: "sakaker-basnusse.firebaseapp.com",
-  projectId: "sakaker-basnusse",
-  storageBucket: "sakaker-basnusse.firebasestorage.app",
-  messagingSenderId: "369109440957",
-  appId: "1:369109440957:web:a3a460e5ef14c46a0d5ad4",
-  measurementId: "G-FKQFWD7E2Z"
-};
+<!-- Firebase موحّد في القسم 01؛ تمت إزالة التهيئة المكررة من هنا. -->
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Services
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-// نجعلها متاحة لبقية ملفات اللعبة
-window.firebaseApp = app;
-window.firebaseAuth = auth;
-window.firebaseDB = db;
-window.firebaseStorage = storage;
-window.emFirebaseChatAPI = {
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  serverTimestamp,
-  limit
-};
-
-console.log("SAKAKER Firebase Ready");
-</script>
 <!-- ================= خلفية موقع ================= -->
 <style>
 html,
