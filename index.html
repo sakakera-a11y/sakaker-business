@@ -325,7 +325,11 @@ body:not(.locked) #loginOverlay{display:none !important;}
       <button id="langEN" type="button">English</button>
     </div>
 
-    <div class="login-footer" id="loginFooter">تجربة مجانية لمدة 24 ساعة لكل حساب، ثم اشتراك موثّق. تفعيل الدفع بعد المراجعة اليدوية.</div>
+    <div class="login-footer" id="loginFooter">تجربة مجانية لمدة 24 ساعة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل بعد مراجعة الدفع. لا تجديد تلقائي.</div>
+    <p id="loginPaymentSupport" style="margin:10px 0;color:#efffff;font-size:14px;line-height:1.7;background:transparent;">
+      <span id="loginPaymentSupportText">دفعت ولم يتفعّل حسابك؟ أرسل رقم العملية ومعرّف حسابك إلى: </span>
+      <a href="mailto:sakaker@outlook.com" style="color:#a3f3dc;text-decoration:underline;display:inline-block;direction:ltr;padding:8px 0;">sakaker@outlook.com</a>
+    </p>
   </div>
 
   <!-- 💳 PayPal — الزر الرسمي الجديد -->
@@ -632,7 +636,9 @@ console.log("SAKAKER Firebase Ready");
     google.textContent=isAR?"المتابعة باستخدام Google":"Continue with Google";
     microsoft.textContent=isAR?"المتابعة باستخدام Microsoft":"Continue with Microsoft";
     facebook.textContent=isAR?"المتابعة باستخدام Facebook":"Continue with Facebook";
-    footer.textContent=isAR?"بعد انتهاء التجربة يلزم اشتراك موثّق. بعد الدفع تواصل مع sakaker@outlook.com برقم العملية ومعرّف حسابك؛ التفعيل بعد مراجعة الدفع وليس تلقائيًا.":"After the trial, a verified subscription is required. After payment, contact sakaker@outlook.com with the transaction reference and your account ID. Activation follows payment review; it is not automatic.";
+    footer.textContent=isAR?"بعد التجربة: اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من تاريخ التفعيل، دون تجديد تلقائي. التفعيل حاليًا بعد مراجعة الدفع يدويًا.":"After the trial: USD 3 for one year from activation, with no automatic renewal. Activation currently follows manual payment review.";
+    document.getElementById('loginPaymentSupportText').textContent=isAR?'دفعت ولم يتفعّل حسابك؟ أرسل رقم العملية ومعرّف حسابك إلى: ':'Paid but your account is not active? Email your transaction reference and account ID to: ';
+    document.getElementById('loginPaypalTitleText').textContent=isAR?'الاشتراك السنوي — 3 دولارات أمريكية عبر PayPal':'Annual access — USD 3 via PayPal';
     ar.classList.toggle("active",isAR); en.classList.toggle("active",!isAR);
     if(err.dataset.system!="1") err.textContent="";
   }
@@ -11114,21 +11120,22 @@ setInterval(() => {
   box-sizing:border-box !important;
   padding:9px 14px !important;
   text-align:center !important;
-  direction:rtl !important;
+  direction:inherit !important;
   font-family:Tajawal,Arial,sans-serif !important;
   color:#efffff !important;
-  background:rgba(2,18,18,.92) !important;
-  border:1px solid rgba(0,255,213,.60) !important;
+  background:transparent !important;
+  border:0 !important;
   border-radius:999px !important;
-  box-shadow:0 0 18px rgba(0,255,213,.32),0 0 12px rgba(255,215,0,.18) !important;
+  box-shadow:none !important;
+  text-shadow:0 1px 3px #000,0 0 6px #000 !important;
   z-index:2147483000 !important;
   pointer-events:auto !important;
   line-height:1.55 !important;
   font-size:13px !important;
-  backdrop-filter:blur(9px);
-  -webkit-backdrop-filter:blur(9px);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 ">
-  <span>للاستفسار والطلبات والملاحظات التواصل على البريد: </span>
+  <span id="businessContactLabel">للاستفسار والطلبات والملاحظات: </span>
   <a href="mailto:sakaker@outlook.com" style="
     color:#ffe36d !important;
     font-weight:900 !important;
@@ -11239,7 +11246,7 @@ html body :is(#livePopup,#emPanel,#sakGlobalPlayerBox) :is(button,input,select,a
 (()=>{
  const $=id=>document.getElementById(id),dock=$('sakakerAllIconsDock');
  const language=document.createElement('button');language.id='sakBusinessFeatureLanguage';language.type='button';document.body.append(language);
- function label(){const en=document.documentElement.lang==='en';language.textContent=en?'العربية':'English';language.setAttribute('aria-label',en?'Switch to Arabic':'التبديل إلى الإنجليزية');}
+ function label(){const en=document.documentElement.lang==='en';language.textContent=en?'العربية':'English';language.setAttribute('aria-label',en?'Switch to Arabic':'التبديل إلى الإنجليزية');const footer=$('sakakerContactFooter');footer.setAttribute('aria-label',en?'Contact us':'تواصل معنا');footer.style.setProperty('direction',en?'ltr':'rtl','important');$('businessContactLabel').textContent=en?'For enquiries, requests and feedback: ':'للاستفسار والطلبات والملاحظات: ';}
  language.onclick=()=>{const lang=document.documentElement.lang==='en'?'ar':'en';if(window.sakakerLoginLanguage)window.sakakerLoginLanguage.setLang(lang);else {document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';}label();};
  new MutationObserver(label).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});label();
  function footerSpace(){const footer=$('sakakerContactFooter');document.documentElement.style.setProperty('--business-footer-height',(footer?footer.getBoundingClientRect().height:60)+'px');}
