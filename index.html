@@ -327,7 +327,7 @@ body:not(.locked) #loginOverlay{display:none !important;}
 
     <div class="login-footer" id="loginFooter">تجربة مجانية لمدة 24 ساعة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل بعد مراجعة الدفع. لا تجديد تلقائي.</div>
     <p id="loginPaymentSupport" style="margin:10px 0;color:#efffff;font-size:14px;line-height:1.7;background:transparent;">
-      <span id="loginPaymentSupportText">دفعت ولم يتفعّل حسابك؟ أرسل رقم العملية ومعرّف حسابك إلى: </span>
+      <span id="loginPaymentSupportText">إذا لم تتمكن من متابعة الدخول بعد الاشتراك، تواصل عبر البريد الإلكتروني مع رقم العملية ومعرّف حسابك: </span>
       <a href="mailto:sakaker@outlook.com" style="color:#a3f3dc;text-decoration:underline;display:inline-block;direction:ltr;padding:8px 0;">sakaker@outlook.com</a>
     </p>
   </div>
@@ -491,6 +491,10 @@ const error=document.getElementById("loginError");
 ========================================================= */
 /* One server-recorded 24-hour trial per Firebase UID. Paid access is admin-owned. */
 const TRIAL_MS=86400000;
+// Owner-authorized free access, NOT PayPal payment verification.
+const RETURN_GRANT_MS=365*86400000;
+let returnGrantRequested=new URL(location.href).searchParams.get('access')==='return';
+let accessGrant=null;
 let accessGeneration=0,accessStops=[],accessTimer=null,accessUser=null;
 let accessTrial=null,accessPaid=null,accessReady=false,accessConnected=false,accessFailed=false;
 let accessClock={server:0,monotonic:0},accessClockReady=false;
@@ -509,13 +513,16 @@ function showLoginGate(){if(overlay.style.display!=='flex')overlay.style.display
 function openSiteAfterPayment(){if(overlay.style.display!=='none')overlay.style.display='none';if(document.body.classList.contains('locked'))document.body.classList.remove('locked');}
 function refreshAccess(){
  const en=document.documentElement.lang==='en',now=accessNow();
+ const grantValid=Number.isFinite(accessGrant?.startedAt)&&accessGrant.startedAt<=now&&now<accessGrant.startedAt+RETURN_GRANT_MS;
  const result=accessDecision(accessUser,accessReady,accessConnected,accessClockReady,accessTrial,accessPaid,now);
+ if(accessUser&&accessReady&&accessConnected&&accessClockReady&&grantValid&&result.kind!=='paid'){result.kind='paid';result.until=accessGrant.startedAt+RETURN_GRANT_MS;result.freeGrant=true;}
  const unlocked=result.kind==='paid'||result.kind==='trial';
  if(unlocked)openSiteAfterPayment();else showLoginGate();
  const status=document.getElementById('paypalGateStatus');
  if(accessFailed)status.textContent=en?'Access could not be verified. Check your connection and try again.':'تعذر التحقق من صلاحية الدخول. تحقق من الاتصال ثم أعد المحاولة.';
  else status.textContent=({login:en?'Sign in to start your one-time 24-hour free trial.':'سجّل الدخول لبدء تجربتك المجانية لمرة واحدة لمدة 24 ساعة.',checking:en?'Verifying account access…':'جارٍ التحقق من صلاحية الحساب…',paid:en?'Verified subscription active.':'الاشتراك الموثق نشط.',trial:en?'Your free trial is active.':'تجربتك المجانية نشطة.',expired:en?'Your free trial has ended. A verified subscription is required.':'انتهت التجربة المجانية. يلزم اشتراك موثّق للمتابعة.'})[result.kind];
  accessAccount.textContent=accessUser?(en?'Account ID for subscription support: ':'معرّف الحساب لدعم الاشتراك: ')+accessUser.uid:'';
+ if(result.freeGrant)status.textContent=en?'Free return-link access is active (not a payment confirmation).':'منحة رابط الرجوع نشطة (ليست تأكيدًا للدفع).';
  accessRetry.textContent=en?'Check access again':'إعادة التحقق من الدخول';accessRetry.hidden=!accessUser||unlocked;
  accessBanner.hidden=result.kind!=='trial';
  if(result.kind==='trial'){const seconds=Math.max(0,Math.ceil((result.until-now)/1000)),h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),s=seconds%60;accessBanner.textContent=(en?'Free trial: ':'التجربة المجانية: ')+[h,m,s].map(n=>String(n).padStart(2,'0')).join(':');}
@@ -524,7 +531,7 @@ function refreshAccess(){
 }
 function stopAccess(){accessGeneration++;accessStops.forEach(stop=>stop());accessStops=[];clearTimeout(accessTimer);accessTrial=accessPaid=null;accessReady=accessConnected=accessClockReady=false;accessFailed=false;}
 async function loadAccess(user){
- stopAccess();accessUser=user;refreshAccess();if(!user)return;
+ stopAccess();accessGrant=null;accessUser=user;refreshAccess();if(!user)return;
  const token=accessGeneration;
  try{
   const rt=await import('https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js');
@@ -540,8 +547,21 @@ async function loadAccess(user){
    catch(error){const existing=await rt.get(trialRef);if(!existing.exists())throw error;}
   }
   if(token!==accessGeneration)return;
-  let trialLoaded=false,paidLoaded=false;
-  const ready=()=>{accessReady=trialLoaded&&paidLoaded;accessFailed=false;refreshAccess();};
+  const grantRef=rt.ref(db,'siteReturnGrants/'+user.uid);
+  if(returnGrantRequested){
+   const previous=await rt.get(grantRef);
+   if(!previous.exists()){
+    try{await rt.set(grantRef,{startedAt:rt.serverTimestamp()});}
+    catch(error){if(!(await rt.get(grantRef)).exists())throw error;}
+   }
+   if(token!==accessGeneration)return;
+   returnGrantRequested=false;
+   const url=new URL(location.href);url.searchParams.delete('access');history.replaceState({},document.title,url.pathname+url.search+url.hash);
+  }
+  if(token!==accessGeneration)return;
+  let trialLoaded=false,paidLoaded=false,grantLoaded=false;
+  const ready=()=>{accessReady=trialLoaded&&paidLoaded&&grantLoaded;accessFailed=false;refreshAccess();};
+  accessStops.push(rt.onValue(grantRef,snap=>{if(token!==accessGeneration)return;accessGrant=snap.val();grantLoaded=true;ready();},fail));
   accessStops.push(rt.onValue(trialRef,snap=>{if(token!==accessGeneration)return;accessTrial=snap.val();trialLoaded=true;ready();},fail));
   accessStops.push(rt.onValue(rt.ref(db,'siteSubscriptions/'+user.uid),snap=>{if(token!==accessGeneration)return;accessPaid=snap.val();paidLoaded=true;ready();},fail));
  }catch(e){if(token!==accessGeneration)return;accessFailed=true;accessReady=false;refreshAccess();console.warn('Account access could not be verified.');}
@@ -636,8 +656,8 @@ console.log("SAKAKER Firebase Ready");
     google.textContent=isAR?"المتابعة باستخدام Google":"Continue with Google";
     microsoft.textContent=isAR?"المتابعة باستخدام Microsoft":"Continue with Microsoft";
     facebook.textContent=isAR?"المتابعة باستخدام Facebook":"Continue with Facebook";
-    footer.textContent=isAR?"بعد التجربة: اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من تاريخ التفعيل، دون تجديد تلقائي. التفعيل حاليًا بعد مراجعة الدفع يدويًا.":"After the trial: USD 3 for one year from activation, with no automatic renewal. Activation currently follows manual payment review.";
-    document.getElementById('loginPaymentSupportText').textContent=isAR?'دفعت ولم يتفعّل حسابك؟ أرسل رقم العملية ومعرّف حسابك إلى: ':'Paid but your account is not active? Email your transaction reference and account ID to: ';
+    footer.textContent=isAR?"بعد التجربة: اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من تاريخ التفعيل، دون تجديد تلقائي.":"After the trial: USD 3 for one year from activation, with no automatic renewal.";
+    document.getElementById('loginPaymentSupportText').textContent=isAR?'إذا لم تتمكن من متابعة الدخول بعد الاشتراك، تواصل عبر البريد الإلكتروني مع رقم العملية ومعرّف حسابك: ':'If you cannot continue signing in after subscribing, email your transaction reference and account ID to: ';
     document.getElementById('loginPaypalTitleText').textContent=isAR?'الاشتراك السنوي — 3 دولارات أمريكية عبر PayPal':'Annual access — USD 3 via PayPal';
     ar.classList.toggle("active",isAR); en.classList.toggle("active",!isAR);
     if(err.dataset.system!="1") err.textContent="";
@@ -11242,6 +11262,23 @@ html body :is(#livePopup,#emPanel,#sakGlobalPlayerBox) :is(button,input,select,a
 }
 @media(max-width:340px){html body #livePopup :is(#sakGlobalLiveResults,#sakRadioResults){grid-template-columns:minmax(0,1fr)!important;}}
 </style>
+<style id="business-encyclopedia-gull">
+html body #sakakerAllIconsDock{flex-wrap:wrap!important;row-gap:42px!important;}
+html body #sakakerAllIconsDock#sakakerAllIconsDock#sakakerAllIconsDock #businessEncyclopedia::before{background-image:var(--encyclopedia-gull)!important;filter:drop-shadow(0 0 4px #ffe891) drop-shadow(0 0 9px #ffc526)!important;}
+html body #sakakerAllIconsDock#sakakerAllIconsDock#sakakerAllIconsDock #businessEncyclopedia::after{color:#ffe58b!important;-webkit-text-fill-color:#ffe58b!important;font-size:10px!important;line-height:1.4!important;width:100px!important;white-space:normal!important;text-shadow:0 1px 3px #000,0 0 6px #c58a00!important;}
+html body #sakakerAllIconsDock #businessEncyclopedia{margin-inline:22px!important;text-decoration:none!important;}
+</style>
+<script id="business-encyclopedia-link">
+(()=>{
+ const dock=document.getElementById('sakakerAllIconsDock'),style=document.getElementById('sak-shore-gulls-style');if(!dock||!style)return;
+ const match=style.textContent.match(/url\("data:image\/svg\+xml,([^"]+)"\)/);if(!match)return;
+ const svg=decodeURIComponent(match[1]).replace(/fill="url\(#body\)"/g,'fill="#ffda45"').replace(/fill="url\(#wing\)"/g,'fill="#e6aa17"').replace('fill="#344855"','fill="#b98109"');
+ const link=document.createElement('a');link.id='businessEncyclopedia';link.className='sak-shore-gull';link.href='https://sakaker.co/';link.target='_blank';link.rel='noopener noreferrer';
+ link.style.setProperty('--encyclopedia-gull','url("data:image/svg+xml,'+encodeURIComponent(svg)+'")');
+ function translate(){const name=document.documentElement.lang==='en'?'Abwalqmrzmrd Encyclopedia':'موسوعة ابوالقمرزمرد';link.dataset.gullLabel=name;link.setAttribute('aria-label',name);link.title=name;}
+ dock.append(link);translate();new MutationObserver(translate).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+})();
+</script>
 <script id="business-feature-integration">
 (()=>{
  const $=id=>document.getElementById(id),dock=$('sakakerAllIconsDock');
