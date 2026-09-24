@@ -11279,6 +11279,20 @@ html body #sakakerAllIconsDock #businessEncyclopedia{margin-inline:22px!importan
  dock.append(link);translate();new MutationObserver(translate).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 })();
 </script>
+<style id="business-scoreboard-style">
+html body #businessVisitScore{position:fixed;top:var(--visit-top,58px);left:12px;z-index:1000;display:grid;grid-template-columns:1fr 1fr;gap:2px;width:196px;max-width:calc(100vw - 24px);padding:6px;border:1px solid #9de6d780;border-top:3px solid #efcc69;border-radius:12px;background:linear-gradient(145deg,#092d39f5,#102031f5);box-shadow:0 5px 20px #0005;box-sizing:border-box;color:#f4fbff;font:12px/1.5 Tahoma,Arial,sans-serif;pointer-events:none;}
+html body #businessVisitScore .visit-cell{text-align:center;padding:5px;min-width:0;}
+html body #businessVisitScore .visit-cell+ .visit-cell{border-inline-start:1px solid #ffffff25;}
+html body #businessVisitScore strong{display:block;font:700 24px/1.4 Consolas,monospace;font-variant-numeric:tabular-nums;color:#ffe18c;overflow-wrap:anywhere;}
+html body #businessVisitScore small{grid-column:1/-1;text-align:center;color:#c5dfe7;font-size:10px;}
+@media(max-width:600px){html body #businessVisitScore{width:160px;font-size:11px;}html body #businessVisitScore strong{font-size:20px;}}
+</style>
+<style id="business-annual-score-style">
+html body #businessVisitScore{width:220px;grid-template-columns:1fr 1fr;}
+html body #businessVisitScore .annual-cell{grid-column:1/-1;border-inline-start:0!important;border-top:1px solid #ffffff25;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;}
+html body #businessVisitScore .annual-cell strong{color:#9df0ce;font-size:22px;}
+@media(max-width:600px){html body #businessVisitScore{width:170px;}html body #businessVisitScore .annual-cell strong{font-size:20px;}}
+</style>
 <script id="business-feature-integration">
 (()=>{
  const $=id=>document.getElementById(id),dock=$('sakakerAllIconsDock');
@@ -11301,6 +11315,73 @@ html body #sakakerAllIconsDock #businessEncyclopedia{margin-inline:22px!importan
  live.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const items=[...live.querySelectorAll('button,input,select,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length);const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
  new MutationObserver(()=>{if(!document.body.classList.contains('locked'))return;$('sakPongArena')?.close();$('emPanel')?.querySelector('.emClose')?.click();if(getComputedStyle(live).display!=='none')toggleLivePopup();closeVideo();$('sakGlobalPlayerClose')?.click();}).observe(document.body,{attributes:true,attributeFilter:['class']});
 })();
+</script>
+<section id="businessVisitScore" aria-label="عدد الزيارات">
+ <div class="visit-cell"><span id="visitTodayLabel">زيارات اليوم</span><strong id="visitTodayValue">—</strong></div>
+ <div class="visit-cell"><span id="visitTotalLabel">إجمالي الزيارات</span><strong id="visitTotalValue">—</strong></div>
+ <div class="visit-cell annual-cell"><span id="annualScoreLabel">اشتراكات السنة</span><strong id="annualScoreValue">—</strong></div>
+ <small id="visitScoreStatus">جارٍ تحميل العداد…</small>
+</section>
+<script type="module" id="business-scoreboard-script">
+import {getDatabase,ref,get,onValue,runTransaction} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
+import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
+const box=document.getElementById('businessVisitScore'),languageButton=document.getElementById('sakBusinessFeatureLanguage');
+let data=null,offset=0,failed=false,loaded=false,counted=false,busy=false;
+const dayAt=time=>Math.floor((time+10800000)/86400000);
+function nextVisit(current,time){const day=dayAt(time);return {day,total:(current?.total||0)+1,today:current?.day===day?(current.today||0)+1:1};}
+function draw(){const en=document.documentElement.lang==='en';box.dir=en?'ltr':'rtl';box.setAttribute('aria-label',en?'Visit scoreboard':'عدد الزيارات');document.getElementById('visitTodayLabel').textContent=en?'Today':'زيارات اليوم';document.getElementById('visitTotalLabel').textContent=en?'Total visits':'إجمالي الزيارات';const format=new Intl.NumberFormat(en?'en-US':'ar-SA');document.getElementById('visitTotalValue').textContent=loaded?format.format(data?.total||0):'—';document.getElementById('visitTodayValue').textContent=loaded?format.format(data?.day===dayAt(Date.now()+offset)?data.today:0):'—';document.getElementById('visitScoreStatus').textContent=failed?(en?'Counter unavailable':'تعذر تحديث العداد'):loaded?(en?'Signed-in visits · Saudi time':'زيارات المسجّلين · توقيت السعودية'):(en?'Loading counter…':'جارٍ تحميل العداد…');}
+function position(){if(languageButton)box.style.setProperty('--visit-top',Math.ceil(languageButton.getBoundingClientRect().bottom+10)+'px');}
+if(languageButton)new ResizeObserver(position).observe(languageButton);window.addEventListener('resize',position,{passive:true});new MutationObserver(()=>{draw();position();}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});position();draw();
+try{
+ await window.sakFeatureDatabaseReady;
+ if(!window.firebaseApp)throw Error('Firebase unavailable');
+ const db=getDatabase(window.firebaseApp),counter=ref(db,'businessVisitStats'),auth=getAuth(window.firebaseApp);
+ onValue(ref(db,'.info/serverTimeOffset'),snapshot=>{offset=Number(snapshot.val())||0;draw();});
+ onValue(counter,snapshot=>{data=snapshot.val();loaded=true;failed=false;draw();},()=>{failed=true;draw();});
+ async function countVisit(){if(counted||busy||!auth.currentUser)return;busy=true;try{const clock=await get(ref(db,'.info/serverTimeOffset'));offset=Number(clock.val())||0;const result=await runTransaction(counter,current=>nextVisit(current,Date.now()+offset),{applyLocally:false});counted=result.committed;failed=!result.committed;}catch(_){failed=true;}finally{busy=false;draw();}}
+ onAuthStateChanged(auth,user=>{if(user)countVisit();});
+ onValue(ref(db,'.info/connected'),snapshot=>{if(snapshot.val())countVisit();});
+ setInterval(draw,60000);
+}catch(_){failed=true;draw();}
+</script>
+<script type="module" id="business-annual-score-script">
+import {getDatabase,ref,get,set,onValue} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
+import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
+let entries=null,offset=0,readFailed=false;
+const label=document.getElementById('annualScoreLabel'),value=document.getElementById('annualScoreValue');
+function drawAnnual(){const en=document.documentElement.lang==='en';label.textContent=en?'Annual access':'اشتراكات السنة';label.title=en?'Active annual accounts indexed since this update; includes free grants.':'الحسابات السنوية السارية المسجلة في العداد منذ التحديث، وتشمل المنح.';const now=Date.now()+offset;value.textContent=entries===null||readFailed?'—':new Intl.NumberFormat(en?'en-US':'ar-SA').format(Object.values(entries).filter(expiry=>Number.isFinite(expiry)&&expiry>now).length);value.title=readFailed?(en?'Counter unavailable':'تعذر تحميل العداد'):label.title;}
+new MutationObserver(drawAnnual).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});drawAnnual();
+try{
+ await window.sakFeatureDatabaseReady;if(!window.firebaseApp)throw Error('Firebase unavailable');
+ const db=getDatabase(window.firebaseApp),auth=getAuth(window.firebaseApp);
+ onValue(ref(db,'.info/serverTimeOffset'),s=>{offset=Number(s.val())||0;drawAnnual();});
+ onValue(ref(db,'publicAnnualAccess'),s=>{entries=s.val()||{};readFailed=false;drawAnnual();},()=>{readFailed=true;drawAnnual();});
+ let generation=0,stops=[];
+ onAuthStateChanged(auth,user=>{
+  const generationAtStart=++generation;stops.forEach(stop=>stop());stops=[];if(!user)return;
+  let grant=null,paid=null,grantReady=false,paidReady=false,running=false,pending=false;
+  async function sync(){
+   if(!grantReady||!paidReady||generationAtStart!==generation)return;
+   if(running){pending=true;return;}running=true;
+   try{
+    do{
+     pending=false;if(generationAtStart!==generation)return;
+     const expiry=Math.max(Number.isFinite(grant?.startedAt)?grant.startedAt+31536000000:0,paid?.active===true&&Number.isFinite(paid.expiresAt)?paid.expiresAt:0);
+     const privateRef=ref(db,'annualCounterKeys/'+user.uid);let key=(await get(privateRef)).val();
+     if(!key&&expiry>Date.now()+offset){
+      key=Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');
+      try{await set(privateRef,key);}catch(error){key=(await get(privateRef)).val();if(!key)throw error;}
+     }
+     if(key&&generationAtStart===generation)await set(ref(db,'publicAnnualAccess/'+key),expiry||null);
+    }while(pending);
+   }catch(_){console.warn('Annual counter sync unavailable; account access is unchanged.');}
+   finally{running=false;}
+  }
+  stops.push(onValue(ref(db,'siteReturnGrants/'+user.uid),s=>{grant=s.val();grantReady=true;sync();}));
+  stops.push(onValue(ref(db,'siteSubscriptions/'+user.uid),s=>{paid=s.val();paidReady=true;sync();}));
+ });
+ setInterval(drawAnnual,60000);
+}catch(_){readFailed=true;drawAnnual();}
 </script>
 </body>
 </html>
