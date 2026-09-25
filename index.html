@@ -7566,6 +7566,23 @@ html body #sakGlobalStreamDetails{
     {kind:'hadath',ar:'العربية الحدث',en:'Al Hadath',url:'https://www.alhadath.net/live-stream'},
     {kind:'business',ar:'العربية Business — الاقتصادية',en:'Al Arabiya Business',url:'https://www.youtube.com/watch?v=_Mj9CjqrNtk'}
   ];
+  const officialChoices=[
+    {ar:'الأولى — القنوات السعودية',en:'Aloula — Saudi channels',url:'https://aloula.sba.sa/',group:'government'},
+    {ar:'SBC السعودية',en:'Saudi SBC',url:'https://sbctv.sba.sa/',group:'government'},
+    {ar:'TRT World',en:'TRT World',url:'https://www.trtworld.com/',group:'government'},
+    {ar:'ARTE — ثقافة ووثائقيات',en:'ARTE — Culture & documentaries',url:'https://www.arte.tv/en/',group:'government'},
+    {ar:'الجزيرة — مباشر ووثائقيات',en:'Al Jazeera — Live & documentaries',url:'https://www.aljazeera.net/video/live',group:'other'},
+    {ar:'العربية الإخبارية',en:'Al Arabiya News',url:'https://live.alarabiya.net/',group:'other'},
+    {ar:'الحدث',en:'Al Hadath',url:'https://www.alhadath.net/live-stream',group:'other'},
+    {ar:'شاهد — قنوات MBC وترفيه',en:'Shahid — MBC & entertainment',url:'https://shahid.mbc.net/',group:'other',paid:true},
+    {ar:'TOD — رياضة وقنوات باشتراك',en:'TOD — Sports & subscription channels',url:'https://www.tod.tv/',group:'other',paid:true}
+  ];
+  function buildOfficialSources(header){
+    const section=document.createElement('details');section.id='sakOfficialSources';section.open=true;
+    const summary=document.createElement('summary'),note=document.createElement('p'),input=document.createElement('input'),grid=document.createElement('div');grid.className='sak-official-grid';input.type='search';input.id='sakOfficialSourceSearch';section.append(summary,note,input,grid);header.append(section);
+    function refresh(){const en=isEn();summary.textContent=en?'Official channels & platforms ↗':'قنوات ومنصات رسمية ↗';note.textContent=en?'These links open the official service. Availability varies by country; a separate provider subscription may be required. Your site subscription does not include it.':'تفتح هذه الروابط الخدمة الرسمية. التوفر حسب البلد، وقد تحتاج اشتراكًا منفصلًا لدى المزود لا يشمله اشتراك موقعنا.';input.placeholder=en?'Search official sources…':'بحث المصادر الرسمية…';input.setAttribute('aria-label',input.placeholder);grid.replaceChildren();const q=normalize(input.value);officialChoices.filter(c=>(currentGroup==='all'||c.group===currentGroup)&&normalize(c.ar+' '+c.en).includes(q)).forEach(c=>{const a=document.createElement('a');a.href=c.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=(en?c.en:c.ar)+(c.paid?(en?' · May require subscription':' · قد يتطلب اشتراكًا'):'')+' ↗';grid.append(a);});if(!grid.children.length)grid.textContent=en?'No matching official sources.':'لا توجد مصادر رسمية مطابقة.';}
+    input.addEventListener('input',refresh);section.refreshSources=refresh;new MutationObserver(refresh).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});refresh();
+  }
   let loadingPromise = null;
   let currentHls = null;
   let currentStreamUrl = '';
@@ -7876,6 +7893,7 @@ html body #sakGlobalStreamDetails{
     header.appendChild(selectRow);
     header.appendChild(meta);
     header.appendChild(notice);
+    buildOfficialSources(header);
 
     const results =
       document.createElement('div');
@@ -8270,6 +8288,7 @@ html body #sakGlobalStreamDetails{
         buildSelects();
         // Show usable channels before optional directory statistics finish.
         render();
+        catalogReady=false;
         void enrichWorldCatalog();
 
         void (async()=>{try{
@@ -8973,7 +8992,8 @@ html body #sakGlobalStreamDetails{
   }
 
   function render(){
-    if(!searchData&&currentFilter!=='arabiya'&&currentGroup!=='government'){
+    document.getElementById('sakOfficialSources')?.refreshSources();
+    if(!searchData&&!allRows.length&&currentFilter!=='arabiya'&&currentGroup!=='government'){
       return;
     }
 
@@ -9771,6 +9791,7 @@ html body #sakGlobalStreamDetails{
               ? 'The global channel index could not be loaded right now.'
               : 'تعذر تحميل فهرس القنوات العالمي حاليًا.';
         }
+        void enrichWorldCatalog();
       }
     }
   );
@@ -9795,7 +9816,7 @@ html body #sakGlobalStreamDetails{
             await loadGlobalData();
             render();
             applyLanguage();
-          }catch(e){}
+          }catch(e){void enrichWorldCatalog();}
         }
       }
     ).observe(
@@ -10792,8 +10813,7 @@ html body #sakakerAllIconsDock#sakakerAllIconsDock#sakakerAllIconsDock .sak-shor
  const keys=new Set();let y1=210,y2=210,ball={x:400,y:250,vx:300,vy:110},scores=[0,0],audio=false;
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  function status(key,extra=''){statusKey=key;statusExtra=extra;$('sakPongStatus').textContent=t(key)+extra;}
- function labels(){
-   $('ecModeLabel').textContent=t('نوع التسجيل','Recording mode');$('ecMode').options[0].textContent=t('صوت المعزوفة فقط','Instrument audio only');$('ecMode').options[1].textContent=t('فيديو مع صوت المعزوفة','Video with instrument audio');$('ecIncludeMicLabel').textContent=t('إضافة صوت الميكروفون (اختياري؛ استخدم سماعات لمنع الصدى)','Include microphone (optional; use headphones to avoid echo)');arena.dir=lang()==='ar'?'rtl':'ltr';$('sakPongTitle').textContent=t('title');arena.querySelectorAll('[data-sp]').forEach(el=>el.textContent=t(el.dataset.sp));$('sakPongCode').placeholder=t('code');$('sakPongCode').setAttribute('aria-label',t('code'));$('sakPongMessage').placeholder=t('message');$('sakPongMessage').setAttribute('aria-label',t('message'));$('sakPongExit').setAttribute('aria-label',lang()==='ar'?'إغلاق اللعبة':'Close game');canvas.setAttribute('aria-label',t('help'));$('sakPongAudio').textContent=t(audio?'mute':'sound');status(statusKey,statusExtra);}
+ function labels(){arena.dir=lang()==='ar'?'rtl':'ltr';$('sakPongTitle').textContent=t('title');arena.querySelectorAll('[data-sp]').forEach(el=>el.textContent=t(el.dataset.sp));$('sakPongCode').placeholder=t('code');$('sakPongCode').setAttribute('aria-label',t('code'));$('sakPongMessage').placeholder=t('message');$('sakPongMessage').setAttribute('aria-label',t('message'));$('sakPongExit').setAttribute('aria-label',lang()==='ar'?'إغلاق اللعبة':'Close game');canvas.setAttribute('aria-label',t('help'));$('sakPongAudio').textContent=t(audio?'mute':'sound');status(statusKey,statusExtra);}
  function controls(){for(const id of ['sakPongCreate','sakPongJoin','sakPongSolo','sakPongDuration'])$(id).disabled=busy||!!mode;$('sakPongLeave').disabled=busy||!mode;$('sakPongCopy').disabled=!room;$('sakPongMessage').disabled=mode!=='online'||ended||!endAt;updateShare();}
  function reset(){y1=y2=210;ball={x:400,y:250,vx:300,vy:110};scores=[0,0];ended=false;lastFrame=0;lastSend=0;}
  function serve(direction){ball={x:400,y:250,vx:300*direction,vy:(Math.random()-.5)*280};}
@@ -11535,6 +11555,14 @@ html body #emCrystalSettings [hidden]{display:none!important;}
 html body #emCrystalSettings h3{margin:0 0 10px;color:#a3f3dc;font-size:18px;}
 html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-offset:3px;}
 </style>
+<style id="official-sources-style">
+#sakOfficialSources{margin:12px 0;padding:12px;background:#082d3de8;border:1px solid #6ce1bf66;border-radius:12px;color:#efffff}
+#sakOfficialSources summary{cursor:pointer;font-weight:bold;color:#b9ffe6}#sakOfficialSources p{font-size:12px;line-height:1.7}
+#sakOfficialSourceSearch{box-sizing:border-box;width:100%;padding:10px;border:1px solid #94cbd5;border-radius:8px;background:#061c29;color:white}
+#sakOfficialSources .sak-official-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr));gap:8px;margin-top:10px}
+#sakOfficialSources a{display:block;padding:10px;border:1px solid #73c5d566;border-radius:8px;background:#153b50;color:#fff;text-decoration:none;overflow-wrap:anywhere}
+#sakOfficialSources a:hover{background:#20526a}#sakOfficialSources :focus-visible{outline:3px solid #ffe49b;outline-offset:2px}
+</style>
 <script id="emerald-audio-bus">
 (()=>{let bus;const sources=new WeakMap();window.emeraldAudioBus=()=>{if(!bus){const ac=new (window.AudioContext||window.webkitAudioContext)(),input=ac.createGain();input.connect(ac.destination);bus={ac,input};}if(bus.ac.state==='suspended')bus.ac.resume().catch(()=>{});return bus;};window.emeraldRouteNote=audio=>{const b=window.emeraldAudioBus();let source=sources.get(audio);if(!source){source=b.ac.createMediaElementSource(audio);sources.set(audio,source);}source.disconnect();source.connect(b.input);};window.emeraldReleaseNote=audio=>sources.get(audio)?.disconnect();})();
 </script>
@@ -11552,6 +11580,7 @@ html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-of
   function active(){return recorder&&recorder.state!=='inactive';}
   function message(ar,en){$('ecStatus').textContent=t(ar,en);}
   function labels(){
+   $('ecModeLabel').textContent=t('نوع التسجيل','Recording mode');$('ecMode').options[0].textContent=t('صوت المعزوفة فقط','Instrument audio only');$('ecMode').options[1].textContent=t('فيديو مع صوت المعزوفة','Video with instrument audio');$('ecIncludeMicLabel').textContent=t('إضافة صوت الميكروفون (اختياري؛ استخدم سماعات لمنع الصدى)','Include microphone (optional; use headphones to avoid echo)');
    $('ecTitle').textContent=t('♫ إعدادات الكاميرا والتسجيل والمشاركة','♫ Camera, recording & sharing');$('ecDeviceLabel').textContent=t('الكاميرا','Camera');$('ecDevice').options[0].textContent=t('الكاميرا الافتراضية','Default camera');$('ecFacingLabel').textContent=t('الاتجاه (للكاميرا الافتراضية)','Facing (default camera)');$('ecFacing').options[0].textContent=t('أمامية','Front');$('ecFacing').options[1].textContent=t('خلفية','Rear');$('ecQualityLabel').textContent=t('الدقة المطلوبة','Preferred resolution');$('ecPreview').textContent=stream?t('إغلاق الكاميرا','Close camera'):t('تشغيل معاينة الكاميرا','Start camera preview');$('ecRefresh').textContent=t('تحديث قائمة الكاميرات','Refresh cameras');$('ecDownload').textContent=t('تحميل التسجيل','Download recording');
    rec.textContent=active()?t('⏹ إنهاء وحفظ التسجيل','⏹ Finish recording'):($('ecMode').value==='audio'?t('⏺ تسجيل المعزوفة','⏺ Record music'):t('⏺ تسجيل فيديو ومعزوفة','⏺ Record video & music'));pause.textContent=recorder?.state==='paused'?t('▶ متابعة','▶ Resume'):t('⏸ إيقاف مؤقت','⏸ Pause');camera.textContent=t('الكاميرا: ','Camera: ')+(camOn?t('مفعلة','On'):t('متوقفة','Off'));mic.textContent=t('الميكروفون: ','Microphone: ')+(micOn?t('مفعل','On'):t('صامت','Muted'));
    $('ecPrivacy').textContent=t('لا تُفتح الكاميرا إلا بإذنك. صوت آلات الاستديو يُسجّل مباشرة، والميكروفون اختياري. تسجيل الصوت فقط لا يحتاج كاميرا. الملف يبقى على جهازك ولا يُرفع تلقائيًا. احفظه قبل تحديث الصفحة. الحد 10 دقائق أو نحو 100 ميغابايت.','Camera access requires your permission. Instrument audio is recorded directly; microphone is optional. Audio-only recording needs no camera. Nothing uploads automatically. Save before refreshing. Limit: 10 minutes or about 100 MB.');
