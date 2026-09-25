@@ -7544,11 +7544,18 @@ html body #sakGlobalStreamDetails{
   let currentGroup = 'all';
   const groupQueries={all:'',government:'',other:''};
   const countryLabels=new Map(),languageLabels=new Map();
+  const worldCountryCodes='AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(' ');
+  let catalogPromise=null,catalogReady=false,countrySearch='';
+  function familyChannel(ch){return ch.isNsfw!==true&&!ch.categories.some(c=>/^(xxx|adult|porn|erotic)$/i.test(c))&&!/\b(porn|xxx|playboy|penthouse|hustler|erotic)\b/i.test(ch.name||'');}
   function governmentChannel(ch){
     if(/^(government|state-owned|state)$/i.test(ch.ownership||''))return true;
+    if((ch.owners||[]).some(owner=>/\b(ministry of|government of|state broadcasting corporation)\b/i.test(owner)))return true;
+    const publicIds={GB:/^BBC(One|Two|Three|Four|News|Parliament|WorldNews|Arabic)(\.|$)/i,DE:/^DW(English|Arabic|Arabia|Espanol|Deutsch)?(\.|$)/i,TR:/^TRT/i,JP:/^NHK/i};
+    if(publicIds[ch.country]?.test(ch.id))return true;
     return ch.country==='SA' && /^(Saudi(Quran|Sunnah|TV|1|2)|SBC|AlEkhbariya|KSA(Sports)?[1-4]?)(\.|$)/i.test(ch.id);
   }
   function arabiyaChannel(ch,kind){
+    if(!familyChannel(ch))return false;
     const name=normalize(ch.name+' '+ch.id);
     if(kind==='business')return /alarabiya(business|alhadathbusiness)|العربية(business|بزنس|الاقتصادية)/.test(name);
     if(kind==='hadath')return /alhadath|الحدث/.test(name)&&!/business|الاقتصاد/.test(name)&&!/elyoum|اليوم/.test(name);
@@ -7667,8 +7674,9 @@ html body #sakGlobalStreamDetails{
       id:String(rowValue(row,'id') || ''),
       name:String(rowValue(row,'name') || ''),
       ownership:String(rowValue(row,'ownership') || ''),
+      isNsfw:rowValue(row,'is_nsfw')===true||rowValue(row,'is_nsfw')===1||rowValue(row,'is_nsfw')==='true',
       search:String(rowValue(row,'search') || ''),
-      country:String(rowValue(row,'country') || ''),
+      country:String(rowValue(row,'country') || '').replace(/^UK$/,'GB'),
       categories:parseList(rowValue(row,'categories')),
       languages:parseList(rowValue(row,'languages')),
       logo:String(rowValue(row,'logo') || ''),
@@ -7697,6 +7705,7 @@ html body #sakGlobalStreamDetails{
   }
 
   function countryName(code){
+    if(code==='UK')code='GB';
     if(!code) return '—';
     const cacheKey=lang()+':'+code;if(countryLabels.has(cacheKey))return countryLabels.get(cacheKey);
 
@@ -7787,6 +7796,9 @@ html body #sakGlobalStreamDetails{
       ['arabiya','العربية','Al Arabiya'],
       ['news','📰 أخبار','📰 News'],
       ['sports','⚽ رياضة','⚽ Sports'],
+      ['kids','أطفال','Kids'],
+      ['education','تعليم وثائقي وثقافة','Learning & documentaries'],
+      ['entertainment','ترفيه وأفلام وموسيقى','Entertainment & music'],
       ['favorites','★ المفضلة','★ Favorites'],
       ['saved','⭐ المحفوظة','⭐ Saved']
     ].forEach(function(row){
@@ -7858,7 +7870,7 @@ html body #sakGlobalStreamDetails{
 
     header.appendChild(title);
     const groups=document.createElement('div');groups.id='sakLiveOwnershipGroups';groups.setAttribute('role','group');
-    [['all','كل القنوات','All channels'],['government','القنوات الحكومية','Government channels'],['other','العامة والخاصة والأخرى','General, private & other']].forEach(([key,ar,en])=>{const button=document.createElement('button');button.type='button';button.dataset.group=key;button.dataset.ar=ar;button.dataset.en=en;button.setAttribute('aria-pressed',String(key===currentGroup));button.addEventListener('click',()=>{groupQueries[currentGroup]=input.value;currentGroup=key;input.value=groupQueries[key];currentFilter='all';filters.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));groups.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));visibleLimit=60;applyLanguage();render();});groups.append(button);});header.appendChild(groups);
+    [['all','كل القنوات','All channels'],['government','الحكومية والخدمة العامة حسب الدولة','Government & public service by country'],['other','العامة والخاصة — حول العالم','General & private — worldwide']].forEach(([key,ar,en])=>{const button=document.createElement('button');button.type='button';button.dataset.group=key;button.dataset.ar=ar;button.dataset.en=en;button.setAttribute('aria-pressed',String(key===currentGroup));button.addEventListener('click',()=>{groupQueries[currentGroup]=input.value;currentGroup=key;input.value=groupQueries[key];country.value='';language.value='';currentFilter='all';filters.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));groups.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));visibleLimit=60;applyLanguage();render();});groups.append(button);});header.appendChild(groups);
     header.appendChild(searchRow);
     header.appendChild(filters);
     header.appendChild(selectRow);
@@ -8258,6 +8270,7 @@ html body #sakGlobalStreamDetails{
         buildSelects();
         // Show usable channels before optional directory statistics finish.
         render();
+        void enrichWorldCatalog();
 
         void (async()=>{try{
           const indexResponse =
@@ -8299,6 +8312,28 @@ html body #sakGlobalStreamDetails{
     }
   }
 
+  async function enrichWorldCatalog(){
+    if(catalogReady)return;if(catalogPromise)return catalogPromise;
+    catalogPromise=(async()=>{
+      const response=await fetch('https://iptv-org.github.io/api/channels.json',{cache:'default',signal:AbortSignal.timeout(18000)});if(!response.ok)throw Error('Catalog unavailable');const entries=await response.json();if(!Array.isArray(entries))throw Error('Invalid catalog');
+      const byId=new Map(entries.map(row=>[row.id,row])),ids=new Set(allRows.map(ch=>ch.id));
+      allRows.forEach(ch=>{const item=byId.get(ch.id);if(item){ch.owners=Array.isArray(item.owners)?item.owners:[];ch.isNsfw=item.is_nsfw===true;ch.website=item.website||'';ch.categories=[...new Set([...ch.categories,...(item.categories||[])])];}});
+      entries.forEach(item=>{if(ids.has(item.id)||item.closed||item.is_nsfw||!/^https?:\/\//i.test(item.website||''))return;const ch={id:item.id,name:item.name,search:(item.alt_names||[]).join(' '),country:item.country==='UK'?'GB':item.country,categories:item.categories||[],languages:[],owners:item.owners||[],isNsfw:false,website:item.website,sourceOnly:true,logo:'',score:0,online:false,streams:0,quality:''};if(familyChannel(ch))allRows.push(ch);});
+      allRows.forEach(ch=>{ch._search=normalize(ch.name+' '+ch.search+' '+ch.country+' '+ch.categories.join(' ')+' '+ch.languages.join(' '));});catalogReady=true;buildSelects();render();applyLanguage();
+    })().catch(()=>{const notice=document.getElementById('sakGlobalLiveNotice');if(notice)notice.textContent=isEn()?'Additional world metadata unavailable; showing the current directory.':'تعذر تحميل بيانات العالم الإضافية؛ يُعرض الدليل المتاح.';}).finally(()=>{catalogPromise=null;});return catalogPromise;
+  }
+  function renderCountryBrowser(results,more){
+    const select=document.getElementById('sakGlobalCountry');if(currentGroup!=='government')return false;
+    const header=document.createElement('div');header.className='sak-country-browser-header';
+    if(select?.value){const back=document.createElement('button');back.type='button';back.textContent=isEn()?'← All countries':'جميع الدول ←';back.onclick=()=>{select.value='';visibleLimit=60;render();};const title=document.createElement('strong');title.textContent=countryName(select.value);header.append(back,title);results.append(header);return false;}
+    const heading=document.createElement('h3');heading.textContent=isEn()?'Choose a country or territory':'اختر الدولة أو الإقليم';
+    const input=document.createElement('input');input.id='sakGovernmentCountrySearch';input.type='search';input.placeholder=isEn()?'Search countries…':'ابحث عن دولة…';input.setAttribute('aria-label',input.placeholder);input.value=countrySearch;
+    header.append(heading,input);results.append(header);
+    const grid=document.createElement('div');grid.className='sak-country-grid';results.append(grid);
+    const counts=new Map();allRows.forEach(ch=>{if(governmentChannel(ch)&&familyChannel(ch))counts.set(ch.country,(counts.get(ch.country)||0)+1);});
+    function fill(){grid.replaceChildren();const q=normalize(countrySearch),codes=worldCountryCodes.filter(code=>normalize(countryName(code)+' '+code).includes(q)).sort((a,b)=>countryName(a).localeCompare(countryName(b),isEn()?'en':'ar'));const fragment=document.createDocumentFragment();codes.slice(0,visibleLimit).forEach(code=>{const button=document.createElement('button');button.type='button';const name=document.createElement('span');name.textContent=countryName(code);const count=document.createElement('small');const n=counts.get(code)||0;count.textContent=n?(isEn()?n+' directory entries':n+' إدخالًا في الدليل'):(isEn()?'No classified channel yet':'لا توجد قناة مصنّفة بعد');button.append(name,count);button.onclick=()=>{select.value=code;visibleLimit=60;render();};fragment.append(button);});grid.append(fragment);more.style.display=codes.length>visibleLimit?'block':'none';more.textContent=isEn()?'More countries':'المزيد من الدول';updateMeta(codes.length);}
+    input.addEventListener('input',()=>{countrySearch=input.value;visibleLimit=60;fill();});fill();return true;
+  }
   function buildSelects(){
     const country =
       document.getElementById(
@@ -8321,7 +8356,7 @@ html body #sakGlobalStreamDetails{
     const countries =
       Array.from(
         new Set(
-          allRows
+          [...worldCountryCodes,...allRows.map(ch=>ch.country)].map(code=>({country:code}))
             .map(function(ch){
               return ch.country;
             })
@@ -8387,6 +8422,7 @@ html body #sakGlobalStreamDetails{
      الحالات
   ======================================================= */
   function statusInfo(ch){
+    if(ch.sourceOnly)return {key:'unchecked',cls:'sak-status-unchecked',ar:'الموقع الرسمي — قد يتطلب اشتراكًا',en:'Official website — may require subscription'};
     if(ch.online){
       if(ch.score > 0 && ch.score < 65){
         return {
@@ -8526,6 +8562,10 @@ html body #sakGlobalStreamDetails{
       ? Object.values(favorites).map(function(ch){ return allRows.find(function(row){return row.id === ch.id;}) || ch; })
       : allRows;
     return candidates.filter(function(ch){
+      if(!familyChannel(ch))return false;
+      if(currentFilter==='kids'&&!ch.categories.some(c=>/^(kids|children)$/i.test(c)))return false;
+      if(currentFilter==='education'&&!ch.categories.some(c=>/^(education|documentary|culture|science)$/i.test(c)))return false;
+      if(currentFilter==='entertainment'&&!ch.categories.some(c=>/^(entertainment|movies|music|comedy|series|animation)$/i.test(c)))return false;
       if(currentGroup==='government'&&!governmentChannel(ch))return false;
       if(currentGroup==='other'&&governmentChannel(ch))return false;
       if(currentFilter === 'sports' && !ch.categories.some(function(category){return /sport/i.test(category);})) return false;
@@ -8712,6 +8752,7 @@ html body #sakGlobalStreamDetails{
     card.addEventListener(
       'click',
       function(){
+        if(ch.sourceOnly){if(/^https?:\/\//i.test(ch.website||''))window.open(ch.website,'_blank','noopener,noreferrer');return;}
         openGlobalChannel(ch,card);
       }
     );
@@ -8835,6 +8876,8 @@ html body #sakGlobalStreamDetails{
     if(!results || !more) return;
 
     results.innerHTML = '';
+    if(renderCountryBrowser(results,more))return;
+    more.textContent=isEn()?'Show more channels':'عرض المزيد من القنوات';
 
     renderDWInfo(results);
     if(currentFilter==='arabiya'){
@@ -8906,8 +8949,8 @@ html body #sakGlobalStreamDetails{
 
       empty.textContent =
         isEn()
-          ? 'No matching channels. Try another name, country, language, or status.'
-          : 'لا توجد قنوات مطابقة. جرّب اسمًا آخر أو دولة أو لغة أو حالة مختلفة.';
+          ? (currentGroup==='government'?'No classified public/government channel available for this selection. This does not mean the country has no channels.':'No matching channels. Try another name, country, language, or status.')
+          : (currentGroup==='government'?'لا توجد قناة حكومية أو خدمة عامة مصنّفة لهذا الاختيار حاليًا؛ هذا لا يعني أن الدولة لا تملك قنوات.':'لا توجد قنوات مطابقة. جرّب اسمًا آخر أو دولة أو لغة أو حالة مختلفة.');
 
       results.appendChild(empty);
     }else{
@@ -8930,7 +8973,7 @@ html body #sakGlobalStreamDetails{
   }
 
   function render(){
-    if(!searchData&&currentFilter!=='arabiya'){
+    if(!searchData&&currentFilter!=='arabiya'&&currentGroup!=='government'){
       return;
     }
 
@@ -9662,8 +9705,8 @@ html body #sakGlobalStreamDetails{
     if(notice){
       notice.textContent =
         isEn()
-          ? 'Government classification uses available ownership metadata and a limited Saudi public-channel list. Unclassified channels stay in Other; this is not a complete global ownership registry. Stream availability depends on the source and region.'
-          : 'التصنيف الحكومي يعتمد على بيانات الملكية المتاحة وقائمة محددة من القنوات السعودية الرسمية. غير المصنّف يبقى في الأخرى؛ التصنيف ليس سجل ملكية عالميًا شاملًا. توفر البث يعتمد على المصدر والمنطقة.';
+          ? 'World directory: public-service broadcasters are not necessarily government-controlled. Ownership classification is incomplete; unclassified entries stay in Other. Known adult categories are excluded, but live content is not age-certified. Official websites may require a subscription; no paywall bypass is provided.'
+          : 'دليل عالمي: الخدمة العامة لا تعني بالضرورة التحكم الحكومي. تصنيف الملكية غير مكتمل، وغير المصنّف يبقى في الأخرى. تُستبعد تصنيفات البالغين المعروفة، ولا يُضمن عمر محتوى البث الحي. المواقع الرسمية قد تتطلب اشتراكًا؛ لا يوجد تجاوز للاشتراكات.';
     }
 
     if(more){
@@ -11344,6 +11387,13 @@ html body #businessVisitScore .annual-cell strong{color:#9df0ce;font-size:22px;}
 @media(max-width:600px){html body #businessVisitScore{width:170px;}html body #businessVisitScore .annual-cell strong{font-size:20px;}}
 </style>
 <style id="business-live-groups-style">
+html body #livePopup .sak-country-browser-header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 0;}
+html body #livePopup .sak-country-browser-header h3{font-size:18px;color:#a3f3dc;margin:0;}
+html body #livePopup .sak-country-browser-header input{flex:1 1 220px;}
+html body #livePopup .sak-country-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+html body #livePopup .sak-country-grid button{display:flex;flex-direction:column;justify-content:center;gap:6px;min-height:80px!important;border-radius:12px;padding:12px!important;white-space:normal;}
+html body #livePopup .sak-country-grid small{color:#c5d7e1;font:12px/1.6 Tahoma,Arial,sans-serif;}
+@media(max-width:450px){html body #livePopup .sak-country-grid{grid-template-columns:repeat(2,minmax(0,1fr));}html body #livePopup .sak-country-grid button{font-size:13px!important;}}
 html body #livePopup #sakLiveOwnershipGroups{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
 html body #livePopup #sakLiveOwnershipGroups button{flex:1 1 150px;padding:10px;border-radius:10px;}
 html body #livePopup #sakLiveOwnershipGroups button[aria-pressed="true"]{background:#a3f3dc!important;color:#08252b!important;border-color:#a3f3dc!important;}
