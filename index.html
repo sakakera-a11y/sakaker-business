@@ -5262,14 +5262,14 @@ html body #emeraldMusicHost .emCredit{
           '<i></i><i></i><i></i><i></i><i></i>' +
         '</div>' +
         '<div class="sak-music-icon-label">' +
-          (en ? 'Music Studio' : 'استوديو الموسيقى') +
+          (en ? 'Emerald Music Studio' : 'استديو إيميرالد ميوزك') +
         '</div>' +
       '</div>';
 
     const label =
       en
-        ? 'Open Music Studio'
-        : 'فتح استوديو الموسيقى';
+        ? 'Open Emerald Music Studio'
+        : 'فتح استديو إيميرالد ميوزك';
 
     btn.setAttribute(
       'aria-label',
@@ -6029,8 +6029,8 @@ html body #emeraldMusicHost .emCredit{
     if(name){
       name.textContent =
         en
-          ? '♫ Sakaker Music Studio'
-          : '♫ استوديو سكاكر للموسيقى';
+          ? '♫ Emerald Music Studio'
+          : '♫ استديو إيميرالد ميوزك';
     }
 
     if(status){
@@ -10922,7 +10922,7 @@ html body #sakakerAllIconsDock{grid-auto-rows:62px!important;padding-bottom:14px
 </style>
 <script id="sak-shore-gulls-js">
 (()=>{'use strict';
- const labels={facebookVideoIcon:['فيس بوك','Facebook'],liveFlasher:['بث مباشر','Live'],emeraldLibraryButton:['مكتبة الفيديو','Videos'], 'pongGame-btn':['بونج','Pong'],shipIcon_new:['السفينة','Ship'],emOpenBtn:['استوديو الموسيقى','Music Studio']};
+ const labels={facebookVideoIcon:['فيس بوك','Facebook'],liveFlasher:['بث مباشر','Live'],emeraldLibraryButton:['مكتبة الفيديو','Videos'], 'pongGame-btn':['بونج','Pong'],shipIcon_new:['السفينة','Ship'],emOpenBtn:['استديو إيميرالد ميوزك','Emerald Music Studio']};
  function apply(){const dock=document.getElementById('sakakerAllIconsDock');if(!dock)return;const en=document.documentElement.lang==='en';
  dock.querySelectorAll('.icon-card,#facebookVideoIcon,#liveFlasher,#emeraldLibraryButton,#pongGame-btn,#shipIcon_new,#emOpenBtn').forEach(el=>{
  if(el.id==='sakNotebookCard')return;el.classList.add('sak-shore-gull');const pair=labels[el.id];const label=pair?pair[en?1:0]:el.matches('.launcher')?(en?'Maps':'خرائط'):(el.querySelector('.icon-label')?.textContent.trim()||el.getAttribute('aria-label')||'');
@@ -10954,7 +10954,7 @@ html body #sakakerAllIconsDock#sakakerAllIconsDock#sakakerAllIconsDock #emOpenBt
    el.classList.add('sak-colored-name');
    if(!el.style.getPropertyValue('--sak-name-color'))el.style.setProperty('--sak-name-color',palette[next++%palette.length]);
    if(el.id==='emOpenBtn'||el.id==='facebookVideoIcon'){
-    const name=el.id==='emOpenBtn'?(en?'Music Studio':'استوديو الموسيقى'):(en?'Facebook':'فيس بوك');
+    const name=el.id==='emOpenBtn'?(en?'Emerald Music Studio':'استديو إيميرالد ميوزك'):(en?'Facebook':'فيس بوك');
     el.classList.add('sak-shore-gull');if(el.dataset.gullLabel!==name)el.dataset.gullLabel=name;
     if(el.getAttribute('aria-label')!==name)el.setAttribute('aria-label',name);
     if(el.getAttribute('title')!==name)el.setAttribute('title',name);
@@ -11515,6 +11515,82 @@ try{
  });
  setInterval(drawAnnual,60000);
 }catch(_){readFailed=true;drawAnnual();}
+</script>
+<style id="emerald-crystal-recording-style">
+html body #emeraldMusicHost #emPanel .emBox{background-color:#081b2c!important;background-image:radial-gradient(ellipse at 15% 5%,#63f3cd55,transparent 42%),radial-gradient(ellipse at 95% 60%,#a88cff44,transparent 45%),repeating-conic-gradient(from 20deg at 50% 30%,#a7efff18 0deg 30deg,#06152b10 30deg 65deg,#8df6cd20 65deg 90deg)!important;border:1px solid #c0ffed99!important;box-shadow:inset 0 0 50px #50e6c320,0 0 35px #52edd330!important;}
+html body #emeraldMusicHost #emPanel #sakMusicStudioHeader{background:linear-gradient(120deg,#143c4cf5,#244259f5)!important;border:1px solid #b3f8ed99!important;box-shadow:0 0 18px #93ffe02b!important;}
+html body #emeraldMusicHost #emPanel .emCamBox{grid-column:1/-1!important;width:min(600px,100%)!important;justify-self:center!important;border:1px solid #c0ffed99!important;border-radius:14px!important;background:#061520!important;}
+html body #emeraldMusicHost #emPanel .emCameraControls{justify-content:center!important;}
+html body #emeraldMusicHost #emPanel :is(#emCamPause,#emCamToggle,#emMicToggle){display:inline-block!important;}
+html body #emeraldMusicHost #emPanel #emCrystalSettings{order:0!important;padding:14px;border:1px solid #a3f3dc80;border-radius:14px;background:#0c2437eb;color:#f4fbff;font:14px/1.7 Tahoma,Arial,sans-serif;}
+html body #emCrystalSettings .ec-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+html body #emCrystalSettings label{display:flex;flex-direction:column;gap:5px;}
+html body #emCrystalSettings select{padding:9px;min-height:44px;background:#193c50;color:#fff;border:1px solid #94cdd9;border-radius:8px;font:16px Tahoma,Arial,sans-serif;max-width:100%;}
+html body #emCrystalSettings .ec-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+html body #emCrystalSettings button{min-height:44px;padding:9px 12px;background:#224958;color:#fff;border:1px solid #94cdd9;border-radius:9px;cursor:pointer;font:14px Tahoma,Arial,sans-serif;}
+html body #emCrystalSettings button:disabled{opacity:.5;cursor:not-allowed;}
+html body #emCrystalSettings #ecPlayback{width:min(100%,520px);max-height:300px;background:#000;border-radius:10px;}
+html body #emCrystalSettings [hidden]{display:none!important;}
+html body #emCrystalSettings h3{margin:0 0 10px;color:#a3f3dc;font-size:18px;}
+html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-offset:3px;}
+</style>
+<script id="emerald-camera-sharing">
+(()=>{'use strict';
+ let savedFile=null,savedURL=null,controller=null;
+ const english=()=>document.documentElement.lang==='en',t=(ar,en)=>english()?en:ar;
+ function install(){
+  const panel=document.getElementById('emPanel');if(!panel||panel.querySelector('#emCrystalSettings'))return;
+  const box=panel.querySelector('.emBox'),video=panel.querySelector('#emCam');if(!box||!video)return;
+  const section=document.createElement('section');section.id='emCrystalSettings';section.innerHTML='<h3 id="ecTitle"></h3><div class="ec-fields"><label><span id="ecDeviceLabel"></span><select id="ecDevice"><option value=""></option></select></label><label><span id="ecFacingLabel"></span><select id="ecFacing"><option value="user"></option><option value="environment"></option></select></label><label><span id="ecQualityLabel"></span><select id="ecQuality"><option value="480">480p</option><option value="720" selected>720p</option><option value="1080">1080p</option></select></label></div><div class="ec-actions"><button type="button" id="ecPreview"></button><button type="button" id="ecRefresh"></button></div><p id="ecStatus" role="status"></p><p id="ecPrivacy"></p><video id="ecPlayback" controls playsinline hidden></video><div class="ec-actions" id="ecShare"><button type="button" id="ecDownload"></button><button type="button" data-share="Facebook">Facebook</button><button type="button" data-share="X / Twitter">X / Twitter</button><button type="button" data-share="YouTube">YouTube</button><button type="button" data-share="WhatsApp">WhatsApp</button></div><p id="ecShareHelp"></p>';box.append(section);
+  const $=id=>panel.querySelector('#'+id),rec=$('emCamRec'),pause=$('emCamPause'),camera=$('emCamToggle'),mic=$('emMicToggle');
+  let stream=null,recorder=null,request=0,busy=false,disposed=false,camOn=true,micOn=true,timer=null,parts=[],bytes=0,stopping=false;
+  function active(){return recorder&&recorder.state!=='inactive';}
+  function message(ar,en){$('ecStatus').textContent=t(ar,en);}
+  function labels(){
+   $('ecTitle').textContent=t('♫ إعدادات الكاميرا والتسجيل والمشاركة','♫ Camera, recording & sharing');$('ecDeviceLabel').textContent=t('الكاميرا','Camera');$('ecDevice').options[0].textContent=t('الكاميرا الافتراضية','Default camera');$('ecFacingLabel').textContent=t('الاتجاه (للكاميرا الافتراضية)','Facing (default camera)');$('ecFacing').options[0].textContent=t('أمامية','Front');$('ecFacing').options[1].textContent=t('خلفية','Rear');$('ecQualityLabel').textContent=t('الدقة المطلوبة','Preferred resolution');$('ecPreview').textContent=stream?t('إغلاق الكاميرا','Close camera'):t('تشغيل معاينة الكاميرا','Start camera preview');$('ecRefresh').textContent=t('تحديث قائمة الكاميرات','Refresh cameras');$('ecDownload').textContent=t('تحميل التسجيل','Download recording');
+   rec.textContent=active()?t('⏹ إنهاء وحفظ التسجيل','⏹ Finish recording'):t('⏺ تسجيل فيديو','⏺ Record video');pause.textContent=recorder?.state==='paused'?t('▶ متابعة','▶ Resume'):t('⏸ إيقاف مؤقت','⏸ Pause');camera.textContent=t('الكاميرا: ','Camera: ')+(camOn?t('مفعلة','On'):t('متوقفة','Off'));mic.textContent=t('الميكروفون: ','Microphone: ')+(micOn?t('مفعل','On'):t('صامت','Muted'));
+   $('ecPrivacy').textContent=t('لا تُفتح الكاميرا إلا بإذنك. التسجيل من الكاميرا والميكروفون؛ صوت آلات الاستديو غير مدمج داخليًا. الملف يبقى على جهازك ولا يُرفع تلقائيًا. احفظه قبل تحديث الصفحة. الحد 10 دقائق أو نحو 100 ميغابايت.','Camera access requires your permission. Records camera and microphone; instrument audio is not mixed internally. Nothing uploads automatically. Save before refreshing. Limit: 10 minutes or about 100 MB.');
+   $('ecShareHelp').textContent=t('المشاركة تفتح خيارات الجهاز لاختيار التطبيق إن كان يدعم إرسال الفيديو. وإلا حمّل الملف ثم ارفعه يدويًا. YouTube يفتح استديو الرفع بعد تحميل الملف؛ لم يتم نشر أي فيديو تلقائيًا.','Sharing opens the device chooser where file sharing is supported. Otherwise download and attach the file manually. YouTube opens its upload studio after download. No video is published automatically.');
+   pause.disabled=!active()||stopping;rec.disabled=busy||stopping;camera.disabled=mic.disabled=!stream||stopping;['ecDevice','ecFacing','ecQuality','ecPreview','ecRefresh'].forEach(id=>$(id).disabled=busy||!!active()||stopping);section.querySelectorAll('#ecShare button').forEach(b=>b.disabled=!savedFile||!!active()||stopping);
+  }
+  function release(){request++;stream?.getTracks().forEach(track=>track.stop());stream=null;video.srcObject=null;}
+  async function devices(){if(!navigator.mediaDevices?.enumerateDevices)return;const selected=$('ecDevice').value,list=await navigator.mediaDevices.enumerateDevices();$('ecDevice').length=1;list.filter(d=>d.kind==='videoinput').forEach((d,i)=>{const option=document.createElement('option');option.value=d.deviceId;option.textContent=d.label||t('كاميرا ','Camera ')+(i+1);$('ecDevice').append(option);});$('ecDevice').value=selected;}
+  async function preview(){
+   if(stream)return true;if(!isSecureContext||!navigator.mediaDevices?.getUserMedia){message('افتح الموقع المنشور عبر HTTPS للسماح بالكاميرا.','Open the published HTTPS site to use the camera.');return false;}
+   const token=++request;busy=true;labels();try{
+    const height=Number($('ecQuality').value),device=$('ecDevice').value;
+    const result=await navigator.mediaDevices.getUserMedia({video:{height:{ideal:height},width:{ideal:Math.round(height*16/9)},frameRate:{ideal:24,max:30},...(device?{deviceId:{exact:device}}:{facingMode:{ideal:$('ecFacing').value}})},audio:true});
+    if(disposed||token!==request||!panel.isConnected){result.getTracks().forEach(track=>track.stop());return false;}stream=result;camOn=micOn=true;video.srcObject=stream;await video.play().catch(()=>{});await devices();message('المعاينة جاهزة؛ اضغط تسجيل لبدء الفيديو.','Preview ready. Press Record to begin.');return true;
+   }catch(error){release();if(!disposed)message('تعذر فتح الكاميرا أو الميكروفون. تحقق من الإذن وإغلاق التطبيقات الأخرى.','Camera or microphone unavailable. Check permission and other apps.');return false;}finally{busy=false;if(!disposed)labels();}
+  }
+  function showSaved(){if(!savedURL)return;const player=$('ecPlayback');player.src=savedURL;player.hidden=false;labels();}
+  function stop(){if(active()){stopping=true;clearTimeout(timer);recorder.stop();}release();if(!disposed)labels();}
+  async function record(){
+   if(active()){stop();return;}if(busy||stopping)return;
+   if(savedFile&&!confirm(t('بدء تسجيل جديد يستبدل التسجيل السابق في هذه الصفحة. هل حفظته؟','A new recording replaces the previous recording on this page. Have you saved it?')))return;
+   if(!window.MediaRecorder){message('هذا المتصفح لا يدعم التسجيل. جرّب متصفحًا أحدث.','Recording is unsupported. Try a newer browser.');return;}
+   $('ecPlayback').pause();
+   if(!await preview()||disposed)return;
+   try{
+    const type=['video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(v=>MediaRecorder.isTypeSupported(v));
+    recorder=new MediaRecorder(stream,type?{mimeType:type,videoBitsPerSecond:2500000}:undefined);parts=[];bytes=0;
+    recorder.ondataavailable=e=>{if(e.data.size){parts.push(e.data);bytes+=e.data.size;if(bytes>=100*1024*1024&&active()){message('بلغ التسجيل حد الذاكرة؛ جارٍ الحفظ.','Recording reached the memory limit. Saving.');stop();}}};
+    recorder.onstop=()=>{const mime=recorder.mimeType||parts[0]?.type||'video/webm';const blob=new Blob(parts,{type:mime});parts=[];stopping=false;recorder=null;clearTimeout(timer);release();if(blob.size){if(savedURL)URL.revokeObjectURL(savedURL);savedFile=new File([blob],'emerald-music-'+Date.now()+(mime.includes('mp4')?'.mp4':'.webm'),{type:mime});savedURL=URL.createObjectURL(savedFile);}if(!disposed){showSaved();message('التسجيل جاهز. حمّله أو شاركه من الأزرار أدناه.','Recording ready. Download or share using the buttons below.');labels();}};
+    recorder.onerror=()=>{message('حدث خطأ أثناء التسجيل. احفظ المقطع المتاح إن ظهر.','Recording error. Save the available clip if shown.');stop();};recorder.start(1000);timer=setTimeout(stop,600000);message('● التسجيل جارٍ','● Recording');labels();
+   }catch(_){release();message('تعذر بدء التسجيل بهذا المتصفح.','Could not start recording in this browser.');labels();}
+  }
+  function download(){if(!savedFile)return;const a=document.createElement('a');a.href=savedURL;a.download=savedFile.name;document.body.append(a);a.click();a.remove();}
+  async function share(network){if(!savedFile)return;const sites={Facebook:'https://www.facebook.com/', 'X / Twitter':'https://x.com/compose/post',YouTube:'https://studio.youtube.com/',WhatsApp:'https://web.whatsapp.com/'};
+   if(network!=='YouTube'&&navigator.share&&navigator.canShare?.({files:[savedFile]})){try{await navigator.share({files:[savedFile],title:'Emerald Music Studio'});message('تم تسليم الملف لنافذة مشاركة الجهاز؛ تحقق من النشر داخل التطبيق.','File handed to the device share dialog; verify publication in the app.');}catch(e){if(e.name!=='AbortError')message('تعذرت المشاركة. استخدم تحميل التسجيل ثم أرفقه يدويًا.','Sharing failed. Download and attach the recording manually.');}return;}
+   download();window.open(sites[network],'_blank','noopener,noreferrer');message('تم طلب تحميل الفيديو وفتح المنصة. اختر الملف لإرفاقه أو رفعه بنفسك.','Download requested and platform opened. Select the file to upload or attach it yourself.');
+  }
+  panel.addEventListener('click',e=>{const target=e.target.closest('#emCamRec,#emCamPause,#emCamToggle,#emMicToggle');if(!target)return;e.preventDefault();e.stopImmediatePropagation();if(target.disabled)return;if(target===rec)record();else if(target===pause&&active()){recorder.state==='paused'?recorder.resume():recorder.pause();labels();}else if(target===camera){camOn=!camOn;stream?.getVideoTracks().forEach(track=>track.enabled=camOn);labels();}else if(target===mic){micOn=!micOn;stream?.getAudioTracks().forEach(track=>track.enabled=micOn);labels();}},true);
+  $('ecPreview').onclick=()=>{if(stream){release();labels();}else preview();};$('ecRefresh').onclick=()=>devices().catch(()=>message('تعذر تحديث الكاميرات.','Could not refresh cameras.'));['ecDevice','ecFacing','ecQuality'].forEach(id=>$(id).onchange=()=>{release();labels();message('اضغط تشغيل المعاينة لتطبيق الإعدادات.','Start preview to apply settings.');});$('ecDownload').onclick=download;section.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>share(b.dataset.share));
+  const languageObserver=new MutationObserver(labels);languageObserver.observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  controller={panel,close(){if(disposed)return;disposed=true;stop();languageObserver.disconnect();}};showSaved();labels();message('الكاميرا مغلقة حتى تضغط تشغيل المعاينة أو التسجيل.','Camera is off until you start preview or recording.');
+ }
+ const observer=new MutationObserver(()=>{if(controller&&!controller.panel.isConnected){controller.close();controller=null;}install();});observer.observe(document.body,{childList:true,subtree:true});install();window.addEventListener('pagehide',()=>controller?.close());
+})();
 </script>
 </body>
 </html>
