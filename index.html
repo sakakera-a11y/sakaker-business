@@ -5658,7 +5658,7 @@ html body #emeraldMusicHost .emCredit{
 
       if(AC){
         audioCtx =
-          new AC();
+          window.emeraldAudioBus().ac;
       }
     }
 
@@ -5736,7 +5736,7 @@ html body #emeraldMusicHost .emCredit{
     );
 
     o.connect(g);
-    g.connect(ac.destination);
+    g.connect(window.emeraldAudioBus().input);
 
     o.start();
     o.stop(ac.currentTime + .30);
@@ -5776,7 +5776,7 @@ html body #emeraldMusicHost .emCredit{
 
     noise.connect(filter);
     filter.connect(gain);
-    gain.connect(ac.destination);
+    gain.connect(window.emeraldAudioBus().input);
 
     noise.start();
 
@@ -5800,7 +5800,7 @@ html body #emeraldMusicHost .emCredit{
     );
 
     osc.connect(oscGain);
-    oscGain.connect(ac.destination);
+    oscGain.connect(window.emeraldAudioBus().input);
 
     osc.start();
     osc.stop(ac.currentTime + .13);
@@ -5841,7 +5841,7 @@ html body #emeraldMusicHost .emCredit{
 
     noise.connect(hp);
     hp.connect(gain);
-    gain.connect(ac.destination);
+    gain.connect(window.emeraldAudioBus().input);
 
     noise.start();
   }
@@ -5883,7 +5883,7 @@ html body #emeraldMusicHost .emCredit{
 
         source.connect(bp);
         bp.connect(g);
-        g.connect(ac.destination);
+        g.connect(window.emeraldAudioBus().input);
 
         source.start(
           ac.currentTime +
@@ -5917,7 +5917,7 @@ html body #emeraldMusicHost .emCredit{
     );
 
     o.connect(g);
-    g.connect(ac.destination);
+    g.connect(window.emeraldAudioBus().input);
 
     o.start();
     o.stop(ac.currentTime + .24);
@@ -6455,8 +6455,8 @@ html body #emeraldMusicHost #emPanel .emBusinessBox{display:none!important}
  function pump(){while(running<4&&queue.length){const item=queue.shift();running++;(async()=>{let blob=memory.get(item.url)||await read(item.url);if(!blob){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);try{const response=await fetch(item.url,{signal:controller.signal,cache:'force-cache'});if(!response.ok)throw Error('HTTP '+response.status);blob=await response.blob();if(!blob.size||(!blob.type.startsWith('audio/')&&!blob.type.includes('octet-stream')))throw Error('Invalid audio response');await write(item.url,blob)}finally{clearTimeout(timer)}}item.resolve(retain(item.url,blob))})().catch(error=>{failed.set(item.url,Date.now());item.reject(error)}).finally(()=>{pending.delete(item.url);running--;pump()})}}
  function get(url,priority=false){if(memory.has(url))return Promise.resolve(memory.get(url));if(pending.has(url)){if(priority){const i=queue.findIndex(x=>x.url===url);if(i>0)queue.unshift(queue.splice(i,1)[0])}return pending.get(url)}const p=new Promise((resolve,reject)=>{const item={url,resolve,reject};priority?queue.unshift(item):queue.push(item)});pending.set(url,p);pump();return p}
  function report(){const el=document.getElementById('sakNoteCacheStatus');if(!el)return;const en=document.documentElement.lang==='en';el.textContent=(en?'Instrument notes: ':'نغمات الآلات: ')+done+'/'+total+(persistent?(en?' · saved on this device':' · محفوظة على الجهاز'):(en?' · session cache':' · ذاكرة الجلسة'))+(errors?(en?' · Some notes unavailable; retry when played.':' · بعض النغمات تعذّر جلبها؛ تُعاد المحاولة عند العزف.'):'')}
- window.sakCachedNote=function(url){const audio=new Audio();audio.preload='auto';const nativePlay=audio.play.bind(audio),nativePause=audio.pause.bind(audio);let ticket=0,objectUrl=null;const release=()=>{if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;audio.removeAttribute('src')}};
- audio.play=async()=>{const current=++ticket;try{if(!objectUrl){const blob=await get(url,true);if(current!==ticket)return;objectUrl=URL.createObjectURL(blob);audio.src=objectUrl}if(current===ticket)return await nativePlay()}catch(error){if(current===ticket){errors++;report()}throw error}};
+ window.sakCachedNote=function(url){const audio=new Audio();audio.preload='auto';const nativePlay=audio.play.bind(audio),nativePause=audio.pause.bind(audio);let ticket=0,objectUrl=null;const release=()=>{window.emeraldReleaseNote?.(audio);if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;audio.removeAttribute('src')}};
+ audio.play=async()=>{window.emeraldRouteNote(audio);const current=++ticket;try{if(!objectUrl){const blob=await get(url,true);if(current!==ticket)return;objectUrl=URL.createObjectURL(blob);audio.src=objectUrl}if(current===ticket)return await nativePlay()}catch(error){if(current===ticket){errors++;report()}throw error}};
  audio.pause=()=>{ticket++;nativePause();release()};audio.addEventListener('ended',release);audio.addEventListener('error',release);return audio;};
  function warm(instrument){if(typeof base==='undefined'||typeof notes==='undefined')return;const instruments=Object.keys(base);if(instrument&&base[instrument]){const urls=notes.map(note=>base[instrument]+note+'.mp3');urls.reverse().forEach(url=>{if(!failed.has(url)||Date.now()-failed.get(url)>30000)get(url,true).catch(()=>{})})}if(warmed)return;warmed=true;const urls=[...new Set(instruments.flatMap(name=>notes.map(note=>base[name]+note+'.mp3')))];total=urls.length;urls.forEach(url=>get(url).then(()=>done++).catch(()=>errors++).finally(report));report()}
  document.addEventListener('click',e=>{const open=e.target.closest('#emOpenBtn'),choice=e.target.closest('[data-em-i],[data-em-m]');if(open||choice){warm(choice?.dataset.emI||choice?.dataset.emM||'piano');setTimeout(()=>{const panel=document.querySelector('#emPanel .emBox');if(panel&&!document.getElementById('sakNoteCacheStatus')){const status=document.createElement('p');status.id='sakNoteCacheStatus';status.setAttribute('role','status');status.style.order='4';panel.append(status);report()}},0)}},true);
@@ -10792,7 +10792,8 @@ html body #sakakerAllIconsDock#sakakerAllIconsDock#sakakerAllIconsDock .sak-shor
  const keys=new Set();let y1=210,y2=210,ball={x:400,y:250,vx:300,vy:110},scores=[0,0],audio=false;
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  function status(key,extra=''){statusKey=key;statusExtra=extra;$('sakPongStatus').textContent=t(key)+extra;}
- function labels(){arena.dir=lang()==='ar'?'rtl':'ltr';$('sakPongTitle').textContent=t('title');arena.querySelectorAll('[data-sp]').forEach(el=>el.textContent=t(el.dataset.sp));$('sakPongCode').placeholder=t('code');$('sakPongCode').setAttribute('aria-label',t('code'));$('sakPongMessage').placeholder=t('message');$('sakPongMessage').setAttribute('aria-label',t('message'));$('sakPongExit').setAttribute('aria-label',lang()==='ar'?'إغلاق اللعبة':'Close game');canvas.setAttribute('aria-label',t('help'));$('sakPongAudio').textContent=t(audio?'mute':'sound');status(statusKey,statusExtra);}
+ function labels(){
+   $('ecModeLabel').textContent=t('نوع التسجيل','Recording mode');$('ecMode').options[0].textContent=t('صوت المعزوفة فقط','Instrument audio only');$('ecMode').options[1].textContent=t('فيديو مع صوت المعزوفة','Video with instrument audio');$('ecIncludeMicLabel').textContent=t('إضافة صوت الميكروفون (اختياري؛ استخدم سماعات لمنع الصدى)','Include microphone (optional; use headphones to avoid echo)');arena.dir=lang()==='ar'?'rtl':'ltr';$('sakPongTitle').textContent=t('title');arena.querySelectorAll('[data-sp]').forEach(el=>el.textContent=t(el.dataset.sp));$('sakPongCode').placeholder=t('code');$('sakPongCode').setAttribute('aria-label',t('code'));$('sakPongMessage').placeholder=t('message');$('sakPongMessage').setAttribute('aria-label',t('message'));$('sakPongExit').setAttribute('aria-label',lang()==='ar'?'إغلاق اللعبة':'Close game');canvas.setAttribute('aria-label',t('help'));$('sakPongAudio').textContent=t(audio?'mute':'sound');status(statusKey,statusExtra);}
  function controls(){for(const id of ['sakPongCreate','sakPongJoin','sakPongSolo','sakPongDuration'])$(id).disabled=busy||!!mode;$('sakPongLeave').disabled=busy||!mode;$('sakPongCopy').disabled=!room;$('sakPongMessage').disabled=mode!=='online'||ended||!endAt;updateShare();}
  function reset(){y1=y2=210;ball={x:400,y:250,vx:300,vy:110};scores=[0,0];ended=false;lastFrame=0;lastSend=0;}
  function serve(direction){ball={x:400,y:250,vx:300*direction,vy:(Math.random()-.5)*280};}
@@ -11534,6 +11535,9 @@ html body #emCrystalSettings [hidden]{display:none!important;}
 html body #emCrystalSettings h3{margin:0 0 10px;color:#a3f3dc;font-size:18px;}
 html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-offset:3px;}
 </style>
+<script id="emerald-audio-bus">
+(()=>{let bus;const sources=new WeakMap();window.emeraldAudioBus=()=>{if(!bus){const ac=new (window.AudioContext||window.webkitAudioContext)(),input=ac.createGain();input.connect(ac.destination);bus={ac,input};}if(bus.ac.state==='suspended')bus.ac.resume().catch(()=>{});return bus;};window.emeraldRouteNote=audio=>{const b=window.emeraldAudioBus();let source=sources.get(audio);if(!source){source=b.ac.createMediaElementSource(audio);sources.set(audio,source);}source.disconnect();source.connect(b.input);};window.emeraldReleaseNote=audio=>sources.get(audio)?.disconnect();})();
+</script>
 <script id="emerald-camera-sharing">
 (()=>{'use strict';
  let savedFile=null,savedURL=null,controller=null;
@@ -11542,24 +11546,25 @@ html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-of
   const panel=document.getElementById('emPanel');if(!panel||panel.querySelector('#emCrystalSettings'))return;
   const box=panel.querySelector('.emBox'),video=panel.querySelector('#emCam');if(!box||!video)return;
   const section=document.createElement('section');section.id='emCrystalSettings';section.innerHTML='<h3 id="ecTitle"></h3><div class="ec-fields"><label><span id="ecDeviceLabel"></span><select id="ecDevice"><option value=""></option></select></label><label><span id="ecFacingLabel"></span><select id="ecFacing"><option value="user"></option><option value="environment"></option></select></label><label><span id="ecQualityLabel"></span><select id="ecQuality"><option value="480">480p</option><option value="720" selected>720p</option><option value="1080">1080p</option></select></label></div><div class="ec-actions"><button type="button" id="ecPreview"></button><button type="button" id="ecRefresh"></button></div><p id="ecStatus" role="status"></p><p id="ecPrivacy"></p><video id="ecPlayback" controls playsinline hidden></video><div class="ec-actions" id="ecShare"><button type="button" id="ecDownload"></button><button type="button" data-share="Facebook">Facebook</button><button type="button" data-share="X / Twitter">X / Twitter</button><button type="button" data-share="YouTube">YouTube</button><button type="button" data-share="WhatsApp">WhatsApp</button></div><p id="ecShareHelp"></p>';box.append(section);
+  const modes=document.createElement('div');modes.className='ec-fields';modes.innerHTML='<label><span id="ecModeLabel"></span><select id="ecMode"><option value="audio"></option><option value="video"></option></select></label><label><input type="checkbox" id="ecIncludeMic"><span id="ecIncludeMicLabel"></span></label>';section.querySelector('h3').after(modes);
   const $=id=>panel.querySelector('#'+id),rec=$('emCamRec'),pause=$('emCamPause'),camera=$('emCamToggle'),mic=$('emMicToggle');
-  let stream=null,recorder=null,request=0,busy=false,disposed=false,camOn=true,micOn=true,timer=null,parts=[],bytes=0,stopping=false;
+  let stream=null,recorder=null,request=0,busy=false,disposed=false,camOn=true,micOn=true,timer=null,parts=[],bytes=0,stopping=false,mix=null,micSource=null,recordStream=null;
   function active(){return recorder&&recorder.state!=='inactive';}
   function message(ar,en){$('ecStatus').textContent=t(ar,en);}
   function labels(){
    $('ecTitle').textContent=t('♫ إعدادات الكاميرا والتسجيل والمشاركة','♫ Camera, recording & sharing');$('ecDeviceLabel').textContent=t('الكاميرا','Camera');$('ecDevice').options[0].textContent=t('الكاميرا الافتراضية','Default camera');$('ecFacingLabel').textContent=t('الاتجاه (للكاميرا الافتراضية)','Facing (default camera)');$('ecFacing').options[0].textContent=t('أمامية','Front');$('ecFacing').options[1].textContent=t('خلفية','Rear');$('ecQualityLabel').textContent=t('الدقة المطلوبة','Preferred resolution');$('ecPreview').textContent=stream?t('إغلاق الكاميرا','Close camera'):t('تشغيل معاينة الكاميرا','Start camera preview');$('ecRefresh').textContent=t('تحديث قائمة الكاميرات','Refresh cameras');$('ecDownload').textContent=t('تحميل التسجيل','Download recording');
-   rec.textContent=active()?t('⏹ إنهاء وحفظ التسجيل','⏹ Finish recording'):t('⏺ تسجيل فيديو','⏺ Record video');pause.textContent=recorder?.state==='paused'?t('▶ متابعة','▶ Resume'):t('⏸ إيقاف مؤقت','⏸ Pause');camera.textContent=t('الكاميرا: ','Camera: ')+(camOn?t('مفعلة','On'):t('متوقفة','Off'));mic.textContent=t('الميكروفون: ','Microphone: ')+(micOn?t('مفعل','On'):t('صامت','Muted'));
-   $('ecPrivacy').textContent=t('لا تُفتح الكاميرا إلا بإذنك. التسجيل من الكاميرا والميكروفون؛ صوت آلات الاستديو غير مدمج داخليًا. الملف يبقى على جهازك ولا يُرفع تلقائيًا. احفظه قبل تحديث الصفحة. الحد 10 دقائق أو نحو 100 ميغابايت.','Camera access requires your permission. Records camera and microphone; instrument audio is not mixed internally. Nothing uploads automatically. Save before refreshing. Limit: 10 minutes or about 100 MB.');
+   rec.textContent=active()?t('⏹ إنهاء وحفظ التسجيل','⏹ Finish recording'):($('ecMode').value==='audio'?t('⏺ تسجيل المعزوفة','⏺ Record music'):t('⏺ تسجيل فيديو ومعزوفة','⏺ Record video & music'));pause.textContent=recorder?.state==='paused'?t('▶ متابعة','▶ Resume'):t('⏸ إيقاف مؤقت','⏸ Pause');camera.textContent=t('الكاميرا: ','Camera: ')+(camOn?t('مفعلة','On'):t('متوقفة','Off'));mic.textContent=t('الميكروفون: ','Microphone: ')+(micOn?t('مفعل','On'):t('صامت','Muted'));
+   $('ecPrivacy').textContent=t('لا تُفتح الكاميرا إلا بإذنك. صوت آلات الاستديو يُسجّل مباشرة، والميكروفون اختياري. تسجيل الصوت فقط لا يحتاج كاميرا. الملف يبقى على جهازك ولا يُرفع تلقائيًا. احفظه قبل تحديث الصفحة. الحد 10 دقائق أو نحو 100 ميغابايت.','Camera access requires your permission. Instrument audio is recorded directly; microphone is optional. Audio-only recording needs no camera. Nothing uploads automatically. Save before refreshing. Limit: 10 minutes or about 100 MB.');
    $('ecShareHelp').textContent=t('المشاركة تفتح خيارات الجهاز لاختيار التطبيق إن كان يدعم إرسال الفيديو. وإلا حمّل الملف ثم ارفعه يدويًا. YouTube يفتح استديو الرفع بعد تحميل الملف؛ لم يتم نشر أي فيديو تلقائيًا.','Sharing opens the device chooser where file sharing is supported. Otherwise download and attach the file manually. YouTube opens its upload studio after download. No video is published automatically.');
-   pause.disabled=!active()||stopping;rec.disabled=busy||stopping;camera.disabled=mic.disabled=!stream||stopping;['ecDevice','ecFacing','ecQuality','ecPreview','ecRefresh'].forEach(id=>$(id).disabled=busy||!!active()||stopping);section.querySelectorAll('#ecShare button').forEach(b=>b.disabled=!savedFile||!!active()||stopping);
+   pause.disabled=!active()||stopping;rec.disabled=busy||stopping;camera.disabled=!stream?.getVideoTracks().length||stopping;mic.disabled=!stream?.getAudioTracks().length||stopping;['ecMode','ecIncludeMic','ecDevice','ecFacing','ecQuality','ecPreview','ecRefresh'].forEach(id=>$(id).disabled=busy||!!active()||stopping);section.querySelectorAll('#ecShare button').forEach(b=>b.disabled=!savedFile||!!active()||stopping);
   }
-  function release(){request++;stream?.getTracks().forEach(track=>track.stop());stream=null;video.srcObject=null;}
+  function release(){request++;if(mix){window.emeraldAudioBus().input.disconnect(mix);mix.stream.getTracks().forEach(track=>track.stop());mix=null;}micSource?.disconnect();micSource=null;recordStream=null;stream?.getTracks().forEach(track=>track.stop());stream=null;video.srcObject=null;}
   async function devices(){if(!navigator.mediaDevices?.enumerateDevices)return;const selected=$('ecDevice').value,list=await navigator.mediaDevices.enumerateDevices();$('ecDevice').length=1;list.filter(d=>d.kind==='videoinput').forEach((d,i)=>{const option=document.createElement('option');option.value=d.deviceId;option.textContent=d.label||t('كاميرا ','Camera ')+(i+1);$('ecDevice').append(option);});$('ecDevice').value=selected;}
   async function preview(){
    if(stream)return true;if(!isSecureContext||!navigator.mediaDevices?.getUserMedia){message('افتح الموقع المنشور عبر HTTPS للسماح بالكاميرا.','Open the published HTTPS site to use the camera.');return false;}
    const token=++request;busy=true;labels();try{
     const height=Number($('ecQuality').value),device=$('ecDevice').value;
-    const result=await navigator.mediaDevices.getUserMedia({video:{height:{ideal:height},width:{ideal:Math.round(height*16/9)},frameRate:{ideal:24,max:30},...(device?{deviceId:{exact:device}}:{facingMode:{ideal:$('ecFacing').value}})},audio:true});
+    const result=await navigator.mediaDevices.getUserMedia({video:{height:{ideal:height},width:{ideal:Math.round(height*16/9)},frameRate:{ideal:24,max:30},...(device?{deviceId:{exact:device}}:{facingMode:{ideal:$('ecFacing').value}})},audio:$('ecIncludeMic').checked});
     if(disposed||token!==request||!panel.isConnected){result.getTracks().forEach(track=>track.stop());return false;}stream=result;camOn=micOn=true;video.srcObject=stream;await video.play().catch(()=>{});await devices();message('المعاينة جاهزة؛ اضغط تسجيل لبدء الفيديو.','Preview ready. Press Record to begin.');return true;
    }catch(error){release();if(!disposed)message('تعذر فتح الكاميرا أو الميكروفون. تحقق من الإذن وإغلاق التطبيقات الأخرى.','Camera or microphone unavailable. Check permission and other apps.');return false;}finally{busy=false;if(!disposed)labels();}
   }
@@ -11570,22 +11575,25 @@ html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-of
    if(savedFile&&!confirm(t('بدء تسجيل جديد يستبدل التسجيل السابق في هذه الصفحة. هل حفظته؟','A new recording replaces the previous recording on this page. Have you saved it?')))return;
    if(!window.MediaRecorder){message('هذا المتصفح لا يدعم التسجيل. جرّب متصفحًا أحدث.','Recording is unsupported. Try a newer browser.');return;}
    $('ecPlayback').pause();
-   if(!await preview()||disposed)return;
+   let bus;busy=true;labels();try{bus=window.emeraldAudioBus();await bus.ac.resume();}catch(e){message('تعذر تشغيل محرك الصوت في هذا المتصفح.','Unable to start audio in this browser.');return;}finally{busy=false;if(!disposed)labels();}if(disposed)return;
+   if($('ecMode').value==='video'){if(!await preview()||disposed)return;}else{release();if($('ecIncludeMic').checked){const token=++request;busy=true;labels();try{const result=await navigator.mediaDevices.getUserMedia({audio:true,video:false});if(disposed||token!==request){result.getTracks().forEach(track=>track.stop());return;}stream=result;micOn=true;}catch(e){message('تعذر فتح الميكروفون. ألغِ اختياره لتسجيل المعزوفة فقط.','Microphone unavailable. Uncheck it to record instruments only.');return;}finally{busy=false;if(!disposed)labels();}}}if(disposed)return;
    try{
-    const type=['video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(v=>MediaRecorder.isTypeSupported(v));
-    recorder=new MediaRecorder(stream,type?{mimeType:type,videoBitsPerSecond:2500000}:undefined);parts=[];bytes=0;
+    const audioOnly=$('ecMode').value==='audio';mix=bus.ac.createMediaStreamDestination();bus.input.connect(mix);if(stream?.getAudioTracks().length){micSource=bus.ac.createMediaStreamSource(stream);micSource.connect(mix);}recordStream=new MediaStream([...mix.stream.getAudioTracks(),...(audioOnly?[]:stream.getVideoTracks())]);
+    const type=(audioOnly?['audio/webm;codecs=opus','audio/mp4','audio/ogg;codecs=opus','audio/webm']:['video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']).find(v=>MediaRecorder.isTypeSupported(v));
+    recorder=new MediaRecorder(recordStream,type?{mimeType:type,videoBitsPerSecond:2500000}:undefined);parts=[];bytes=0;
     recorder.ondataavailable=e=>{if(e.data.size){parts.push(e.data);bytes+=e.data.size;if(bytes>=100*1024*1024&&active()){message('بلغ التسجيل حد الذاكرة؛ جارٍ الحفظ.','Recording reached the memory limit. Saving.');stop();}}};
-    recorder.onstop=()=>{const mime=recorder.mimeType||parts[0]?.type||'video/webm';const blob=new Blob(parts,{type:mime});parts=[];stopping=false;recorder=null;clearTimeout(timer);release();if(blob.size){if(savedURL)URL.revokeObjectURL(savedURL);savedFile=new File([blob],'emerald-music-'+Date.now()+(mime.includes('mp4')?'.mp4':'.webm'),{type:mime});savedURL=URL.createObjectURL(savedFile);}if(!disposed){showSaved();message('التسجيل جاهز. حمّله أو شاركه من الأزرار أدناه.','Recording ready. Download or share using the buttons below.');labels();}};
+    recorder.onstop=()=>{const mime=recorder.mimeType||parts[0]?.type||'video/webm';const blob=new Blob(parts,{type:mime});parts=[];stopping=false;recorder=null;clearTimeout(timer);release();if(blob.size){if(savedURL)URL.revokeObjectURL(savedURL);savedFile=new File([blob],'emerald-music-'+Date.now()+(mime.includes('mp4')?(audioOnly?'.m4a':'.mp4'):mime.includes('ogg')?'.ogg':'.webm'),{type:mime});savedURL=URL.createObjectURL(savedFile);}if(!disposed){showSaved();message('التسجيل جاهز. حمّله أو شاركه من الأزرار أدناه.','Recording ready. Download or share using the buttons below.');labels();}};
     recorder.onerror=()=>{message('حدث خطأ أثناء التسجيل. احفظ المقطع المتاح إن ظهر.','Recording error. Save the available clip if shown.');stop();};recorder.start(1000);timer=setTimeout(stop,600000);message('● التسجيل جارٍ','● Recording');labels();
    }catch(_){release();message('تعذر بدء التسجيل بهذا المتصفح.','Could not start recording in this browser.');labels();}
   }
   function download(){if(!savedFile)return;const a=document.createElement('a');a.href=savedURL;a.download=savedFile.name;document.body.append(a);a.click();a.remove();}
-  async function share(network){if(!savedFile)return;const sites={Facebook:'https://www.facebook.com/', 'X / Twitter':'https://x.com/compose/post',YouTube:'https://studio.youtube.com/',WhatsApp:'https://web.whatsapp.com/'};
+  async function share(network){if(!savedFile)return;if(network==='YouTube'&&savedFile.type.startsWith('audio/')){download();message('YouTube يحتاج ملف فيديو. اختر تسجيل فيديو مع المعزوفة، أو حوّل الصوت إلى فيديو قبل رفعه.','YouTube requires video. Record video with music, or convert your audio to video before uploading.');return;}const sites={Facebook:'https://www.facebook.com/', 'X / Twitter':'https://x.com/compose/post',YouTube:'https://studio.youtube.com/',WhatsApp:'https://web.whatsapp.com/'};
    if(network!=='YouTube'&&navigator.share&&navigator.canShare?.({files:[savedFile]})){try{await navigator.share({files:[savedFile],title:'Emerald Music Studio'});message('تم تسليم الملف لنافذة مشاركة الجهاز؛ تحقق من النشر داخل التطبيق.','File handed to the device share dialog; verify publication in the app.');}catch(e){if(e.name!=='AbortError')message('تعذرت المشاركة. استخدم تحميل التسجيل ثم أرفقه يدويًا.','Sharing failed. Download and attach the recording manually.');}return;}
-   download();window.open(sites[network],'_blank','noopener,noreferrer');message('تم طلب تحميل الفيديو وفتح المنصة. اختر الملف لإرفاقه أو رفعه بنفسك.','Download requested and platform opened. Select the file to upload or attach it yourself.');
+   download();window.open(sites[network],'_blank','noopener,noreferrer');message('تم طلب تحميل التسجيل وفتح المنصة. اختر الملف لإرفاقه أو رفعه بنفسك.','Download requested and platform opened. Select the file to upload or attach it yourself.');
   }
   panel.addEventListener('click',e=>{const target=e.target.closest('#emCamRec,#emCamPause,#emCamToggle,#emMicToggle');if(!target)return;e.preventDefault();e.stopImmediatePropagation();if(target.disabled)return;if(target===rec)record();else if(target===pause&&active()){recorder.state==='paused'?recorder.resume():recorder.pause();labels();}else if(target===camera){camOn=!camOn;stream?.getVideoTracks().forEach(track=>track.enabled=camOn);labels();}else if(target===mic){micOn=!micOn;stream?.getAudioTracks().forEach(track=>track.enabled=micOn);labels();}},true);
   $('ecPreview').onclick=()=>{if(stream){release();labels();}else preview();};$('ecRefresh').onclick=()=>devices().catch(()=>message('تعذر تحديث الكاميرات.','Could not refresh cameras.'));['ecDevice','ecFacing','ecQuality'].forEach(id=>$(id).onchange=()=>{release();labels();message('اضغط تشغيل المعاينة لتطبيق الإعدادات.','Start preview to apply settings.');});$('ecDownload').onclick=download;section.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>share(b.dataset.share));
+  ['ecMode','ecIncludeMic'].forEach(id=>$(id).onchange=()=>{if(active())return;release();labels();});
   const languageObserver=new MutationObserver(labels);languageObserver.observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   controller={panel,close(){if(disposed)return;disposed=true;stop();languageObserver.disconnect();}};showSaved();labels();message('الكاميرا مغلقة حتى تضغط تشغيل المعاينة أو التسجيل.','Camera is off until you start preview or recording.');
  }
