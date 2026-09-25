@@ -445,7 +445,8 @@ measurementId:"G-FKQFWD7E2Z"
 const app=initializeApp(firebaseConfig);
 
 
-const analytics=getAnalytics(app);
+let analytics=null;
+try{analytics=getAnalytics(app);}catch(_){console.warn('Analytics unavailable; sign-in remains available.');}
 
 const auth=getAuth(app);
 
@@ -7540,6 +7541,24 @@ html body #sakGlobalStreamDetails{
   let currentMatches = [];
   let visibleLimit = 60;
   let currentFilter = 'all';
+  let currentGroup = 'all';
+  const groupQueries={all:'',government:'',other:''};
+  const countryLabels=new Map(),languageLabels=new Map();
+  function governmentChannel(ch){
+    if(/^(government|state-owned|state)$/i.test(ch.ownership||''))return true;
+    return ch.country==='SA' && /^(Saudi(Quran|Sunnah|TV|1|2)|SBC|AlEkhbariya|KSA(Sports)?[1-4]?)(\.|$)/i.test(ch.id);
+  }
+  function arabiyaChannel(ch,kind){
+    const name=normalize(ch.name+' '+ch.id);
+    if(kind==='business')return /alarabiya(business|alhadathbusiness)|العربية(business|بزنس|الاقتصادية)/.test(name);
+    if(kind==='hadath')return /alhadath|الحدث/.test(name)&&!/business|الاقتصاد/.test(name)&&!/elyoum|اليوم/.test(name);
+    return /alarabiya|العربية/.test(name)&&!/business|بزنس|اقتصاد|hadath|الحدث|english|انجليزي|program/.test(name);
+  }
+  const arabiyaChoices=[
+    {kind:'news',ar:'العربية الإخبارية',en:'Al Arabiya News',url:'https://live.alarabiya.net/'},
+    {kind:'hadath',ar:'العربية الحدث',en:'Al Hadath',url:'https://www.alhadath.net/live-stream'},
+    {kind:'business',ar:'العربية Business — الاقتصادية',en:'Al Arabiya Business',url:'https://www.youtube.com/watch?v=_Mj9CjqrNtk'}
+  ];
   let loadingPromise = null;
   let currentHls = null;
   let currentStreamUrl = '';
@@ -7647,6 +7666,7 @@ html body #sakGlobalStreamDetails{
     return {
       id:String(rowValue(row,'id') || ''),
       name:String(rowValue(row,'name') || ''),
+      ownership:String(rowValue(row,'ownership') || ''),
       search:String(rowValue(row,'search') || ''),
       country:String(rowValue(row,'country') || ''),
       categories:parseList(rowValue(row,'categories')),
@@ -7678,12 +7698,13 @@ html body #sakGlobalStreamDetails{
 
   function countryName(code){
     if(!code) return '—';
+    const cacheKey=lang()+':'+code;if(countryLabels.has(cacheKey))return countryLabels.get(cacheKey);
 
     try{
-      return new Intl.DisplayNames(
+      const result=new Intl.DisplayNames(
         [isEn() ? 'en' : 'ar'],
         {type:'region'}
-      ).of(code) || code;
+      ).of(code) || code;countryLabels.set(cacheKey,result);return result;
     }catch(e){
       return code;
     }
@@ -7691,12 +7712,13 @@ html body #sakGlobalStreamDetails{
 
   function languageName(code){
     if(!code) return code;
+    const cacheKey=lang()+':'+code;if(languageLabels.has(cacheKey))return languageLabels.get(cacheKey);
 
     try{
-      return new Intl.DisplayNames(
+      const result=new Intl.DisplayNames(
         [isEn() ? 'en' : 'ar'],
         {type:'language'}
-      ).of(code) || code;
+      ).of(code) || code;languageLabels.set(cacheKey,result);return result;
     }catch(e){
       return code;
     }
@@ -7762,6 +7784,7 @@ html body #sakGlobalStreamDetails{
       ['offline','🔴 متوقف','🔴 Offline'],
       ['unchecked','⚪ غير مفحوص','⚪ Unchecked'],
       ['dw','DW','DW'],
+      ['arabiya','العربية','Al Arabiya'],
       ['news','📰 أخبار','📰 News'],
       ['sports','⚽ رياضة','⚽ Sports'],
       ['favorites','★ المفضلة','★ Favorites'],
@@ -7834,6 +7857,8 @@ html body #sakGlobalStreamDetails{
       'sakGlobalLiveNotice';
 
     header.appendChild(title);
+    const groups=document.createElement('div');groups.id='sakLiveOwnershipGroups';groups.setAttribute('role','group');
+    [['all','كل القنوات','All channels'],['government','القنوات الحكومية','Government channels'],['other','العامة والخاصة والأخرى','General, private & other']].forEach(([key,ar,en])=>{const button=document.createElement('button');button.type='button';button.dataset.group=key;button.dataset.ar=ar;button.dataset.en=en;button.setAttribute('aria-pressed',String(key===currentGroup));button.addEventListener('click',()=>{groupQueries[currentGroup]=input.value;currentGroup=key;input.value=groupQueries[key];currentFilter='all';filters.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));groups.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));visibleLimit=60;applyLanguage();render();});groups.append(button);});header.appendChild(groups);
     header.appendChild(searchRow);
     header.appendChild(filters);
     header.appendChild(selectRow);
@@ -7862,6 +7887,7 @@ html body #sakGlobalStreamDetails{
 
     container.appendChild(results);
     container.appendChild(more);
+    let searchTimer;input.addEventListener('input',()=>{groupQueries[currentGroup]=input.value;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{visibleLimit=60;render();},180);});
 
     searchBtn.addEventListener(
       'click',
@@ -7893,6 +7919,7 @@ html body #sakGlobalStreamDetails{
           function(){
             currentFilter =
               btn.dataset.filter || 'all';
+            if(currentFilter==='arabiya'||currentFilter==='dw'){groupQueries[currentGroup]=input.value;currentGroup='all';input.value='';country.value='';language.value='';groups.querySelectorAll('bUtton').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.group==='all')));}
 
             filters
               .querySelectorAll(
@@ -7931,6 +7958,7 @@ html body #sakGlobalStreamDetails{
       'click',
       function(){
         input.value = '';
+        groupQueries[currentGroup]='';
 
         country.value = '';
         language.value = '';
@@ -8200,7 +8228,7 @@ html body #sakGlobalStreamDetails{
         const response =
           await fetch(
             SEARCH_URL,
-            {cache:'no-cache'}
+            {cache:'default',signal:AbortSignal.timeout(18000)}
           );
 
         if(!response.ok){
@@ -8225,14 +8253,17 @@ html body #sakGlobalStreamDetails{
         allRows =
           (data.channels || [])
             .map(rowObject);
+        allRows.forEach(ch=>{ch._search=normalize(ch.name+' '+ch.search+' '+ch.country+' '+ch.categories.join(' ')+' '+ch.languages.join(' '));});
 
         buildSelects();
+        // Show usable channels before optional directory statistics finish.
+        render();
 
-        try{
+        void (async()=>{try{
           const indexResponse =
             await fetch(
               INDEX_URL,
-              {cache:'no-cache'}
+              {cache:'default',signal:AbortSignal.timeout(8000)}
             );
 
           if(indexResponse.ok){
@@ -8256,7 +8287,7 @@ html body #sakGlobalStreamDetails{
                   : '';
             }
           }
-        }catch(e){}
+        }catch(e){}})();
 
         return data;
       })();
@@ -8495,6 +8526,8 @@ html body #sakGlobalStreamDetails{
       ? Object.values(favorites).map(function(ch){ return allRows.find(function(row){return row.id === ch.id;}) || ch; })
       : allRows;
     return candidates.filter(function(ch){
+      if(currentGroup==='government'&&!governmentChannel(ch))return false;
+      if(currentGroup==='other'&&governmentChannel(ch))return false;
       if(currentFilter === 'sports' && !ch.categories.some(function(category){return /sport/i.test(category);})) return false;
       if(
         countryCode &&
@@ -8513,7 +8546,7 @@ html body #sakGlobalStreamDetails{
       }
 
       if(needle){
-        const haystack =
+        const haystack = ch._search ||
           normalize(
             ch.name + ' ' +
             ch.search + ' ' +
@@ -8804,6 +8837,18 @@ html body #sakGlobalStreamDetails{
     results.innerHTML = '';
 
     renderDWInfo(results);
+    if(currentFilter==='arabiya'){
+      more.style.display='none';
+      const fragment=document.createDocumentFragment();
+      arabiyaChoices.forEach(choice=>{
+        const matches=allRows.filter(ch=>arabiyaChannel(ch,choice.kind)).sort((a,b)=>Number(b.online)-Number(a.online)||b.score-a.score);
+        const block=document.createElement('div');block.className='sak-arabiya-choice';
+        const title=document.createElement('h3');title.textContent=isEn()?choice.en:choice.ar;block.append(title);
+        if(matches.length)block.append(createChannelCard(matches[0]));
+        else{const note=document.createElement('p');note.textContent=isEn()?'No indexed stream available. Use the source below.':'لا يتوفر بث مفهرس حاليًا؛ استخدم المصدر أدناه.';block.append(note);}
+        const source=document.createElement('a');source.href=choice.url;source.target='_blank';source.rel='noopener noreferrer';source.textContent=isEn()?'Open source ↗':'فتح المصدر ↗';block.append(source);fragment.append(block);
+      });results.append(fragment);updateMeta(3);return;
+    }
 
     if(currentFilter === 'saved'){
       const list =
@@ -8885,7 +8930,7 @@ html body #sakGlobalStreamDetails{
   }
 
   function render(){
-    if(!searchData){
+    if(!searchData&&currentFilter!=='arabiya'){
       return;
     }
 
@@ -9494,6 +9539,7 @@ html body #sakGlobalStreamDetails{
      اللغة
   ======================================================= */
   function applyLanguage(){
+    document.querySelectorAll('#sakLiveOwnershipGroups button').forEach(button=>button.textContent=isEn()?button.dataset.en:button.dataset.ar);
     const title =
       document.getElementById(
         'sakGlobalLiveTitle'
@@ -9559,8 +9605,9 @@ html body #sakGlobalStreamDetails{
     if(input){
       input.placeholder =
         isEn()
-          ? 'Type a channel name exactly or partially…'
-          : 'اكتب اسم القناة كاملًا أو جزءًا منه…';
+          ? (currentGroup==='government'?'Search government channels…':currentGroup==='other'?'Search general, private & other channels…':'Search all channels…')
+          : (currentGroup==='government'?'ابحث داخل القنوات الحكومية…':currentGroup==='other'?'ابحث داخل العامة والخاصة والأخرى…':'ابحث في جميع القنوات…');
+      input.setAttribute('aria-label',input.placeholder);
     }
 
     if(searchBtn){
@@ -9615,8 +9662,8 @@ html body #sakGlobalStreamDetails{
     if(notice){
       notice.textContent =
         isEn()
-          ? 'Channels are shown globally and are not hidden by your region. 🟡 A geo-restricted stream may still work where you are; 🔴 means it failed the last health scan, not that it will never return.'
-          : 'القنوات تظهر عالميًا ولا يتم إخفاؤها حسب منطقتك. 🟡 البث المقيد جغرافيًا قد يعمل لديك، و🔴 يعني أنه فشل في آخر فحص فقط وليس أنه لن يعود للعمل.';
+          ? 'Government classification uses available ownership metadata and a limited Saudi public-channel list. Unclassified channels stay in Other; this is not a complete global ownership registry. Stream availability depends on the source and region.'
+          : 'التصنيف الحكومي يعتمد على بيانات الملكية المتاحة وقائمة محددة من القنوات السعودية الرسمية. غير المصنّف يبقى في الأخرى؛ التصنيف ليس سجل ملكية عالميًا شاملًا. توفر البث يعتمد على المصدر والمنطقة.';
     }
 
     if(more){
@@ -9647,6 +9694,7 @@ html body #sakGlobalStreamDetails{
           : '🌐 الموقع الرسمي';
     }
 
+    if(currentFilter==='arabiya'&&!allRows.length)render();
     if(allRows.length){
       buildSelects();
       render();
@@ -11027,6 +11075,8 @@ function hideExpiredMessages(messages) {
 function startChatExpiry() {
 
   if (chatCleanupStarted) return;
+  // This business page has no music-chat UI; do not subscribe to unused data.
+  if (!getChatContainer()) return;
 
   if (!window.firebaseApp) {
 
@@ -11293,6 +11343,28 @@ html body #businessVisitScore .annual-cell{grid-column:1/-1;border-inline-start:
 html body #businessVisitScore .annual-cell strong{color:#9df0ce;font-size:22px;}
 @media(max-width:600px){html body #businessVisitScore{width:170px;}html body #businessVisitScore .annual-cell strong{font-size:20px;}}
 </style>
+<style id="business-live-groups-style">
+html body #livePopup #sakLiveOwnershipGroups{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+html body #livePopup #sakLiveOwnershipGroups button{flex:1 1 150px;padding:10px;border-radius:10px;}
+html body #livePopup #sakLiveOwnershipGroups button[aria-pressed="true"]{background:#a3f3dc!important;color:#08252b!important;border-color:#a3f3dc!important;}
+html body #livePopup .sak-arabiya-choice{background:#112c37;border:1px solid #487681;border-radius:12px;padding:12px;min-width:0;}
+html body #livePopup .sak-arabiya-choice h3{font:700 16px/1.6 Tahoma,Arial,sans-serif;color:#fff;margin:0 0 10px;}
+html body #livePopup .sak-arabiya-choice p{font:14px/1.7 Tahoma,Arial,sans-serif;color:#d7e7ef;}
+html body #livePopup .sak-arabiya-choice a{display:block;color:#a3f3dc;padding:12px 4px;font:14px/1.6 Tahoma,Arial,sans-serif;}
+html body #livePopup .sak-arabiya-choice .sak-channel-with-favorite{width:100%;}
+@media(max-width:600px){html body #livePopup #sakGlobalLiveResults:has(.sak-arabiya-choice){grid-template-columns:minmax(0,1fr)!important;}}
+</style>
+<style id="business-bottom-layout-repair">
+html body #businessVisitScore{position:fixed!important;top:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;left:50%!important;transform:translateX(-50%)!important;width:min(480px,96vw)!important;max-width:96vw!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;text-shadow:0 1px 3px #000,0 0 5px #000;pointer-events:auto!important;padding:2px!important;}
+html body #businessVisitScore .visit-cell{border:0!important;padding:2px 5px!important;}
+html body #businessVisitScore .annual-cell{grid-column:auto!important;display:block!important;border:0!important;}
+html body #businessVisitScore strong{font-size:20px!important;line-height:1.3!important;}
+html body #businessVisitScore #visitScoreStatus{font-size:10px;}
+html body #businessVisitRetry{grid-column:1/-1;justify-self:center;background:#123641;color:#fff;border:1px solid #95c9cf;border-radius:8px;padding:4px 12px;cursor:pointer;}
+html body #sakakerContactFooter{bottom:calc(var(--business-score-height,76px) + 12px + env(safe-area-inset-bottom))!important;}
+html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:calc(var(--business-score-height,76px) + var(--business-footer-height,50px) + 20px + env(safe-area-inset-bottom))!important;width:min(580px,96vw)!important;max-width:96vw!important;justify-content:center!important;align-items:flex-start!important;flex-wrap:wrap!important;column-gap:20px!important;row-gap:40px!important;max-height:38dvh!important;overflow-y:auto!important;overflow-x:hidden!important;padding:10px 8px 42px!important;box-sizing:border-box!important;}
+@media(max-width:600px){html body #sakakerAllIconsDock{column-gap:12px!important;row-gap:40px!important;}html body #businessVisitScore{font-size:10px!important;}}
+</style>
 <script id="business-feature-integration">
 (()=>{
  const $=id=>document.getElementById(id),dock=$('sakakerAllIconsDock');
@@ -11321,24 +11393,35 @@ html body #businessVisitScore .annual-cell strong{color:#9df0ce;font-size:22px;}
  <div class="visit-cell"><span id="visitTotalLabel">إجمالي الزيارات</span><strong id="visitTotalValue">—</strong></div>
  <div class="visit-cell annual-cell"><span id="annualScoreLabel">اشتراكات السنة</span><strong id="annualScoreValue">—</strong></div>
  <small id="visitScoreStatus">جارٍ تحميل العداد…</small>
+ <button id="businessVisitRetry" type="button" hidden>إعادة المحاولة</button>
 </section>
+<script id="business-counter-bootstrap">
+window.businessCounterFirebaseReady=new Promise(resolve=>{
+ function check(){if(window.firebaseApp&&window.firebaseAuth)resolve(window.firebaseApp);else setTimeout(check,250);}check();
+});
+(()=>{const score=document.getElementById('businessVisitScore'),footer=document.getElementById('sakakerContactFooter');let queued=false;function measure(){queued=false;document.body.style.setProperty('--business-score-height',Math.ceil(score.getBoundingClientRect().height)+'px');if(footer)document.body.style.setProperty('--business-footer-height',Math.ceil(footer.getBoundingClientRect().height)+'px');}function queue(){if(!queued){queued=true;requestAnimationFrame(measure);}}const observer=new ResizeObserver(queue);observer.observe(score);if(footer)observer.observe(footer);window.addEventListener('resize',queue,{passive:true});queue();})();
+</script>
 <script type="module" id="business-scoreboard-script">
 import {getDatabase,ref,get,onValue,runTransaction} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
 import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
 const box=document.getElementById('businessVisitScore'),languageButton=document.getElementById('sakBusinessFeatureLanguage');
-let data=null,offset=0,failed=false,loaded=false,counted=false,busy=false;
+let data=null,offset=0,failed=false,loaded=false,counted=false,busy=false,clockReady=false,retryDelay=2000,retryTimer=null,errorCode='';
+const retryButton=document.getElementById('businessVisitRetry');
 const dayAt=time=>Math.floor((time+10800000)/86400000);
 function nextVisit(current,time){const day=dayAt(time);return {day,total:(current?.total||0)+1,today:current?.day===day?(current.today||0)+1:1};}
 function draw(){const en=document.documentElement.lang==='en';box.dir=en?'ltr':'rtl';box.setAttribute('aria-label',en?'Visit scoreboard':'عدد الزيارات');document.getElementById('visitTodayLabel').textContent=en?'Today':'زيارات اليوم';document.getElementById('visitTotalLabel').textContent=en?'Total visits':'إجمالي الزيارات';const format=new Intl.NumberFormat(en?'en-US':'ar-SA');document.getElementById('visitTotalValue').textContent=loaded?format.format(data?.total||0):'—';document.getElementById('visitTodayValue').textContent=loaded?format.format(data?.day===dayAt(Date.now()+offset)?data.today:0):'—';document.getElementById('visitScoreStatus').textContent=failed?(en?'Counter unavailable':'تعذر تحديث العداد'):loaded?(en?'Signed-in visits · Saudi time':'زيارات المسجّلين · توقيت السعودية'):(en?'Loading counter…':'جارٍ تحميل العداد…');}
-function position(){if(languageButton)box.style.setProperty('--visit-top',Math.ceil(languageButton.getBoundingClientRect().bottom+10)+'px');}
+function position(){retryButton.textContent=document.documentElement.lang==='en'?'Retry counter':'إعادة محاولة العداد';}
 if(languageButton)new ResizeObserver(position).observe(languageButton);window.addEventListener('resize',position,{passive:true});new MutationObserver(()=>{draw();position();}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});position();draw();
 try{
- await window.sakFeatureDatabaseReady;
+ await window.businessCounterFirebaseReady;
  if(!window.firebaseApp)throw Error('Firebase unavailable');
- const db=getDatabase(window.firebaseApp),counter=ref(db,'businessVisitStats'),auth=getAuth(window.firebaseApp);
- onValue(ref(db,'.info/serverTimeOffset'),snapshot=>{offset=Number(snapshot.val())||0;draw();});
- onValue(counter,snapshot=>{data=snapshot.val();loaded=true;failed=false;draw();},()=>{failed=true;draw();});
- async function countVisit(){if(counted||busy||!auth.currentUser)return;busy=true;try{const clock=await get(ref(db,'.info/serverTimeOffset'));offset=Number(clock.val())||0;const result=await runTransaction(counter,current=>nextVisit(current,Date.now()+offset),{applyLocally:false});counted=result.committed;failed=!result.committed;}catch(_){failed=true;}finally{busy=false;draw();}}
+ const db=getDatabase(window.firebaseApp,'https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app'),counter=ref(db,'businessVisitStats'),auth=getAuth(window.firebaseApp);
+ function report(){draw();retryButton.hidden=!failed;if(failed){document.getElementById('visitScoreStatus').textContent=(document.documentElement.lang==='en'?'Counter error: ':'خطأ العداد: ')+(errorCode||'connection');}}
+ let stopCounter;
+ function listen(){stopCounter?.();stopCounter=onValue(counter,snapshot=>{data=snapshot.val();loaded=true;draw();},error=>{failed=true;errorCode=error.code||'connection';report();});}
+ onValue(ref(db,'.info/serverTimeOffset'),snapshot=>{const n=snapshot.val();if(typeof n==='number'){offset=n;clockReady=true;countVisit();}draw();});listen();
+ async function countVisit(){if(counted||busy||!clockReady||!auth.currentUser)return;clearTimeout(retryTimer);busy=true;try{const result=await runTransaction(counter,current=>nextVisit(current,Date.now()+offset),{applyLocally:false});counted=result.committed;failed=!result.committed;if(counted){errorCode='';retryDelay=2000;}}catch(error){failed=true;errorCode=error.code||'connection';if(!/permission/i.test(errorCode)){retryTimer=setTimeout(countVisit,retryDelay);retryDelay=Math.min(60000,retryDelay*2);}}finally{busy=false;report();}}
+ retryButton.onclick=()=>{failed=false;errorCode='';listen();countVisit();report();};
  onAuthStateChanged(auth,user=>{if(user)countVisit();});
  onValue(ref(db,'.info/connected'),snapshot=>{if(snapshot.val())countVisit();});
  setInterval(draw,60000);
@@ -11352,8 +11435,8 @@ const label=document.getElementById('annualScoreLabel'),value=document.getElemen
 function drawAnnual(){const en=document.documentElement.lang==='en';label.textContent=en?'Annual access':'اشتراكات السنة';label.title=en?'Active annual accounts indexed since this update; includes free grants.':'الحسابات السنوية السارية المسجلة في العداد منذ التحديث، وتشمل المنح.';const now=Date.now()+offset;value.textContent=entries===null||readFailed?'—':new Intl.NumberFormat(en?'en-US':'ar-SA').format(Object.values(entries).filter(expiry=>Number.isFinite(expiry)&&expiry>now).length);value.title=readFailed?(en?'Counter unavailable':'تعذر تحميل العداد'):label.title;}
 new MutationObserver(drawAnnual).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});drawAnnual();
 try{
- await window.sakFeatureDatabaseReady;if(!window.firebaseApp)throw Error('Firebase unavailable');
- const db=getDatabase(window.firebaseApp),auth=getAuth(window.firebaseApp);
+ await window.businessCounterFirebaseReady;if(!window.firebaseApp)throw Error('Firebase unavailable');
+ const db=getDatabase(window.firebaseApp,'https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app'),auth=getAuth(window.firebaseApp);
  onValue(ref(db,'.info/serverTimeOffset'),s=>{offset=Number(s.val())||0;drawAnnual();});
  onValue(ref(db,'publicAnnualAccess'),s=>{entries=s.val()||{};readFailed=false;drawAnnual();},()=>{readFailed=true;drawAnnual();});
  let generation=0,stops=[];
