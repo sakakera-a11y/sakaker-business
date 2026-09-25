@@ -493,7 +493,12 @@ const error=document.getElementById("loginError");
 /* One server-recorded 24-hour trial per Firebase UID. Paid access is admin-owned. */
 const TRIAL_MS=86400000;
 // Owner-authorized free access, NOT PayPal payment verification.
-const RETURN_GRANT_MS=365*86400000;
+// رابط المنحة access=return صالح لمدة 30 يومًا من تاريخ إنشاء الحملة.
+// تاريخ إنشاء الرابط: 2026-09-26T02:12:00+03:00
+// انتهاء الرابط: 2026-10-26T02:12:00+03:00
+const RETURN_GRANT_MS=30*86400000;
+const RETURN_LINK_CREATED_AT=1790377920000;
+const RETURN_LINK_EXPIRES_AT=RETURN_LINK_CREATED_AT+RETURN_GRANT_MS;
 let returnGrantRequested=new URL(location.href).searchParams.get('access')==='return';
 let accessGrant=null;
 let accessGeneration=0,accessStops=[],accessTimer=null,accessUser=null;
@@ -515,15 +520,18 @@ function openSiteAfterPayment(){if(overlay.style.display!=='none')overlay.style.
 function refreshAccess(){
  const en=document.documentElement.lang==='en',now=accessNow();
  const grantValid=Number.isFinite(accessGrant?.startedAt)&&accessGrant.startedAt<=now&&now<accessGrant.startedAt+RETURN_GRANT_MS;
+ const returnLinkValid=now>=RETURN_LINK_CREATED_AT&&now<RETURN_LINK_EXPIRES_AT;
  const result=accessDecision(accessUser,accessReady,accessConnected,accessClockReady,accessTrial,accessPaid,now);
  if(accessUser&&accessReady&&accessConnected&&accessClockReady&&grantValid&&result.kind!=='paid'){result.kind='paid';result.until=accessGrant.startedAt+RETURN_GRANT_MS;result.freeGrant=true;}
+ if(accessUser&&accessReady&&accessConnected&&accessClockReady&&!returnLinkValid&&returnGrantRequested){returnGrantRequested=false;}
  const unlocked=result.kind==='paid'||result.kind==='trial';
  if(unlocked)openSiteAfterPayment();else showLoginGate();
  const status=document.getElementById('paypalGateStatus');
  if(accessFailed)status.textContent=en?'Access could not be verified. Check your connection and try again.':'تعذر التحقق من صلاحية الدخول. تحقق من الاتصال ثم أعد المحاولة.';
  else status.textContent=({login:en?'Sign in to start your one-time 24-hour free trial.':'سجّل الدخول لبدء تجربتك المجانية لمرة واحدة لمدة 24 ساعة.',checking:en?'Verifying account access…':'جارٍ التحقق من صلاحية الحساب…',paid:en?'Verified subscription active.':'الاشتراك الموثق نشط.',trial:en?'Your free trial is active.':'تجربتك المجانية نشطة.',expired:en?'Your free trial has ended. A verified subscription is required.':'انتهت التجربة المجانية. يلزم اشتراك موثّق للمتابعة.'})[result.kind];
  accessAccount.textContent=accessUser?(en?'Account ID for subscription support: ':'معرّف الحساب لدعم الاشتراك: ')+accessUser.uid:'';
- if(result.freeGrant)status.textContent=en?'Free return-link access is active (not a payment confirmation).':'منحة رابط الرجوع نشطة (ليست تأكيدًا للدفع).';
+ if(result.freeGrant)status.textContent=en?'Free return-link access is active for 30 days (not a payment confirmation).':'منحة رابط الرجوع نشطة لمدة 30 يومًا (وليست تأكيدًا للدفع).';
+ if(accessUser&&accessReady&&accessConnected&&accessClockReady&&!returnLinkValid&&!grantValid&&accessGrant?.startedAt)status.textContent=en?'The return-link grant has expired. A verified subscription is required.':'انتهت منحة رابط الرجوع. يلزم اشتراك موثّق للمتابعة.';
  accessRetry.textContent=en?'Check access again':'إعادة التحقق من الدخول';accessRetry.hidden=!accessUser||unlocked;
  accessBanner.hidden=result.kind!=='trial';
  if(result.kind==='trial'){const seconds=Math.max(0,Math.ceil((result.until-now)/1000)),h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),s=seconds%60;accessBanner.textContent=(en?'Free trial: ':'التجربة المجانية: ')+[h,m,s].map(n=>String(n).padStart(2,'0')).join(':');}
@@ -550,10 +558,15 @@ async function loadAccess(user){
   if(token!==accessGeneration)return;
   const grantRef=rt.ref(db,'siteReturnGrants/'+user.uid);
   if(returnGrantRequested){
-   const previous=await rt.get(grantRef);
-   if(!previous.exists()){
-    try{await rt.set(grantRef,{startedAt:rt.serverTimestamp()});}
-    catch(error){if(!(await rt.get(grantRef)).exists())throw error;}
+   // لا يمكن إنشاء منحة جديدة بعد انتهاء صلاحية الرابط.
+   const now=accessClockReady?accessNow():Date.now();
+   if(now>=RETURN_LINK_CREATED_AT&&now<RETURN_LINK_EXPIRES_AT){
+    const previous=await rt.get(grantRef);
+    // إنشاء المنحة مرة واحدة فقط للحساب؛ وجود السجل يمنع تمديدها بإعادة فتح الرابط.
+    if(!previous.exists()){
+     try{await rt.set(grantRef,{startedAt:rt.serverTimestamp(),linkCreatedAt:RETURN_LINK_CREATED_AT,linkExpiresAt:RETURN_LINK_EXPIRES_AT});}
+     catch(error){if(!(await rt.get(grantRef)).exists())throw error;}
+    }
    }
    if(token!==accessGeneration)return;
    returnGrantRequested=false;
