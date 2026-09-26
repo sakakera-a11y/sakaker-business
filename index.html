@@ -11439,9 +11439,10 @@ html body #livePopup .sak-arabiya-choice .sak-channel-with-favorite{width:100%;}
 @media(max-width:600px){html body #livePopup #sakGlobalLiveResults:has(.sak-arabiya-choice){grid-template-columns:minmax(0,1fr)!important;}}
 </style>
 <style id="business-bottom-layout-repair">
-html body #businessVisitScore{position:fixed!important;top:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;left:50%!important;transform:translateX(-50%)!important;width:min(480px,96vw)!important;max-width:96vw!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;text-shadow:0 1px 3px #000,0 0 5px #000;pointer-events:auto!important;padding:2px!important;}
+html body #businessVisitScore{position:fixed!important;top:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;left:50%!important;transform:translateX(-50%)!important;width:min(360px,96vw)!important;max-width:96vw!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;text-shadow:0 1px 3px #000,0 0 5px #000;pointer-events:auto!important;padding:2px!important;}
 html body #businessVisitScore .visit-cell{border:0!important;padding:2px 5px!important;}
-html body #businessVisitScore .annual-cell{grid-column:auto!important;display:block!important;border:0!important;}
+html body #businessVisitScore .annual-cell{display:none!important;}
+html body #businessVisitScore #visitScoreStatus{display:none!important;}
 html body #businessVisitScore strong{font-size:20px!important;line-height:1.3!important;}
 html body #businessVisitScore #visitScoreStatus{font-size:10px;}
 html body #businessVisitRetry{grid-column:1/-1;justify-self:center;background:#123641;color:#fff;border:1px solid #95c9cf;border-radius:8px;padding:4px 12px;cursor:pointer;}
@@ -11475,8 +11476,7 @@ html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform
 <section id="businessVisitScore" aria-label="عدد الزيارات">
  <div class="visit-cell"><span id="visitTodayLabel">زيارات اليوم</span><strong id="visitTodayValue">—</strong></div>
  <div class="visit-cell"><span id="visitTotalLabel">إجمالي الزيارات</span><strong id="visitTotalValue">—</strong></div>
- <div class="visit-cell annual-cell"><span id="annualScoreLabel">اشتراكات السنة</span><strong id="annualScoreValue">—</strong></div>
- <small id="visitScoreStatus">جارٍ تحميل العداد…</small>
+
  <button id="businessVisitRetry" type="button" hidden>إعادة المحاولة</button>
 </section>
 <script id="business-counter-bootstrap">
@@ -11493,7 +11493,7 @@ let data=null,offset=0,failed=false,loaded=false,counted=false,busy=false,clockR
 const retryButton=document.getElementById('businessVisitRetry');
 const dayAt=time=>Math.floor((time+10800000)/86400000);
 function nextVisit(current,time){const day=dayAt(time);return {day,total:(current?.total||0)+1,today:current?.day===day?(current.today||0)+1:1};}
-function draw(){const en=document.documentElement.lang==='en';box.dir=en?'ltr':'rtl';box.setAttribute('aria-label',en?'Visit scoreboard':'عدد الزيارات');document.getElementById('visitTodayLabel').textContent=en?'Today':'زيارات اليوم';document.getElementById('visitTotalLabel').textContent=en?'Total visits':'إجمالي الزيارات';const format=new Intl.NumberFormat(en?'en-US':'ar-SA');document.getElementById('visitTotalValue').textContent=loaded?format.format(data?.total||0):'—';document.getElementById('visitTodayValue').textContent=loaded?format.format(data?.day===dayAt(Date.now()+offset)?data.today:0):'—';document.getElementById('visitScoreStatus').textContent=failed?(en?'Counter unavailable':'تعذر تحديث العداد'):loaded?(en?'Signed-in visits · Saudi time':'زيارات المسجّلين · توقيت السعودية'):(en?'Loading counter…':'جارٍ تحميل العداد…');}
+function draw(){const en=document.documentElement.lang==='en';box.dir=en?'ltr':'rtl';box.setAttribute('aria-label',en?'Visit scoreboard':'عدد الزيارات');document.getElementById('visitTodayLabel').textContent=en?'Today':'زيارات اليوم';document.getElementById('visitTotalLabel').textContent=en?'Total visits':'إجمالي الزيارات';const format=new Intl.NumberFormat(en?'en-US':'ar-SA');document.getElementById('visitTotalValue').textContent=loaded?format.format(data?.total||0):'—';document.getElementById('visitTodayValue').textContent=loaded?format.format(data?.day===dayAt(Date.now()+offset)?data.today:0):'—';document.getElementById('visitScoreStatus').textContent=failed?(en?'Counter unavailable':'تعذر تحديث العداد'):loaded?(en?'Visits':'الزيارات'):(en?'Loading counter…':'جارٍ تحميل العداد…');}
 function position(){retryButton.textContent=document.documentElement.lang==='en'?'Retry counter':'إعادة محاولة العداد';}
 if(languageButton)new ResizeObserver(position).observe(languageButton);window.addEventListener('resize',position,{passive:true});new MutationObserver(()=>{draw();position();}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});position();draw();
 try{
