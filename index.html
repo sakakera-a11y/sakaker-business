@@ -8101,7 +8101,7 @@ html body #sakGlobalStreamDetails{
     header.appendChild(selectRow);
     header.appendChild(meta);
     header.appendChild(notice);
-    buildOfficialSources(header);
+    /* تم إلغاء قسم القنوات والمنصات الرسمية من الواجهة */
 
     const results =
       document.createElement('div');
@@ -8457,10 +8457,8 @@ html body #sakGlobalStreamDetails{
           );
 
         if(meta){
-          meta.textContent =
-            isEn()
-              ? 'Loading the worldwide channel directory…'
-              : 'جاري تحميل دليل القنوات العالمي…';
+          /* تحميل الدليل بصمت — لا نظهر رسائل انتظار للمستخدم */
+          meta.textContent = '';
         }
 
         const response =
@@ -9333,13 +9331,9 @@ html body #sakGlobalStreamDetails{
       ) +
       ch.score;
 
-    message.style.display =
-      'flex';
-
-    message.textContent =
-      isEn()
-        ? 'Checking the best available stream and its latest health status…'
-        : 'جاري فحص أفضل رابط بث متاح وآخر حالة صحية له…';
+    /* فحص الرابط والحالة الصحية يتم في الخلفية بدون إظهار رسالة انتظار */
+    message.style.display = 'none';
+    message.textContent = '';
 
     details.textContent = '';
 
@@ -11981,6 +11975,165 @@ html body #videoOverlay:not([style*="display: flex"]){content-visibility:auto;}
  document.addEventListener('visibilitychange',sync,{passive:true});
  window.addEventListener('pageshow',sync,{passive:true});
  window.addEventListener('pagehide',()=>video.pause(),{passive:true});
+})();
+</script>
+
+
+
+<!-- =========================================================
+     LIVE CHANNELS FINAL REFINEMENT — V7
+     فحص صامت + كل القنوات فقط + ملء الشاشة + إرشاد الجوال
+     ========================================================= -->
+<style id="sakaker-live-v7-style">
+/* لا تعرض تقسيمات الملكية ولا المنصات الرسمية: الواجهة = كل القنوات فقط */
+html body #sakLiveOwnershipGroups,
+html body #sakOfficialSources{display:none!important;}
+
+/* إخفاء ملاحظات التصنيف القديمة حتى لا يظهر ذكر حكومي/عام/خاص/رسمي */
+html body #sakGlobalLiveNotice{display:none!important;}
+
+/* زر الصوت لا يظهر نهائيًا أثناء بوابة الدخول */
+html body.locked #sakakerAmbientControl{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+
+/* شريط أدوات صغير للقنوات */
+html body #sakLiveV7Tools{
+  display:flex!important;align-items:center!important;justify-content:center!important;flex-wrap:wrap!important;
+  gap:6px!important;margin:6px 0!important;
+}
+html body #sakLiveV7Tools button{
+  min-height:34px!important;padding:5px 11px!important;border-radius:10px!important;
+  border:1px solid rgba(255,255,255,.28)!important;background:#173944!important;color:#fff!important;
+  font:700 9px/1.2 Tahoma,Arial,sans-serif!important;cursor:pointer!important;touch-action:manipulation!important;
+}
+html body #sakLiveRotateHint{
+  display:none!important;margin:4px 0 7px!important;padding:5px 8px!important;border-radius:9px!important;
+  border:1px solid rgba(255,226,125,.28)!important;background:rgba(10,28,36,.72)!important;
+  color:#fff0b3!important;text-align:center!important;font:700 9px/1.45 Tahoma,Arial,sans-serif!important;
+}
+
+/* زر ملء الشاشة داخل مشغل القناة */
+html body #sakGlobalFullscreen{
+  min-height:35px!important;padding:0 11px!important;border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:10px!important;background:#173944!important;color:#fff!important;font:900 8px/1 Tahoma,Arial,sans-serif!important;
+  cursor:pointer!important;
+}
+
+/* عندما يصبح صندوق المشغل نفسه في وضع ملء الشاشة */
+html body #sakGlobalPlayerBox:fullscreen,
+html body #sakGlobalPlayerBox:-webkit-full-screen{
+  width:100vw!important;max-width:none!important;height:100dvh!important;max-height:none!important;
+  border-radius:0!important;border:0!important;padding:8px!important;background:#000!important;overflow:auto!important;
+}
+html body #sakGlobalPlayerBox:fullscreen #sakGlobalVideoWrap,
+html body #sakGlobalPlayerBox:-webkit-full-screen #sakGlobalVideoWrap{
+  width:100%!important;max-height:calc(100dvh - 150px)!important;
+}
+
+/* قائمة القنوات في ملء الشاشة */
+html body #livePopup:fullscreen,
+html body #livePopup:-webkit-full-screen{
+  width:100vw!important;height:100dvh!important;inset:0!important;background:#06131b!important;overflow:auto!important;
+}
+html body #livePopup:fullscreen #liveVideosContainer,
+html body #livePopup:-webkit-full-screen #liveVideosContainer{
+  width:100vw!important;max-width:100vw!important;min-height:100dvh!important;padding:10px!important;box-sizing:border-box!important;
+}
+
+@media(max-width:700px){
+  html body #sakLiveRotateHint{display:block!important;}
+  html body #sakLiveV7Tools button{min-height:38px!important;font-size:10px!important;}
+  /* القائمة تبقى واضحة بعد التدوير */
+  html body #livePopup #liveVideosContainer{padding-bottom:20px!important;}
+}
+@media(max-width:700px) and (orientation:landscape){
+  html body #sakLiveRotateHint{display:none!important;}
+  html body #sakGlobalLiveResults{grid-template-columns:repeat(5,minmax(0,1fr))!important;}
+}
+</style>
+<script id="sakaker-live-v7-js">
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ const en=()=>document.documentElement.lang==='en';
+ const livePopup=$('livePopup'),header=$('sakGlobalLiveHeader'),playerBox=$('sakGlobalPlayerBox');
+
+ // تأكيد أن الواجهة تبدأ دائمًا في كل القنوات فقط.
+ const groups=$('sakLiveOwnershipGroups');
+ if(groups) groups.setAttribute('aria-hidden','true');
+ const official=$('sakOfficialSources');
+ if(official) official.remove();
+
+ // أدوات القائمة + إرشاد التدوير.
+ if(header && !$('sakLiveV7Tools')){
+   const tools=document.createElement('div');tools.id='sakLiveV7Tools';
+   const full=document.createElement('button');full.id='sakLiveDirectoryFullscreen';full.type='button';
+   const hint=document.createElement('div');hint.id='sakLiveRotateHint';
+   tools.append(full);
+   const title=$('sakGlobalLiveTitle');
+   if(title) title.after(tools,hint); else header.prepend(tools,hint);
+
+   const setLabels=()=>{
+     full.textContent=en()?'⛶ Full screen':'⛶ ملء الشاشة';
+     full.setAttribute('aria-label',full.textContent.replace('⛶ ','') );
+     hint.textContent=en()?'📱 For the best mobile view, rotate your phone to landscape. The channel list remains available.':'📱 لأفضل مشاهدة على الجوال دوّر الهاتف للوضع الأفقي؛ وتبقى قائمة القنوات متاحة.';
+   };
+   new MutationObserver(setLabels).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});setLabels();
+   full.addEventListener('click',async()=>{
+     try{
+       if(!document.fullscreenElement){
+         await (livePopup?.requestFullscreen?.()||livePopup?.webkitRequestFullscreen?.());
+         try{await screen.orientation?.lock?.('landscape');}catch(_){}
+       }else{
+         try{screen.orientation?.unlock?.();}catch(_){}
+         await (document.exitFullscreen?.()||document.webkitExitFullscreen?.());
+       }
+     }catch(_){}
+   });
+ }
+
+ // زر ملء الشاشة للمشغل نفسه.
+ if(playerBox && !$('sakGlobalFullscreen')){
+   const actions=$('sakGlobalPlayerActions');
+   const full=document.createElement('button');full.id='sakGlobalFullscreen';full.type='button';
+   const setLabel=()=>{full.textContent=en()?'⛶ Full screen':'⛶ ملء الشاشة';};
+   setLabel();new MutationObserver(setLabel).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+   actions?.append(full);
+   full.addEventListener('click',async()=>{
+     try{
+       if(document.fullscreenElement===playerBox){
+         try{screen.orientation?.unlock?.();}catch(_){}
+         await document.exitFullscreen?.();
+       }else{
+         await (playerBox.requestFullscreen?.()||playerBox.webkitRequestFullscreen?.());
+         try{await screen.orientation?.lock?.('landscape');}catch(_){}
+       }
+     }catch(_){}
+   });
+ }
+
+ // الفحص يبقى صامتًا: أخفِ فقط رسائل الانتظار، واترك أخطاء التشغيل الفعلية تظهر.
+ const message=$('sakGlobalPlayerMessage');
+ if(message){
+   const observer=new MutationObserver(()=>{
+     const t=(message.textContent||'').trim().toLowerCase();
+     if(t.includes('جاري فحص')||t.includes('checking the best available stream')){
+       message.textContent='';message.style.display='none';
+     }
+   });
+   observer.observe(message,{childList:true,subtree:true,characterData:true});
+ }
+
+ // لا نظهر رسائل التحميل/الفحص المؤقتة في سطر معلومات الدليل.
+ const meta=$('sakGlobalLiveMeta');
+ if(meta){
+   const observer=new MutationObserver(()=>{
+     const t=(meta.textContent||'').trim().toLowerCase();
+     if(t.includes('جاري تحميل')||t.includes('loading the worldwide channel directory')) meta.textContent='';
+   });
+   observer.observe(meta,{childList:true,subtree:true,characterData:true});
+ }
+
+ // عند الخروج من ملء الشاشة حرر قفل الاتجاه إن كان مدعومًا.
+ document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement){try{screen.orientation?.unlock?.();}catch(_){}}});
 })();
 </script>
 
