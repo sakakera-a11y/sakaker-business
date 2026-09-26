@@ -12137,5 +12137,184 @@ html body #livePopup:-webkit-full-screen #liveVideosContainer{
 })();
 </script>
 
+
+<!-- =========================================================
+     LIVE CHANNELS SAFE PATCH — V9
+     مبني فوق V7 المستقرة: بدون مراقبة عامة للصفحة
+     ========================================================= -->
+<style id="sakaker-live-v9-style">
+/* حذف خانة القنوات المحفوظة من شريط الفلاتر */
+html body #sakGlobalLiveFilters [data-filter="saved"]{display:none!important;}
+
+/* زر النافذة الصغيرة */
+html body #sakGlobalFloatToggle{
+  min-height:35px!important;
+  padding:0 11px!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:10px!important;
+  background:#173944!important;
+  color:#fff!important;
+  font:900 9px/1.2 Tahoma,Arial,sans-serif!important;
+  cursor:pointer!important;
+  touch-action:manipulation!important;
+}
+
+/* مشاهدة مصغرة فوق الموقع مع استمرار التصفح */
+html body #sakGlobalPlayerOverlay.sak-player-floating{
+  position:fixed!important;
+  inset:auto max(10px,env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) auto!important;
+  width:min(420px,calc(100vw - 20px))!important;
+  height:auto!important;
+  padding:0!important;
+  display:block!important;
+  background:transparent!important;
+  pointer-events:none!important;
+  z-index:2147483647!important;
+}
+html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalPlayerBox{
+  position:relative!important;
+  width:100%!important;
+  max-width:none!important;
+  max-height:min(65dvh,390px)!important;
+  margin:0!important;
+  padding:7px!important;
+  overflow:hidden!important;
+  border-radius:15px!important;
+  border:1px solid rgba(163,243,220,.72)!important;
+  background:rgba(5,20,27,.97)!important;
+  box-shadow:0 12px 42px rgba(0,0,0,.65),0 0 18px rgba(0,255,213,.18)!important;
+  pointer-events:auto!important;
+}
+html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalPlayerTitle{
+  min-height:28px!important;
+  padding:3px 38px 5px 6px!important;
+  font-size:11px!important;
+  line-height:1.3!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+html body #sakGlobalPlayerOverlay.sak-player-floating :is(#sakGlobalPlayerInfo,#sakGlobalStreamDetails,#sakGlobalPlayerMessage){display:none!important;}
+html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalVideoWrap{
+  width:100%!important;
+  aspect-ratio:16/9!important;
+  border-radius:10px!important;
+}
+html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalPlayerActions{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  margin:5px 0 0!important;
+  padding:0!important;
+}
+html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalPlayerActions > *:not(#sakGlobalFloatToggle){display:none!important;}
+html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalPlayerClose{
+  width:30px!important;height:30px!important;top:5px!important;right:5px!important;font-size:13px!important;
+}
+@media(max-width:700px){
+  html body #sakGlobalPlayerOverlay.sak-player-floating{
+    right:4vw!important;
+    bottom:calc(78px + env(safe-area-inset-bottom))!important;
+    width:92vw!important;
+    max-width:380px!important;
+  }
+  html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalPlayerBox{max-height:54dvh!important;}
+}
+@media(max-height:480px) and (orientation:landscape){
+  html body #sakGlobalPlayerOverlay.sak-player-floating{
+    width:min(350px,48vw)!important;right:8px!important;bottom:8px!important;
+  }
+  html body #sakGlobalPlayerOverlay.sak-player-floating #sakGlobalPlayerBox{max-height:92dvh!important;}
+}
+</style>
+<script id="sakaker-live-v9-js">
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ const en=()=>document.documentElement.lang==='en';
+ const livePopup=$('livePopup');
+ const results=$('sakGlobalLiveResults');
+ const filters=$('sakGlobalLiveFilters');
+ const overlay=$('sakGlobalPlayerOverlay');
+ const actions=$('sakGlobalPlayerActions');
+
+ /* حذف زر المحفوظة من DOM فقط؛ لا نمس بيانات القنوات أو وظائف التشغيل. */
+ filters?.querySelector('[data-filter="saved"]')?.remove();
+
+ async function exitFullscreenSafe(){
+   const fs=document.fullscreenElement||document.webkitFullscreenElement;
+   if(!fs)return;
+   try{
+     if(document.exitFullscreen) await document.exitFullscreen();
+     else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+   }catch(_){ }
+   try{screen.orientation?.unlock?.();}catch(_){ }
+ }
+
+ /* عند اختيار قناة والقائمة في ملء الشاشة: اخرج أولًا ثم أعد نفس النقرة.
+    هذا يمنع المشغل من الظهور خلف طبقة Fullscreen الخاصة بالمتصفح. */
+ results?.addEventListener('click',async e=>{
+   const fs=document.fullscreenElement||document.webkitFullscreenElement;
+   if(fs!==livePopup)return;
+   const card=e.target.closest?.('.sak-global-channel-card');
+   if(!card)return;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   await exitFullscreenSafe();
+   requestAnimationFrame(()=>card.click());
+ },true);
+
+ let floatButton=null;
+ function setFloatLabel(){
+   if(!floatButton)return;
+   const floating=overlay?.classList.contains('sak-player-floating');
+   const text=floating
+     ? (en()?'↗ Restore player':'↗ تكبير المشغل')
+     : (en()?'▣ Mini player':'▣ نافذة صغيرة');
+   /* لا نكتب النص إلا إذا تغير، لمنع أي حلقة تحديث. */
+   if(floatButton.textContent!==text) floatButton.textContent=text;
+   const aria=text.replace(/^[↗▣]\s*/,'');
+   if(floatButton.getAttribute('aria-label')!==aria) floatButton.setAttribute('aria-label',aria);
+ }
+
+ async function toggleFloating(){
+   if(!overlay)return;
+   const turnOn=!overlay.classList.contains('sak-player-floating');
+   if(turnOn){
+     await exitFullscreenSafe();
+     overlay.classList.add('sak-player-floating');
+     overlay.style.display='block';
+     /* أخفِ دليل القنوات فقط، ولا تمس المشغل أو الصفحة. */
+     if(livePopup) livePopup.style.display='none';
+     document.body.style.overflow='';
+   }else{
+     overlay.classList.remove('sak-player-floating');
+     overlay.style.display='flex';
+   }
+   setFloatLabel();
+ }
+
+ if(actions && overlay){
+   floatButton=document.createElement('button');
+   floatButton.type='button';
+   floatButton.id='sakGlobalFloatToggle';
+   actions.appendChild(floatButton);
+   floatButton.addEventListener('click',toggleFloating);
+   setFloatLabel();
+ }
+
+ /* تحديث الاسم عند تبديل اللغة فقط — مراقب محدود بعنصر html. */
+ new MutationObserver(setFloatLabel).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+
+ function resetFloating(){
+   if(!overlay)return;
+   overlay.classList.remove('sak-player-floating');
+   setFloatLabel();
+ }
+ $('sakGlobalPlayerClose')?.addEventListener('click',resetFloating,true);
+ overlay?.addEventListener('click',e=>{if(e.target===overlay)resetFloating();},true);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')resetFloating();},true);
+})();
+</script>
+
 </body>
 </html>
