@@ -11306,7 +11306,6 @@ setInterval(() => {
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
 ">
-  <span id="businessContactLabel">للاستفسار والطلبات والملاحظات: </span>
   <a href="mailto:sakaker@outlook.com" style="
     color:#ffe36d !important;
     font-weight:900 !important;
@@ -11465,15 +11464,15 @@ html body #businessVisitScore #visitScoreStatus[hidden]{display:none!important;}
 html body #businessVisitScore strong{font-size:20px!important;line-height:1.3!important;}
 html body #businessVisitScore #visitScoreStatus{font-size:10px;}
 html body #businessVisitRetry{grid-column:1/-1;justify-self:center;background:#123641;color:#fff;border:1px solid #95c9cf;border-radius:8px;padding:4px 12px;cursor:pointer;}
-html body #sakakerContactFooter{bottom:calc(var(--business-score-height,76px) + 12px + env(safe-area-inset-bottom))!important;}
-html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:calc(var(--business-score-height,76px) + var(--business-footer-height,50px) + 20px + env(safe-area-inset-bottom))!important;width:min(580px,96vw)!important;max-width:96vw!important;justify-content:center!important;align-items:flex-start!important;flex-wrap:wrap!important;column-gap:20px!important;row-gap:40px!important;max-height:38dvh!important;overflow-y:auto!important;overflow-x:hidden!important;padding:10px 8px 42px!important;box-sizing:border-box!important;}
-@media(max-width:600px){html body #sakakerAllIconsDock{column-gap:12px!important;row-gap:40px!important;}html body #businessVisitScore{font-size:10px!important;}}
+html body #sakakerContactFooter{left:max(8px,env(safe-area-inset-left))!important;right:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;transform:none!important;width:auto!important;max-width:calc(100vw - 350px)!important;padding:5px 8px!important;text-align:left!important;direction:ltr!important;border-radius:10px!important;font-size:12px!important;white-space:nowrap!important;}
+html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:calc(var(--business-score-height,76px) + 12px + env(safe-area-inset-bottom))!important;width:min(580px,96vw)!important;max-width:96vw!important;justify-content:center!important;align-items:flex-start!important;flex-wrap:wrap!important;column-gap:20px!important;row-gap:40px!important;max-height:38dvh!important;overflow-y:auto!important;overflow-x:hidden!important;padding:10px 8px 42px!important;box-sizing:border-box!important;}
+@media(max-width:600px){html body #sakakerAllIconsDock{column-gap:12px!important;row-gap:40px!important;bottom:calc(var(--business-score-height,76px) + 8px + env(safe-area-inset-bottom))!important;}html body #businessVisitScore{font-size:10px!important;}html body #sakakerContactFooter{max-width:42vw!important;bottom:max(4px,env(safe-area-inset-bottom))!important;font-size:10px!important;padding:4px 5px!important;overflow:hidden!important;text-overflow:ellipsis!important;}}
 </style>
 <script id="business-feature-integration">
 (()=>{
  const $=id=>document.getElementById(id),dock=$('sakakerAllIconsDock');
  const language=document.createElement('button');language.id='sakBusinessFeatureLanguage';language.type='button';document.body.append(language);
- function label(){const en=document.documentElement.lang==='en';language.textContent=en?'العربية':'English';language.setAttribute('aria-label',en?'Switch to Arabic':'التبديل إلى الإنجليزية');const footer=$('sakakerContactFooter');footer.setAttribute('aria-label',en?'Contact us':'تواصل معنا');footer.style.setProperty('direction',en?'ltr':'rtl','important');$('businessContactLabel').textContent=en?'For enquiries, requests and feedback: ':'للاستفسار والطلبات والملاحظات: ';}
+ function label(){const en=document.documentElement.lang==='en';language.textContent=en?'العربية':'English';language.setAttribute('aria-label',en?'Switch to Arabic':'التبديل إلى الإنجليزية');const footer=$('sakakerContactFooter');footer.setAttribute('aria-label',en?'Contact us':'تواصل معنا');footer.style.setProperty('direction',en?'ltr':'rtl','important');}
  language.onclick=()=>{const lang=document.documentElement.lang==='en'?'ar':'en';if(window.sakakerLoginLanguage)window.sakakerLoginLanguage.setLang(lang);else {document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';}label();};
  new MutationObserver(label).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});label();
  function footerSpace(){const footer=$('sakakerContactFooter');document.documentElement.style.setProperty('--business-footer-height',(footer?footer.getBoundingClientRect().height:60)+'px');}
@@ -11680,5 +11679,25 @@ html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-of
 })();
 </script>
 
+
+<style id="sakaker-final-contact-position">
+/* Final requested layout: email only at bottom-left; feature icons lowered into the former email area. */
+html body #sakakerContactFooter{
+  left:max(8px,env(safe-area-inset-left))!important;right:auto!important;
+  bottom:max(6px,env(safe-area-inset-bottom))!important;transform:none!important;
+  width:auto!important;max-width:calc(100vw - 350px)!important;
+  padding:5px 8px!important;text-align:left!important;direction:ltr!important;
+  font-size:12px!important;line-height:1.35!important;white-space:nowrap!important;
+}
+html body #sakakerContactFooter a{display:block!important;}
+html body #sakakerAllIconsDock{
+  bottom:calc(var(--business-score-height,76px) + 12px + env(safe-area-inset-bottom))!important;
+}
+@media(max-width:600px){
+  html body #sakakerContactFooter{max-width:42vw!important;font-size:10px!important;padding:4px 5px!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  html body #sakakerContactFooter a{overflow:hidden!important;text-overflow:ellipsis!important;}
+  html body #sakakerAllIconsDock{bottom:calc(var(--business-score-height,76px) + 8px + env(safe-area-inset-bottom))!important;}
+}
+</style>
 </body>
 </html>
