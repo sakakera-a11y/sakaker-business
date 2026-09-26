@@ -11457,7 +11457,7 @@ html body #livePopup .sak-arabiya-choice .sak-channel-with-favorite{width:100%;}
 @media(max-width:600px){html body #livePopup #sakGlobalLiveResults:has(.sak-arabiya-choice){grid-template-columns:minmax(0,1fr)!important;}}
 </style>
 <style id="business-bottom-layout-repair">
-html body #businessVisitScore{position:fixed!important;top:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;left:50%!important;transform:translateX(-50%)!important;width:min(360px,96vw)!important;max-width:96vw!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;text-shadow:0 1px 3px #000,0 0 5px #000;pointer-events:auto!important;padding:2px!important;}
+html body #businessVisitScore{position:fixed!important;top:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;right:max(8px,env(safe-area-inset-right))!important;left:auto!important;transform:none!important;width:min(320px,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;text-shadow:0 1px 3px #000,0 0 5px #000;pointer-events:auto!important;padding:2px!important;}
 html body #businessVisitScore .visit-cell{border:0!important;padding:2px 5px!important;}
 html body #businessVisitScore .annual-cell{display:none!important;}
 html body #businessVisitScore #visitScoreStatus{grid-column:1/-1;text-align:center;font-size:10px;color:#ffd0a6;}
@@ -11654,19 +11654,19 @@ html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-of
      SEA + BIRDS AMBIENCE — Web Audio, lightweight/no extra file
      يبدأ بعد أول تفاعل للمستخدم بسبب سياسة المتصفحات
      ========================================================= -->
-<button id="sakakerAmbientControl" type="button" aria-pressed="false" aria-label="تشغيل صوت البحر والطيور" title="صوت البحر والطيور">🌊🐦</button>
+<button id="sakakerAmbientControl" type="button" aria-pressed="false" aria-label="تشغيل صوت البحر والطيور" title="صوت البحر والطيور">🔇</button>
 <style id="sakaker-ambient-style">
-#sakakerAmbientControl{position:fixed!important;top:max(12px,env(safe-area-inset-top))!important;left:max(12px,env(safe-area-inset-left))!important;z-index:2147483647!important;width:46px!important;height:46px!important;border-radius:50%!important;border:1px solid #d8f8ffcc!important;background:#061923aa!important;color:#fff!important;font-size:20px!important;cursor:pointer!important;box-shadow:0 0 16px #7defff88,inset 0 0 12px #ffffff18!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);touch-action:manipulation;}
+#sakakerAmbientControl{position:fixed!important;top:56px!important;left:max(12px,env(safe-area-inset-left))!important;z-index:2147483646!important;width:42px!important;height:42px!important;border-radius:50%!important;border:1px solid #d8f8ffcc!important;background:#061923dd!important;color:#fff!important;font-size:18px!important;cursor:pointer!important;box-shadow:0 0 16px #7defff88,inset 0 0 12px #ffffff18!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);touch-action:manipulation;}
 #sakakerAmbientControl[aria-pressed="true"]{box-shadow:0 0 18px #7defff,0 0 30px #ffe89a66,inset 0 0 12px #ffffff25!important;}
 #sakakerAmbientControl:focus-visible{outline:3px solid #ffe08a;outline-offset:3px;}
-@media(max-width:600px){#sakakerAmbientControl{width:42px!important;height:42px!important;font-size:18px!important;}}
+@media(max-width:600px){#sakakerAmbientControl{top:54px!important;left:max(10px,env(safe-area-inset-left))!important;width:40px!important;height:40px!important;font-size:17px!important;}}
 </style>
 <script id="sakaker-ambient-audio">
 (()=>{'use strict';
  const button=document.getElementById('sakakerAmbientControl');
  let ctx=null,master=null,oceanSource=null,birdTimer=null,enabled=false,starting=false;
  const saved=()=>{try{return localStorage.getItem('sakakerAmbient')!=='off'}catch(_){return true}};
- function label(){const en=document.documentElement.lang==='en',text=enabled?(en?'Mute sea and birds':'كتم صوت البحر والطيور'):(en?'Play sea and birds':'تشغيل صوت البحر والطيور');button.setAttribute('aria-pressed',String(enabled));button.setAttribute('aria-label',text);button.title=text;button.textContent=enabled?'🌊🐦':'🔇';}
+ function label(){const en=document.documentElement.lang==='en',text=enabled?(en?'Mute sea and birds':'كتم صوت البحر والطيور'):(en?'Play sea and birds':'تشغيل صوت البحر والطيور');button.setAttribute('aria-pressed',String(enabled));button.setAttribute('aria-label',text);button.title=text;button.textContent=enabled?'🔊':'🔇';}
  function noiseBuffer(){const length=ctx.sampleRate*4,b=ctx.createBuffer(1,length,ctx.sampleRate),d=b.getChannelData(0);let last=0;for(let i=0;i<length;i++){const white=Math.random()*2-1;last=last*.985+white*.015;d[i]=last*3.4;}return b;}
  function chirp(){if(!enabled||!ctx||ctx.state!=='running')return;const now=ctx.currentTime,osc=ctx.createOscillator(),g=ctx.createGain(),pan=ctx.createStereoPanner?ctx.createStereoPanner():null;osc.type='sine';osc.frequency.setValueAtTime(1500+Math.random()*700,now);osc.frequency.exponentialRampToValueAtTime(2400+Math.random()*800,now+.08);osc.frequency.exponentialRampToValueAtTime(1750+Math.random()*500,now+.18);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.045,now+.025);g.gain.exponentialRampToValueAtTime(.0001,now+.22);if(pan){pan.pan.value=Math.random()*1.4-.7;osc.connect(g).connect(pan).connect(master);}else osc.connect(g).connect(master);osc.start(now);osc.stop(now+.24);}
  function scheduleBird(){clearTimeout(birdTimer);if(!enabled)return;birdTimer=setTimeout(()=>{chirp();if(Math.random()>.45)setTimeout(chirp,160+Math.random()*260);scheduleBird();},4500+Math.random()*6500);}
