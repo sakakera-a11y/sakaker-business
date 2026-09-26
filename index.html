@@ -8,6 +8,30 @@
 <meta property="og:title" content="قنوات ألعاب برامج | Channels, Games &amp; Software">
 </head>
 <body>
+<!-- =========================================================
+     SAKAKER BUSINESS — VIDEO BACKGROUND
+     خلفية فيديو موحدة لصفحة الدخول والموقع
+     ========================================================= -->
+<video id="sakakerBackgroundVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true" tabindex="-1">
+  <source src="https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/gemini_generated_video_5b142333.mp4" type="video/mp4">
+</video>
+<style id="sakaker-video-background-style">
+html{background:#000!important;}
+html,body{min-height:100%;background-color:#000!important;}
+body{isolation:isolate;background-image:none!important;background-color:transparent!important;overflow-x:hidden;}
+#sakakerBackgroundVideo{
+  position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;
+  object-fit:cover!important;object-position:center center!important;z-index:-2!important;pointer-events:none!important;
+  background:#000!important;transform:translateZ(0);
+}
+body::before{z-index:-1!important;}
+#loginOverlay{
+  background-image:linear-gradient(rgba(0,10,18,.26),rgba(0,8,12,.48))!important;
+  background-color:transparent!important;
+}
+@media (prefers-reduced-motion:reduce){#sakakerBackgroundVideo{filter:saturate(.9) brightness(.92);}}
+</style>
+
 <style id="sak-account-trial-style">
 #sakTrialCountdown{position:fixed!important;top:64px!important;left:50%!important;transform:translateX(-50%)!important;z-index:1001!important;max-width:calc(100vw - 24px);box-sizing:border-box;padding:7px 14px;border:1px solid #a2f4d9aa;border-radius:18px;background:#053c39e8;color:#fff;font:13px/1.5 Tahoma,Arial,sans-serif;text-align:center;font-variant-numeric:tabular-nums;}
 #sakTrialCountdown[hidden]{display:none!important;}
@@ -25,14 +49,14 @@ html,body{
     min-height:100%;
 }
 body{
-    background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png");
+    background-image:none;
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
     background-attachment:fixed;
 }
 #loginOverlay{
-    background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png") !important;
+    background-image:none !important;
     background-size:cover !important;
     background-position:center !important;
     background-repeat:no-repeat !important;
@@ -46,7 +70,7 @@ body{
 
 <!-- 🔒 منع ظهور محتوى الموقع قبل تسجيل الدخول -->
 <style>
-body.locked > *:not(#loginOverlay){
+body.locked > *:not(#loginOverlay):not(#sakakerBackgroundVideo):not(#sakakerAmbientControl){
 visibility:hidden;
 }
 </style>
@@ -61,7 +85,7 @@ document.body.classList.add("locked");
 html,body{margin:0;padding:0;min-height:100%;}
 body.locked{overflow:hidden !important;}
 /* إخفاء كل محتوى الموقع أثناء شاشة الدخول */
-body.locked > *:not(#loginOverlay){
+body.locked > *:not(#loginOverlay):not(#sakakerBackgroundVideo):not(#sakakerAmbientControl){
   visibility:hidden !important;
   pointer-events:none !important;
 }
@@ -81,7 +105,7 @@ body:not(.locked) #loginOverlay{display:none !important;}
   padding:20px !important;
   background-image:
     linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.62)),
-    url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png") !important;
+    none !important;
   background-size:cover !important;
   background-position:center !important;
   background-repeat:no-repeat !important;
@@ -708,7 +732,7 @@ body{
 }
 
 body{
-    background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png");
+    background-image:none;
     background-size:cover;
     background-position:center center;
     background-repeat:no-repeat;
@@ -11017,7 +11041,7 @@ body{
 }
 
 body{
-    background-image:url("https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png");
+    background-image:none;
 
     background-size:cover;
     background-position:center;
@@ -11414,12 +11438,6 @@ html body #businessVisitScore strong{display:block;font:700 24px/1.4 Consolas,mo
 html body #businessVisitScore small{grid-column:1/-1;text-align:center;color:#c5dfe7;font-size:10px;}
 @media(max-width:600px){html body #businessVisitScore{width:160px;font-size:11px;}html body #businessVisitScore strong{font-size:20px;}}
 </style>
-<style id="business-annual-score-style">
-html body #businessVisitScore{width:220px;grid-template-columns:1fr 1fr;}
-html body #businessVisitScore .annual-cell{grid-column:1/-1;border-inline-start:0!important;border-top:1px solid #ffffff25;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;}
-html body #businessVisitScore .annual-cell strong{color:#9df0ce;font-size:22px;}
-@media(max-width:600px){html body #businessVisitScore{width:170px;}html body #businessVisitScore .annual-cell strong{font-size:20px;}}
-</style>
 <style id="business-live-groups-style">
 html body #livePopup .sak-country-browser-header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 0;}
 html body #livePopup .sak-country-browser-header h3{font-size:18px;color:#a3f3dc;margin:0;}
@@ -11442,7 +11460,8 @@ html body #livePopup .sak-arabiya-choice .sak-channel-with-favorite{width:100%;}
 html body #businessVisitScore{position:fixed!important;top:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;left:50%!important;transform:translateX(-50%)!important;width:min(360px,96vw)!important;max-width:96vw!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;text-shadow:0 1px 3px #000,0 0 5px #000;pointer-events:auto!important;padding:2px!important;}
 html body #businessVisitScore .visit-cell{border:0!important;padding:2px 5px!important;}
 html body #businessVisitScore .annual-cell{display:none!important;}
-html body #businessVisitScore #visitScoreStatus{display:none!important;}
+html body #businessVisitScore #visitScoreStatus{grid-column:1/-1;text-align:center;font-size:10px;color:#ffd0a6;}
+html body #businessVisitScore #visitScoreStatus[hidden]{display:none!important;}
 html body #businessVisitScore strong{font-size:20px!important;line-height:1.3!important;}
 html body #businessVisitScore #visitScoreStatus{font-size:10px;}
 html body #businessVisitRetry{grid-column:1/-1;justify-self:center;background:#123641;color:#fff;border:1px solid #95c9cf;border-radius:8px;padding:4px 12px;cursor:pointer;}
@@ -11461,8 +11480,9 @@ html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform
  if($('sakakerContactFooter'))new ResizeObserver(footerSpace).observe($('sakakerContactFooter'));window.addEventListener('resize',footerSpace,{passive:true});footerSpace();
  // Keep the same gull body colours as the four corresponding positions in the source dock.
  const shades={emOpenBtn:'#854d27','pongGame-btn':'#9333ea',sakCreativeIcon:'#ffdf00',liveFlasher:'#ef2424'};
- const original=decodeURIComponent($('sak-shore-gulls-style').textContent.match(/url\("data:image\/svg\+xml,([^"]+)"\)/)[1]);
- function colours(){for(const [id,shade] of Object.entries(shades)){const el=$(id);if(!el||el.dataset.businessColoured)return;const svg=original.replace(/fill="url\(#body\)"/g,`fill="${shade}"`).replace(/fill="url\(#wing\)"/g,'fill="#000000"').replace('fill="#344855"',`fill="${shade}"`);el.style.setProperty('--sak-colored-gull','url("data:image/svg+xml,'+encodeURIComponent(svg)+'")');el.dataset.sakGullColored='true';el.dataset.businessColoured='true';}}
+ const gullStyle=$('sak-shore-gulls-style'),gullMatch=gullStyle?.textContent.match(/url\("data:image\/svg\+xml,([^"]+)"\)/);
+ const original=gullMatch?decodeURIComponent(gullMatch[1]):'';
+ function colours(){if(!original)return;for(const [id,shade] of Object.entries(shades)){const el=$(id);if(!el||el.dataset.businessColoured)return;const svg=original.replace(/fill="url\(#body\)"/g,`fill="${shade}"`).replace(/fill="url\(#wing\)"/g,'fill="#000000"').replace('fill="#344855"',`fill="${shade}"`);el.style.setProperty('--sak-colored-gull','url("data:image/svg+xml,'+encodeURIComponent(svg)+'")');el.dataset.sakGullColored='true';el.dataset.businessColoured='true';}}
  new MutationObserver(colours).observe(dock,{childList:true,subtree:true});colours();
  const live=$('livePopup');let focusBefore=null,overflowBefore='';
  window.toggleLivePopup=()=>{const opened=getComputedStyle(live).display!=='none';if(opened){live.style.display='none';document.body.style.overflow=overflowBefore;const audio=$('sakRadioAudio');audio?.pause();focusBefore?.focus();}else {if(document.body.classList.contains('locked'))return;focusBefore=document.activeElement;overflowBefore=document.body.style.overflow;live.style.display='flex';document.body.style.overflow='hidden';$('closePopup').focus();}};
@@ -11476,7 +11496,7 @@ html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform
 <section id="businessVisitScore" aria-label="عدد الزيارات">
  <div class="visit-cell"><span id="visitTodayLabel">زيارات اليوم</span><strong id="visitTodayValue">—</strong></div>
  <div class="visit-cell"><span id="visitTotalLabel">إجمالي الزيارات</span><strong id="visitTotalValue">—</strong></div>
-
+ <small id="visitScoreStatus" role="status" aria-live="polite"></small>
  <button id="businessVisitRetry" type="button" hidden>إعادة المحاولة</button>
 </section>
 <script id="business-counter-bootstrap">
@@ -11486,69 +11506,56 @@ window.businessCounterFirebaseReady=new Promise(resolve=>{
 (()=>{const score=document.getElementById('businessVisitScore'),footer=document.getElementById('sakakerContactFooter');let queued=false;function measure(){queued=false;document.body.style.setProperty('--business-score-height',Math.ceil(score.getBoundingClientRect().height)+'px');if(footer)document.body.style.setProperty('--business-footer-height',Math.ceil(footer.getBoundingClientRect().height)+'px');}function queue(){if(!queued){queued=true;requestAnimationFrame(measure);}}const observer=new ResizeObserver(queue);observer.observe(score);if(footer)observer.observe(footer);window.addEventListener('resize',queue,{passive:true});queue();})();
 </script>
 <script type="module" id="business-scoreboard-script">
-import {getDatabase,ref,get,onValue,runTransaction} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
+import {getDatabase,ref,onValue,runTransaction} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
 import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
-const box=document.getElementById('businessVisitScore'),languageButton=document.getElementById('sakBusinessFeatureLanguage');
-let data=null,offset=0,failed=false,loaded=false,counted=false,busy=false,clockReady=false,retryDelay=2000,retryTimer=null,errorCode='';
+const box=document.getElementById('businessVisitScore');
 const retryButton=document.getElementById('businessVisitRetry');
-const dayAt=time=>Math.floor((time+10800000)/86400000);
-function nextVisit(current,time){const day=dayAt(time);return {day,total:(current?.total||0)+1,today:current?.day===day?(current.today||0)+1:1};}
-function draw(){const en=document.documentElement.lang==='en';box.dir=en?'ltr':'rtl';box.setAttribute('aria-label',en?'Visit scoreboard':'عدد الزيارات');document.getElementById('visitTodayLabel').textContent=en?'Today':'زيارات اليوم';document.getElementById('visitTotalLabel').textContent=en?'Total visits':'إجمالي الزيارات';const format=new Intl.NumberFormat(en?'en-US':'ar-SA');document.getElementById('visitTotalValue').textContent=loaded?format.format(data?.total||0):'—';document.getElementById('visitTodayValue').textContent=loaded?format.format(data?.day===dayAt(Date.now()+offset)?data.today:0):'—';document.getElementById('visitScoreStatus').textContent=failed?(en?'Counter unavailable':'تعذر تحديث العداد'):loaded?(en?'Visits':'الزيارات'):(en?'Loading counter…':'جارٍ تحميل العداد…');}
-function position(){retryButton.textContent=document.documentElement.lang==='en'?'Retry counter':'إعادة محاولة العداد';}
-if(languageButton)new ResizeObserver(position).observe(languageButton);window.addEventListener('resize',position,{passive:true});new MutationObserver(()=>{draw();position();}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});position();draw();
+const statusEl=document.getElementById('visitScoreStatus');
+let data=null,offset=0,loaded=false,failed=false,counted=false,busy=false,clockReady=false,errorCode='',retryTimer=null,retryDelay=2000;
+const dayAt=time=>Math.floor((time+10800000)/86400000); // Saudi Arabia UTC+3
+const nextVisit=(current,time)=>{
+ const day=dayAt(time),safe=current&&typeof current==='object'?current:{};
+ return {day,total:(Number(safe.total)||0)+1,today:safe.day===day?(Number(safe.today)||0)+1:1};
+};
+function draw(){
+ const en=document.documentElement.lang==='en',fmt=new Intl.NumberFormat(en?'en-US':'ar-SA'),today=data?.day===dayAt(Date.now()+offset)?Number(data?.today)||0:0;
+ box.dir=en?'ltr':'rtl';box.setAttribute('aria-label',en?'Visit counter':'عداد الزيارات');
+ document.getElementById('visitTodayLabel').textContent=en?'Today':'زيارات اليوم';
+ document.getElementById('visitTotalLabel').textContent=en?'Total visits':'إجمالي الزيارات';
+ document.getElementById('visitTodayValue').textContent=loaded?fmt.format(today):'—';
+ document.getElementById('visitTotalValue').textContent=loaded?fmt.format(Number(data?.total)||0):'—';
+ retryButton.textContent=en?'Retry counter':'إعادة محاولة العداد';
+ statusEl.textContent=failed?(en?'Counter sync unavailable':'تعذر مزامنة العداد'):'';
+ statusEl.hidden=!failed;retryButton.hidden=!failed;
+}
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+draw();
 try{
  await window.businessCounterFirebaseReady;
  if(!window.firebaseApp)throw Error('Firebase unavailable');
- const db=getDatabase(window.firebaseApp,'https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app'),counter=ref(db,'businessVisitStats'),auth=getAuth(window.firebaseApp);
- function report(){draw();retryButton.hidden=!failed;if(failed){document.getElementById('visitScoreStatus').textContent=(document.documentElement.lang==='en'?'Counter error: ':'خطأ العداد: ')+(errorCode||'connection');}}
- let stopCounter;
- function listen(){stopCounter?.();stopCounter=onValue(counter,snapshot=>{data=snapshot.val();loaded=true;draw();},error=>{failed=true;errorCode=error.code||'connection';report();});}
- onValue(ref(db,'.info/serverTimeOffset'),snapshot=>{const n=snapshot.val();if(typeof n==='number'){offset=n;clockReady=true;countVisit();}draw();});listen();
- async function countVisit(){if(counted||busy||!clockReady||!auth.currentUser)return;clearTimeout(retryTimer);busy=true;try{const result=await runTransaction(counter,current=>nextVisit(current,Date.now()+offset),{applyLocally:false});counted=result.committed;failed=!result.committed;if(counted){errorCode='';retryDelay=2000;}}catch(error){failed=true;errorCode=error.code||'connection';if(!/permission/i.test(errorCode)){retryTimer=setTimeout(countVisit,retryDelay);retryDelay=Math.min(60000,retryDelay*2);}}finally{busy=false;report();}}
- retryButton.onclick=()=>{failed=false;errorCode='';listen();countVisit();report();};
- onAuthStateChanged(auth,user=>{if(user)countVisit();});
- onValue(ref(db,'.info/connected'),snapshot=>{if(snapshot.val())countVisit();});
+ const db=getDatabase(window.firebaseApp,'https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app');
+ const auth=getAuth(window.firebaseApp);
+ const counter=ref(db,'businessVisitStats');
+ const listen=()=>onValue(counter,s=>{data=s.val()||{};loaded=true;failed=false;errorCode='';draw();},e=>{failed=true;errorCode=e?.code||'connection';draw();});
+ let stopListen=listen();
+ onValue(ref(db,'.info/serverTimeOffset'),s=>{const n=s.val();if(typeof n==='number'){offset=n;clockReady=true;countVisit();}draw();});
+ async function countVisit(){
+  if(counted||busy||!clockReady||!auth.currentUser)return;
+  clearTimeout(retryTimer);busy=true;
+  try{
+   const result=await runTransaction(counter,current=>nextVisit(current,Date.now()+offset),{applyLocally:false});
+   if(!result.committed)throw Error('not-committed');
+   counted=true;failed=false;errorCode='';retryDelay=2000;
+  }catch(error){
+   failed=true;errorCode=error?.code||error?.message||'connection';
+   if(!/permission/i.test(errorCode)){retryTimer=setTimeout(countVisit,retryDelay);retryDelay=Math.min(60000,retryDelay*2);}
+  }finally{busy=false;draw();}
+ }
+ retryButton.onclick=()=>{failed=false;errorCode='';stopListen?.();stopListen=listen();countVisit();draw();};
+ let lastUid='';onAuthStateChanged(auth,user=>{const uid=user?.uid||'';if(uid&&uid!==lastUid){counted=false;lastUid=uid;}else if(!uid){lastUid='';}if(user)countVisit();});
+ onValue(ref(db,'.info/connected'),s=>{if(s.val()===true)countVisit();});
  setInterval(draw,60000);
-}catch(_){failed=true;draw();}
-</script>
-<script type="module" id="business-annual-score-script">
-import {getDatabase,ref,get,set,onValue} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
-import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
-let entries=null,offset=0,readFailed=false;
-const label=document.getElementById('annualScoreLabel'),value=document.getElementById('annualScoreValue');
-function drawAnnual(){const en=document.documentElement.lang==='en';label.textContent=en?'Annual access':'اشتراكات السنة';label.title=en?'Active annual accounts indexed since this update; includes free grants.':'الحسابات السنوية السارية المسجلة في العداد منذ التحديث، وتشمل المنح.';const now=Date.now()+offset;value.textContent=entries===null||readFailed?'—':new Intl.NumberFormat(en?'en-US':'ar-SA').format(Object.values(entries).filter(expiry=>Number.isFinite(expiry)&&expiry>now).length);value.title=readFailed?(en?'Counter unavailable':'تعذر تحميل العداد'):label.title;}
-new MutationObserver(drawAnnual).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});drawAnnual();
-try{
- await window.businessCounterFirebaseReady;if(!window.firebaseApp)throw Error('Firebase unavailable');
- const db=getDatabase(window.firebaseApp,'https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app'),auth=getAuth(window.firebaseApp);
- onValue(ref(db,'.info/serverTimeOffset'),s=>{offset=Number(s.val())||0;drawAnnual();});
- onValue(ref(db,'publicAnnualAccess'),s=>{entries=s.val()||{};readFailed=false;drawAnnual();},()=>{readFailed=true;drawAnnual();});
- let generation=0,stops=[];
- onAuthStateChanged(auth,user=>{
-  const generationAtStart=++generation;stops.forEach(stop=>stop());stops=[];if(!user)return;
-  let grant=null,paid=null,grantReady=false,paidReady=false,running=false,pending=false;
-  async function sync(){
-   if(!grantReady||!paidReady||generationAtStart!==generation)return;
-   if(running){pending=true;return;}running=true;
-   try{
-    do{
-     pending=false;if(generationAtStart!==generation)return;
-     const expiry=Math.max(Number.isFinite(grant?.startedAt)?grant.startedAt+31536000000:0,paid?.active===true&&Number.isFinite(paid.expiresAt)?paid.expiresAt:0);
-     const privateRef=ref(db,'annualCounterKeys/'+user.uid);let key=(await get(privateRef)).val();
-     if(!key&&expiry>Date.now()+offset){
-      key=Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');
-      try{await set(privateRef,key);}catch(error){key=(await get(privateRef)).val();if(!key)throw error;}
-     }
-     if(key&&generationAtStart===generation)await set(ref(db,'publicAnnualAccess/'+key),expiry||null);
-    }while(pending);
-   }catch(_){console.warn('Annual counter sync unavailable; account access is unchanged.');}
-   finally{running=false;}
-  }
-  stops.push(onValue(ref(db,'siteReturnGrants/'+user.uid),s=>{grant=s.val();grantReady=true;sync();}));
-  stops.push(onValue(ref(db,'siteSubscriptions/'+user.uid),s=>{paid=s.val();paidReady=true;sync();}));
- });
- setInterval(drawAnnual,60000);
-}catch(_){readFailed=true;drawAnnual();}
+}catch(error){failed=true;errorCode=error?.message||'firebase';draw();}
 </script>
 <style id="emerald-crystal-recording-style">
 html body #emeraldMusicHost #emPanel .emBox{background-color:#081b2c!important;background-image:radial-gradient(ellipse at 15% 5%,#63f3cd55,transparent 42%),radial-gradient(ellipse at 95% 60%,#a88cff44,transparent 45%),repeating-conic-gradient(from 20deg at 50% 30%,#a7efff18 0deg 30deg,#06152b10 30deg 65deg,#8df6cd20 65deg 90deg)!important;border:1px solid #c0ffed99!important;box-shadow:inset 0 0 50px #50e6c320,0 0 35px #52edd330!important;}
@@ -11642,5 +11649,36 @@ html body #emCrystalSettings :focus-visible{outline:3px solid #ffe095;outline-of
  const observer=new MutationObserver(()=>{if(controller&&!controller.panel.isConnected){controller.close();controller=null;}install();});observer.observe(document.body,{childList:true,subtree:true});install();window.addEventListener('pagehide',()=>controller?.close());
 })();
 </script>
+
+<!-- =========================================================
+     SEA + BIRDS AMBIENCE — Web Audio, lightweight/no extra file
+     يبدأ بعد أول تفاعل للمستخدم بسبب سياسة المتصفحات
+     ========================================================= -->
+<button id="sakakerAmbientControl" type="button" aria-pressed="false" aria-label="تشغيل صوت البحر والطيور" title="صوت البحر والطيور">🌊🐦</button>
+<style id="sakaker-ambient-style">
+#sakakerAmbientControl{position:fixed!important;top:max(12px,env(safe-area-inset-top))!important;left:max(12px,env(safe-area-inset-left))!important;z-index:2147483647!important;width:46px!important;height:46px!important;border-radius:50%!important;border:1px solid #d8f8ffcc!important;background:#061923aa!important;color:#fff!important;font-size:20px!important;cursor:pointer!important;box-shadow:0 0 16px #7defff88,inset 0 0 12px #ffffff18!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);touch-action:manipulation;}
+#sakakerAmbientControl[aria-pressed="true"]{box-shadow:0 0 18px #7defff,0 0 30px #ffe89a66,inset 0 0 12px #ffffff25!important;}
+#sakakerAmbientControl:focus-visible{outline:3px solid #ffe08a;outline-offset:3px;}
+@media(max-width:600px){#sakakerAmbientControl{width:42px!important;height:42px!important;font-size:18px!important;}}
+</style>
+<script id="sakaker-ambient-audio">
+(()=>{'use strict';
+ const button=document.getElementById('sakakerAmbientControl');
+ let ctx=null,master=null,oceanSource=null,birdTimer=null,enabled=false,starting=false;
+ const saved=()=>{try{return localStorage.getItem('sakakerAmbient')!=='off'}catch(_){return true}};
+ function label(){const en=document.documentElement.lang==='en',text=enabled?(en?'Mute sea and birds':'كتم صوت البحر والطيور'):(en?'Play sea and birds':'تشغيل صوت البحر والطيور');button.setAttribute('aria-pressed',String(enabled));button.setAttribute('aria-label',text);button.title=text;button.textContent=enabled?'🌊🐦':'🔇';}
+ function noiseBuffer(){const length=ctx.sampleRate*4,b=ctx.createBuffer(1,length,ctx.sampleRate),d=b.getChannelData(0);let last=0;for(let i=0;i<length;i++){const white=Math.random()*2-1;last=last*.985+white*.015;d[i]=last*3.4;}return b;}
+ function chirp(){if(!enabled||!ctx||ctx.state!=='running')return;const now=ctx.currentTime,osc=ctx.createOscillator(),g=ctx.createGain(),pan=ctx.createStereoPanner?ctx.createStereoPanner():null;osc.type='sine';osc.frequency.setValueAtTime(1500+Math.random()*700,now);osc.frequency.exponentialRampToValueAtTime(2400+Math.random()*800,now+.08);osc.frequency.exponentialRampToValueAtTime(1750+Math.random()*500,now+.18);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.045,now+.025);g.gain.exponentialRampToValueAtTime(.0001,now+.22);if(pan){pan.pan.value=Math.random()*1.4-.7;osc.connect(g).connect(pan).connect(master);}else osc.connect(g).connect(master);osc.start(now);osc.stop(now+.24);}
+ function scheduleBird(){clearTimeout(birdTimer);if(!enabled)return;birdTimer=setTimeout(()=>{chirp();if(Math.random()>.45)setTimeout(chirp,160+Math.random()*260);scheduleBird();},4500+Math.random()*6500);}
+ async function start(){if(enabled||starting||!saved())return;starting=true;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();await ctx.resume();master=master||ctx.createGain();master.gain.value=.75;if(!master.__connected){master.connect(ctx.destination);master.__connected=true;}if(!oceanSource){const src=ctx.createBufferSource(),low=ctx.createBiquadFilter(),high=ctx.createBiquadFilter(),gain=ctx.createGain(),lfo=ctx.createOscillator(),depth=ctx.createGain();src.buffer=noiseBuffer();src.loop=true;low.type='lowpass';low.frequency.value=1200;high.type='highpass';high.frequency.value=55;gain.gain.value=.055;lfo.frequency.value=.075;depth.gain.value=.018;lfo.connect(depth).connect(gain.gain);src.connect(low).connect(high).connect(gain).connect(master);src.start();lfo.start();oceanSource=src;}enabled=true;scheduleBird();}catch(_){enabled=false;}finally{starting=false;label();}}
+ function stop(){enabled=false;clearTimeout(birdTimer);if(ctx&&ctx.state==='running')ctx.suspend().catch(()=>{});label();}
+ button.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();try{localStorage.setItem('sakakerAmbient',enabled?'off':'on')}catch(_){}if(enabled)stop();else await start();});
+ const removeUnlock=()=>{document.removeEventListener('pointerdown',unlock,true);document.removeEventListener('keydown',unlock,true);};
+ const unlock=e=>{if(e?.target===button)return;if(saved())start().finally(removeUnlock);else removeUnlock();};document.addEventListener('pointerdown',unlock,true);document.addEventListener('keydown',unlock,true);
+ document.addEventListener('visibilitychange',()=>{if(!ctx)return;if(document.hidden&&enabled)ctx.suspend().catch(()=>{});else if(!document.hidden&&enabled)ctx.resume().catch(()=>{});});
+ new MutationObserver(label).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});label();
+})();
+</script>
+
 </body>
 </html>
