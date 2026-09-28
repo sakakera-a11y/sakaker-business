@@ -547,6 +547,19 @@ html body #loginOverlay #loginPaypalInner form{
 #loginOverlay .member-separator{display:flex;align-items:center;gap:7px;margin:5px 0 2px;color:#d7efec;font-size:9px;}
 #loginOverlay .member-separator::before,#loginOverlay .member-separator::after{content:"";height:1px;background:rgba(255,255,255,.18);flex:1;}
 #loginOverlay .member-social-label{font-size:9px;color:#e5fffb;margin:2px 0 1px;}
+#loginOverlay .member-home{width:100%;display:grid;gap:7px;margin:2px 0 0;}
+#loginOverlay .member-home-title{font-size:13px;font-weight:800;color:#ffe36d;text-shadow:0 2px 5px #000,0 0 8px #000;}
+#loginOverlay .member-home-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+#loginOverlay .member-home-actions button{min-height:38px;border-radius:10px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;}
+#loginOverlay #memberOpenLogin{border:1px solid rgba(0,255,213,.72);background:rgba(0,62,56,.72);color:#eafffb;box-shadow:0 0 13px rgba(0,255,213,.20);}
+#loginOverlay #memberOpenSignup{border:1px solid rgba(255,227,109,.72);background:rgba(72,48,0,.56);color:#fff2a8;box-shadow:0 0 13px rgba(255,215,0,.16);}
+#loginOverlay #memberBackButton{width:100%;margin-top:5px;}
+#loginOverlay[data-auth-view="home"] :is(.login-logo,.login-title,.login-subtitle,#paypalGateStatus,#memberAuthBox,#loginError,.login-language,.login-footer,#loginPaymentSupport){display:none!important;}
+#loginOverlay:not([data-auth-view="home"]) #memberLanding{display:none!important;}
+#loginOverlay #memberTabs{display:none!important;}
+#loginOverlay[data-auth-view="signup"] :is(.login-logo,.login-title,.login-subtitle,#paypalGateStatus,.login-language,.login-footer,#loginPaymentSupport,#memberSocialArea){display:none!important;}
+#loginOverlay[data-auth-view="signup"] .login-shell{width:min(360px,92vw)!important;}
+#loginOverlay[data-auth-view="home"] .login-shell{width:min(330px,90vw)!important;}
 @media(max-width:600px){
  #loginOverlay .member-input{height:32px;font-size:11px;}
  #loginOverlay .member-action{min-height:32px;font-size:11px;}
@@ -554,12 +567,20 @@ html body #loginOverlay #loginPaypalInner form{
 }
 </style>
 
-<div id="loginOverlay" aria-modal="true" role="dialog">
+<div id="loginOverlay" data-auth-view="home" aria-modal="true" role="dialog">
   <div class="login-shell">
     <div class="login-logo">🎵</div>
     <h2 class="login-title" id="loginTitle">تجربة مجانية لمدة 24 ساعة</h2>
     <div class="login-subtitle" id="loginSubtitle">أهلاً بك في Sakaker Business<br>أنشئ عضويتك ببريد مؤكد لبدء يوم مجاني لمرة واحدة لكل حساب</div>
     <div id="paypalGateStatus" style="margin:6px 0 2px;color:#9fffe9;font-size:12px;">جارٍ تجهيز التحقق من الحساب…</div>
+
+    <div id="memberLanding" class="member-home">
+      <div id="memberLandingTitle" class="member-home-title">Sakaker Business</div>
+      <div class="member-home-actions">
+        <button id="memberOpenLogin" type="button">تسجيل الدخول</button>
+        <button id="memberOpenSignup" type="button">إنشاء حساب</button>
+      </div>
+    </div>
 
     <div id="memberAuthBox" class="member-auth-box">
       <div class="member-tabs" id="memberTabs">
@@ -598,6 +619,8 @@ html body #loginOverlay #loginPaypalInner form{
         <input id="memberProfileUsername" class="member-input username" type="text" autocomplete="username" minlength="3" maxlength="30" placeholder="اسم المستخدم">
         <button id="memberProfileSaveButton" class="member-action" type="button" style="margin-top:5px;width:100%;">حفظ اسم المستخدم</button>
       </div>
+
+      <button id="memberBackButton" class="member-secondary" type="button">الرجوع</button>
 
       <div id="memberSocialArea">
         <div class="member-separator"><span id="memberOrText">أو</span></div>
@@ -694,6 +717,7 @@ sendPasswordResetEmail,
 updateProfile,
 reload,
 getIdToken,
+getIdTokenResult,
 onAuthStateChanged,
 setPersistence,
 browserLocalPersistence,
@@ -881,6 +905,10 @@ refreshAccess();
    - Reserved names containing sakaker / abwalqmrzmrd are owner-only.
    ========================================================= */
 const OWNER_EMAIL='sakaker@sakaker.co';
+const memberLanding=document.getElementById('memberLanding');
+const memberOpenLogin=document.getElementById('memberOpenLogin');
+const memberOpenSignup=document.getElementById('memberOpenSignup');
+const memberBackButton=document.getElementById('memberBackButton');
 const memberLoginTab=document.getElementById('memberLoginTab');
 const memberSignupTab=document.getElementById('memberSignupTab');
 const memberLoginForm=document.getElementById('memberLoginForm');
@@ -910,8 +938,20 @@ let membershipBusy=false;
 let authFlowGeneration=0;
 let pendingProfileUser=null;
 let realtimeModulePromise=null;
+let resendCooldownUntil=0;
+const SOCIAL_PROVIDERS=new Set(['google.com','microsoft.com','facebook.com']);
 
 function memberIsEnglish(){return document.documentElement.lang==='en';}
+async function currentSignInProvider(user){
+  try{
+    const result=await getIdTokenResult(user,true);
+    return result?.signInProvider||result?.claims?.firebase?.sign_in_provider||'';
+  }catch(_){
+    return user?.providerData?.[0]?.providerId||'';
+  }
+}
+function isTrustedSocialProvider(provider){return SOCIAL_PROVIDERS.has(provider);}
+function requiresEmailVerification(provider){return provider==='password';}
 function memberMessage(ar,en,isError=true){
   error.dataset.system='1';
   error.style.color=isError?'#ffaaaa':'#aaffdf';
@@ -920,32 +960,40 @@ function memberMessage(ar,en,isError=true){
 function clearMemberMessage(){error.dataset.system='0';error.textContent='';error.style.color='#ff9b9b';}
 function setMemberBusy(value){
   membershipBusy=value;
-  [memberLoginButton,memberSignupButton,forgotPasswordButton,verifiedCheckButton,resendVerificationButton,memberProfileSaveButton].forEach(b=>{if(b)b.disabled=value;});
+  [memberOpenLogin,memberOpenSignup,memberBackButton,memberLoginButton,memberSignupButton,forgotPasswordButton,verifiedCheckButton,resendVerificationButton,memberProfileSaveButton].forEach(b=>{if(b)b.disabled=value;});
+}
+function setAuthView(view){overlay.dataset.authView=view;}
+function showMemberHome(){
+  pendingProfileUser=null;setAuthView('home');
+  memberLanding.hidden=false;document.getElementById('memberAuthBox').hidden=true;
+  memberVerifyBox.hidden=true;memberProfileBox.hidden=true;memberSocialArea.hidden=true;memberTabs.hidden=true;
+  memberLoginForm.hidden=true;memberSignupForm.hidden=true;memberBackButton.hidden=true;
+  clearMemberMessage();showLoginGate();
 }
 function setMemberMode(mode){
-  memberTabs.hidden=false;memberSocialArea.hidden=false;memberVerifyBox.hidden=true;memberProfileBox.hidden=true;
+  setAuthView(mode);memberLanding.hidden=true;document.getElementById('memberAuthBox').hidden=false;
+  memberTabs.hidden=true;memberVerifyBox.hidden=true;memberProfileBox.hidden=true;memberBackButton.hidden=false;
   memberLoginForm.hidden=mode!=='login';memberSignupForm.hidden=mode!=='signup';
-  memberLoginTab.classList.toggle('active',mode==='login');memberSignupTab.classList.toggle('active',mode==='signup');
-  clearMemberMessage();
+  memberSocialArea.hidden=mode!=='login';
+  clearMemberMessage();showLoginGate();
+  setTimeout(()=>{const target=mode==='login'?memberLoginEmail:memberSignupUsername;target?.focus();},0);
 }
 function showVerificationState(user){
-  showLoginGate();
-  memberTabs.hidden=true;memberLoginForm.hidden=true;memberSignupForm.hidden=true;memberSocialArea.hidden=true;memberProfileBox.hidden=true;memberVerifyBox.hidden=false;
+  showLoginGate();setAuthView('verify');memberLanding.hidden=true;document.getElementById('memberAuthBox').hidden=false;
+  memberTabs.hidden=true;memberLoginForm.hidden=true;memberSignupForm.hidden=true;memberSocialArea.hidden=true;memberProfileBox.hidden=true;memberBackButton.hidden=true;memberVerifyBox.hidden=false;
   const emailText=user?.email||'';
   document.getElementById('memberVerifyText').textContent=memberIsEnglish()
     ?`A verification link was sent to ${emailText}. The site stays locked until the link is confirmed.`
     :`أرسلنا رابط تحقق إلى ${emailText}. سيبقى الموقع مقفولًا حتى تضغط رابط التأكيد.`;
 }
 function showProfileState(user,suggested='',reason=''){
-  pendingProfileUser=user;showLoginGate();
-  memberTabs.hidden=true;memberLoginForm.hidden=true;memberSignupForm.hidden=true;memberSocialArea.hidden=true;memberVerifyBox.hidden=true;memberProfileBox.hidden=false;
+  pendingProfileUser=user;showLoginGate();setAuthView('profile');memberLanding.hidden=true;document.getElementById('memberAuthBox').hidden=false;
+  memberTabs.hidden=true;memberLoginForm.hidden=true;memberSignupForm.hidden=true;memberSocialArea.hidden=true;memberVerifyBox.hidden=true;memberBackButton.hidden=true;memberProfileBox.hidden=false;
   memberProfileUsername.value=suggested||'';
   document.getElementById('memberProfileText').textContent=reason||(memberIsEnglish()?'Choose a unique username to complete your membership.':'اختر اسم مستخدم فريدًا لإكمال عضويتك.');
   setTimeout(()=>memberProfileUsername.focus(),0);
 }
-function resetMemberGate(){
-  pendingProfileUser=null;memberVerifyBox.hidden=true;memberProfileBox.hidden=true;memberTabs.hidden=false;memberSocialArea.hidden=false;setMemberMode('login');
-}
+function resetMemberGate(){showMemberHome();}
 function normalizeUsername(value){return String(value||'').trim();}
 function usernameValidation(username,email){
   const name=normalizeUsername(username),lower=name.toLowerCase(),owner=String(email||'').toLowerCase()===OWNER_EMAIL;
@@ -1019,11 +1067,34 @@ async function processAuthenticatedUser(user){
   if(!user){await loadAccess(null);resetMemberGate();return;}
   try{
     await reload(user);
+    const signInProvider=await currentSignInProvider(user);
     await getIdToken(user,true);
     if(flow!==authFlowGeneration)return;
-    if(!user.email||user.emailVerified!==true){
+
+    if(!user.email){
+      await loadAccess(null);
+      setMemberMode('login');
+      memberMessage(
+        'لم يزوّد مزوّد تسجيل الدخول الموقع بعنوان بريد إلكتروني. استخدم حسابًا يحتوي بريدًا أو سجّل بالبريد وكلمة المرور.',
+        'The sign-in provider did not supply an email address. Use an account with an email address or sign in with email/password.'
+      );
+      return;
+    }
+
+    if(requiresEmailVerification(signInProvider)&&user.emailVerified!==true){
       await loadAccess(null);showVerificationState(user);return;
     }
+
+    if(signInProvider!=='password'&&!isTrustedSocialProvider(signInProvider)&&user.emailVerified!==true){
+      await loadAccess(null);
+      setMemberMode('login');
+      memberMessage(
+        'طريقة تسجيل الدخول هذه غير معتمدة للموقع. استخدم البريد المؤكد أو Google أو Microsoft أو Facebook.',
+        'This sign-in method is not approved. Use verified email/password, Google, Microsoft, or Facebook.'
+      );
+      return;
+    }
+
     const member=await ensureMemberProfile(user);
     if(flow!==authFlowGeneration)return;
     if(!member.ok){
@@ -1044,6 +1115,9 @@ async function processAuthenticatedUser(user){
 }
 window.sakakerRefreshMembership=()=>processAuthenticatedUser(auth.currentUser);
 
+memberOpenLogin.onclick=()=>setMemberMode('login');
+memberOpenSignup.onclick=()=>setMemberMode('signup');
+memberBackButton.onclick=()=>showMemberHome();
 memberLoginTab.onclick=()=>setMemberMode('login');
 memberSignupTab.onclick=()=>setMemberMode('signup');
 
@@ -1078,6 +1152,7 @@ memberSignupForm.addEventListener('submit',async event=>{
     const credential=await createUserWithEmailAndPassword(auth,email,password);
     await updateProfile(credential.user,{displayName:username});
     await sendEmailVerification(credential.user);
+    resendCooldownUntil=Date.now()+60000;
     showVerificationState(credential.user);
     memberMessage('تم إنشاء الحساب وإرسال رابط التحقق. افتح بريدك واضغط الرابط قبل الدخول.','Account created. Open the verification email and confirm the link before entering.',false);
   }catch(e){
@@ -1102,15 +1177,43 @@ forgotPasswordButton.onclick=async()=>{
   memberMessage('إذا كان البريد مسجلًا، فسيصلك رابط إعادة تعيين كلمة المرور.','If the address is registered, a password reset email will be sent.',false);
 };
 
-let resendCooldownUntil=0;
 resendVerificationButton.onclick=async()=>{
   const user=auth.currentUser;if(!user||membershipBusy)return;
+  const provider=await currentSignInProvider(user);
+  if(provider!=='password'){
+    memberMessage('إعادة رسالة التحقق مخصصة للحسابات المسجلة بالبريد وكلمة المرور فقط.','Verification email resend is only for email/password accounts.');
+    return;
+  }
+  if(user.emailVerified===true){
+    memberMessage('بريدك مؤكد بالفعل. اضغط "تحققت من بريدي" للمتابعة.','Your email is already verified. Press "I verified my email" to continue.',false);
+    return;
+  }
   const remaining=resendCooldownUntil-Date.now();
-  if(remaining>0){memberMessage('انتظر قليلًا قبل إعادة إرسال رابط آخر.','Please wait before sending another verification email.');return;}
-  setMemberBusy(true);
-  try{auth.languageCode=memberIsEnglish()?'en':'ar';await sendEmailVerification(user);resendCooldownUntil=Date.now()+30000;memberMessage('تم إرسال رابط تحقق جديد.','A new verification link was sent.',false);}
-  catch(e){memberMessage('تعذر إرسال الرابط الآن. حاول بعد قليل.','Could not send the link now. Try again shortly.');}
-  finally{setMemberBusy(false);}
+  if(remaining>0){
+    const seconds=Math.max(1,Math.ceil(remaining/1000));
+    memberMessage(`انتظر ${seconds} ثانية قبل إعادة الإرسال.`,`Wait ${seconds} seconds before resending.`);
+    return;
+  }
+  setMemberBusy(true);clearMemberMessage();
+  try{
+    auth.languageCode=memberIsEnglish()?'en':'ar';
+    await sendEmailVerification(user);
+    resendCooldownUntil=Date.now()+60000;
+    memberMessage('تم إرسال رابط تحقق جديد. افحص الوارد والرسائل غير المرغوب فيها.','A new verification link was sent. Check your inbox and spam folder.',false);
+  }catch(e){
+    const code=e?.code||'';
+    if(code==='auth/too-many-requests'){
+      resendCooldownUntil=Date.now()+120000;
+      memberMessage('تم طلب روابط كثيرة خلال وقت قصير. انتظر دقيقتين ثم أعد المحاولة.','Too many verification requests. Wait two minutes and try again.');
+    }else if(code==='auth/network-request-failed'){
+      memberMessage('تعذر الاتصال بخدمة Firebase. تحقق من الإنترنت ثم حاول مرة أخرى.','Could not reach Firebase. Check your connection and try again.');
+    }else if(code==='auth/requires-recent-login'){
+      memberMessage('يلزم تسجيل الدخول من جديد قبل إرسال رابط آخر. سجّل الخروج ثم ادخل مرة أخرى.','Please sign in again before requesting another verification email.');
+    }else{
+      console.warn('Verification resend failed',code,e);
+      memberMessage(`تعذر إرسال الرابط الآن${code?' ('+code+')':''}.`,`Could not send the link now${code?' ('+code+')':''}.`);
+    }
+  }finally{setMemberBusy(false);}
 };
 
 verifiedCheckButton.onclick=async()=>{
@@ -1118,7 +1221,8 @@ verifiedCheckButton.onclick=async()=>{
   try{
     const user=auth.currentUser;if(!user)throw new Error('no-user');
     await reload(user);await getIdToken(user,true);
-    if(!user.emailVerified){memberMessage('لم يتم تأكيد البريد بعد. اضغط رابط التحقق في بريدك ثم حاول مجددًا.','Email is not verified yet. Open the verification link, then try again.');return;}
+    const provider=await currentSignInProvider(user);
+    if(provider==='password'&&!user.emailVerified){memberMessage('لم يتم تأكيد البريد بعد. اضغط رابط التحقق في بريدك ثم حاول مجددًا.','Email is not verified yet. Open the verification link, then try again.');return;}
     await processAuthenticatedUser(user);
   }catch(e){memberMessage('تعذر تحديث حالة البريد. حاول مرة أخرى.','Could not refresh verification status. Try again.');}
   finally{setMemberBusy(false);}
@@ -1162,7 +1266,11 @@ async function socialSignIn(id){
  if(socialBusy)return;
  if(!/^https?:$/.test(location.protocol)){showSocialError('local');return;}
  socialBusy=true;socialButtons.forEach(button=>button.disabled=true);clearMemberMessage();
- try{auth.languageCode=memberIsEnglish()?'en':'ar';await signInWithPopup(auth,socialProviders[id]());}
+ try{
+   auth.languageCode=memberIsEnglish()?'en':'ar';
+   const result=await signInWithPopup(auth,socialProviders[id]());
+   if(result?.user)await processAuthenticatedUser(result.user);
+ }
  catch(e){showSocialError(e.code||'unknown');}
  finally{socialBusy=false;socialButtons.forEach(button=>button.disabled=false);}
 }
@@ -1186,18 +1294,19 @@ console.log("SAKAKER Firebase Ready — verified membership enabled");
     document.documentElement.lang=isAR?"ar":"en";document.documentElement.dir=isAR?"rtl":"ltr";document.body.dir=isAR?"rtl":"ltr";
     title.textContent=isAR?"تجربة مجانية لمدة 24 ساعة":"24-hour free trial";
     subtitle.innerHTML=isAR?"أهلاً بك في Sakaker Business<br>عضوية باسم مستخدم وبريد إلكتروني مؤكد":"Welcome to Sakaker Business<br>Membership with a username and verified email";
+    txt('memberLandingTitle','Sakaker Business');txt('memberOpenLogin',isAR?'تسجيل الدخول':'Sign in');txt('memberOpenSignup',isAR?'إنشاء حساب':'Create account');txt('memberBackButton',isAR?'الرجوع':'Back');
     txt('memberLoginTab',isAR?'تسجيل الدخول':'Sign in');txt('memberSignupTab',isAR?'إنشاء حساب':'Create account');
     ph('memberLoginEmail',isAR?'البريد الإلكتروني':'Email address');ph('memberLoginPassword',isAR?'كلمة المرور':'Password');
     txt('memberLoginButton',isAR?'دخول بالبريد':'Sign in with email');txt('forgotPasswordButton',isAR?'نسيت كلمة المرور؟':'Forgot password?');
     ph('memberSignupUsername',isAR?'اسم المستخدم':'Username');ph('memberSignupEmail',isAR?'البريد الإلكتروني الحقيقي':'Real email address');
     ph('memberSignupPassword',isAR?'كلمة المرور — 6 أحرف على الأقل':'Password — at least 6 characters');ph('memberSignupPassword2',isAR?'تأكيد كلمة المرور':'Confirm password');
-    txt('memberReservedHint',isAR?'يجب تأكيد البريد قبل فتح الموقع. الأسماء التي تحتوي sakaker أو abwalqmrzmrd محجوزة للمالك.':'Email must be verified before access. Names containing sakaker or abwalqmrzmrd are reserved for the owner.');
+    txt('memberReservedHint',isAR?'الحساب بالبريد وكلمة المرور يحتاج تأكيد البريد. Google وMicrosoft وFacebook لا تحتاج رسالة تحقق إضافية. الأسماء التي تحتوي sakaker أو abwalqmrzmrd محجوزة للمالك.':'Email/password accounts require email verification. Google, Microsoft, and Facebook do not need an extra verification email. Names containing sakaker or abwalqmrzmrd are reserved for the owner.');
     txt('memberSignupButton',isAR?'إنشاء الحساب وإرسال التحقق':'Create account and send verification');
     txt('memberVerifyTitle',isAR?'تحقق من بريدك الإلكتروني':'Verify your email');txt('verifiedCheckButton',isAR?'تحققت من بريدي':'I verified my email');txt('resendVerificationButton',isAR?'إعادة إرسال الرابط':'Resend link');
     txt('memberProfileTitle',isAR?'إكمال العضوية':'Complete membership');txt('memberProfileText',isAR?'اختر اسم مستخدم فريدًا لإكمال حسابك.':'Choose a unique username to complete your account.');ph('memberProfileUsername',isAR?'اسم المستخدم':'Username');txt('memberProfileSaveButton',isAR?'حفظ اسم المستخدم':'Save username');
     txt('memberOrText',isAR?'أو':'OR');txt('memberSocialLabel',isAR?'يمكنك أيضًا المتابعة بحساب موثوق':'You can also continue with a trusted account');
     txt('googleButton',isAR?'المتابعة باستخدام Google':'Continue with Google');txt('microsoftButton',isAR?'المتابعة باستخدام Microsoft':'Continue with Microsoft');txt('facebookButton',isAR?'المتابعة باستخدام Facebook':'Continue with Facebook');
-    footer.textContent=isAR?'بعد تأكيد البريد تبدأ التجربة المجانية لمدة 24 ساعة لمرة واحدة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل، دون تجديد تلقائي.':'After email verification, the one-time 24-hour trial starts. Then annual access is USD 3 for one year from activation, with no automatic renewal.';
+    footer.textContent=isAR?'لحساب البريد وكلمة المرور: يجب تأكيد البريد أولًا. أما Google وMicrosoft وFacebook فتُعتمد مصادقة المزود. بعد اكتمال العضوية تبدأ التجربة المجانية لمدة 24 ساعة لمرة واحدة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل، دون تجديد تلقائي.':'Email/password accounts must verify the email first. Google, Microsoft, and Facebook use provider authentication. After membership is complete, the one-time 24-hour trial starts; then annual access is USD 3 for one year from activation with no automatic renewal.';
     txt('loginPaymentSupportText',isAR?'إذا لم تتمكن من متابعة الدخول بعد الاشتراك، تواصل عبر البريد الإلكتروني مع رقم العملية ومعرّف حسابك: ':'If you cannot continue signing in after subscribing, email your transaction reference and account ID to: ');
     txt('loginPaypalTitleText',isAR?'الاشتراك السنوي — 3 دولارات أمريكية عبر PayPal':'Annual access — USD 3 via PayPal');
     txt('logoutButton',isAR?'خروج':'Sign out');
