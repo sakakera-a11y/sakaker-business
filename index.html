@@ -1026,6 +1026,7 @@ async function createMemberProfile(user,rawUsername){
   await getIdToken(user,true);
   const {rt,rtdb}=await getMemberRTDB();
   const usernameKey=username.toLowerCase();
+  const profileEmail=typeof user.email==='string'?user.email:'';
   const usernameRef=rt.ref(rtdb,'usernames/'+usernameKey);
   const profileRef=rt.ref(rtdb,'users/'+user.uid);
   const occupied=await rt.get(usernameRef);
@@ -1036,9 +1037,9 @@ async function createMemberProfile(user,rawUsername){
     reservedNow=true;
   }
   try{
-    await rt.set(profileRef,{username,usernameKey,email:user.email,joinedAt:rt.serverTimestamp(),status:'active'});
+    await rt.set(profileRef,{username,usernameKey,email:profileEmail,joinedAt:rt.serverTimestamp(),status:'active'});
     if(user.displayName!==username)await updateProfile(user,{displayName:username});
-    return {ok:true,profile:{username,usernameKey,email:user.email,status:'active'}};
+    return {ok:true,profile:{username,usernameKey,email:profileEmail,status:'active'}};
   }catch(e){
     if(reservedNow){try{await rt.remove(usernameRef);}catch(_){}}
     throw e;
@@ -1071,12 +1072,22 @@ async function processAuthenticatedUser(user){
     await getIdToken(user,true);
     if(flow!==authFlowGeneration)return;
 
-    if(!user.email){
+    if(!user.email && signInProvider==='password'){
       await loadAccess(null);
       setMemberMode('login');
       memberMessage(
-        'لم يزوّد مزوّد تسجيل الدخول الموقع بعنوان بريد إلكتروني. استخدم حسابًا يحتوي بريدًا أو سجّل بالبريد وكلمة المرور.',
-        'The sign-in provider did not supply an email address. Use an account with an email address or sign in with email/password.'
+        'تعذر قراءة بريد حساب البريد وكلمة المرور. سجّل الخروج ثم أعد الدخول بالبريد.',
+        'The email/password account email could not be read. Sign out and sign in again with email/password.'
+      );
+      return;
+    }
+
+    if(!user.email && !isTrustedSocialProvider(signInProvider)){
+      await loadAccess(null);
+      setMemberMode('login');
+      memberMessage(
+        'طريقة تسجيل الدخول هذه لم ترسل بريدًا وليست ضمن المزوّدات المعتمدة.',
+        'This sign-in method supplied no email and is not an approved provider.'
       );
       return;
     }
@@ -1266,6 +1277,7 @@ function buildMicrosoftProvider(){
   const provider=new OAuthProvider('microsoft.com');
   provider.addScope('email');
   provider.addScope('profile');
+  provider.addScope('User.Read');
   provider.setCustomParameters({prompt:'select_account',tenant:'common'});
   return provider;
 }
@@ -1341,7 +1353,7 @@ console.log("SAKAKER Firebase Ready — verified membership enabled");
     txt('memberProfileTitle',isAR?'إكمال العضوية':'Complete membership');txt('memberProfileText',isAR?'اختر اسم مستخدم فريدًا لإكمال حسابك.':'Choose a unique username to complete your account.');ph('memberProfileUsername',isAR?'اسم المستخدم':'Username');txt('memberProfileSaveButton',isAR?'حفظ اسم المستخدم':'Save username');
     txt('memberOrText',isAR?'أو':'OR');txt('memberSocialLabel',isAR?'يمكنك أيضًا المتابعة بحساب موثوق':'You can also continue with a trusted account');
     txt('googleButton',isAR?'المتابعة باستخدام Google':'Continue with Google');txt('microsoftButton',isAR?'المتابعة باستخدام Microsoft':'Continue with Microsoft');txt('facebookButton',isAR?'المتابعة باستخدام Facebook':'Continue with Facebook');
-    footer.textContent=isAR?'لحساب البريد وكلمة المرور: يجب تأكيد البريد أولًا. أما Google وMicrosoft وFacebook فتُعتمد مصادقة المزود. بعد اكتمال العضوية تبدأ التجربة المجانية لمدة 24 ساعة لمرة واحدة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل، دون تجديد تلقائي.':'Email/password accounts must verify the email first. Google, Microsoft, and Facebook use provider authentication. After membership is complete, the one-time 24-hour trial starts; then annual access is USD 3 for one year from activation with no automatic renewal.';
+    footer.textContent=isAR?'لحساب البريد وكلمة المرور: يجب تأكيد البريد أولًا. أما Google وMicrosoft وFacebook فيعتمد الموقع نجاح التوثيق من المزوّد نفسه حتى إن لم يرسل بريدًا فتُعتمد مصادقة المزود. بعد اكتمال العضوية تبدأ التجربة المجانية لمدة 24 ساعة لمرة واحدة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل، دون تجديد تلقائي.':'Email/password accounts must verify the email first. Google, Microsoft, and Facebook use provider authentication. After membership is complete, the one-time 24-hour trial starts; then annual access is USD 3 for one year from activation with no automatic renewal.';
     txt('loginPaymentSupportText',isAR?'إذا لم تتمكن من متابعة الدخول بعد الاشتراك، تواصل عبر البريد الإلكتروني مع رقم العملية ومعرّف حسابك: ':'If you cannot continue signing in after subscribing, email your transaction reference and account ID to: ');
     txt('loginPaypalTitleText',isAR?'الاشتراك السنوي — 3 دولارات أمريكية عبر PayPal':'Annual access — USD 3 via PayPal');
     txt('logoutButton',isAR?'خروج':'Sign out');
