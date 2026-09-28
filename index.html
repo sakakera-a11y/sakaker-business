@@ -513,16 +513,100 @@ html body #loginOverlay #loginPaypalInner form{
 }
 </style>
 
+<!-- ===== Sakaker Business verified membership UI ===== -->
+<style id="sakaker-membership-ui">
+#loginOverlay .member-auth-box{width:100%;margin:4px 0 2px;box-sizing:border-box;}
+#loginOverlay .member-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:3px 0 5px;}
+#loginOverlay .member-tabs button,
+#loginOverlay .member-action,
+#loginOverlay .member-secondary,
+#loginOverlay .member-link{
+  font-family:inherit;cursor:pointer;border-radius:9px;box-sizing:border-box;
+}
+#loginOverlay .member-tabs button{min-height:30px;border:1px solid rgba(0,255,213,.42);background:rgba(0,0,0,.22);color:#fff;font-size:11px;}
+#loginOverlay .member-tabs button.active{background:rgba(0,255,213,.18);border-color:#00ffd5;color:#bffff4;box-shadow:0 0 10px rgba(0,255,213,.18);}
+#loginOverlay .member-form{display:grid;gap:4px;}
+#loginOverlay .member-form[hidden],#loginOverlay .member-state[hidden],#loginOverlay .member-separator[hidden]{display:none!important;}
+#loginOverlay .member-input{
+  width:100%;height:34px;box-sizing:border-box;padding:6px 10px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.22);outline:none;background:rgba(0,0,0,.34);color:#fff;
+  font:11.5px/1.2 Tajawal,Tahoma,Arial,sans-serif;direction:ltr;text-align:left;
+  box-shadow:inset 0 0 10px rgba(0,0,0,.18);
+}
+#loginOverlay .member-input:focus{border-color:#00ffd5;box-shadow:0 0 10px rgba(0,255,213,.18);}
+#loginOverlay .member-input.username{direction:auto;text-align:start;}
+#loginOverlay .member-action{min-height:34px;border:0;background:linear-gradient(90deg,#00ffd5,#16c79a);color:#001510;font-size:11.5px;font-weight:800;padding:7px 9px;}
+#loginOverlay .member-secondary{min-height:32px;border:1px solid rgba(255,227,109,.58);background:rgba(0,0,0,.24);color:#ffe36d;font-size:10.5px;padding:6px 8px;}
+#loginOverlay .member-link{border:0;background:transparent;color:#bfffee;text-decoration:underline;font-size:10px;padding:3px 5px;min-height:24px;}
+#loginOverlay .member-action:disabled,#loginOverlay .member-secondary:disabled,#loginOverlay .member-link:disabled{opacity:.55;cursor:wait;}
+#loginOverlay .member-hint{font-size:9.5px;line-height:1.4;color:#dffbf5;margin:1px 0 2px;text-shadow:0 1px 3px #000;}
+#loginOverlay .member-state{padding:7px;border:1px solid rgba(255,227,109,.45);border-radius:10px;background:rgba(0,0,0,.28);margin:4px 0;}
+#loginOverlay .member-state-title{font-size:11.5px;font-weight:800;color:#ffe36d;margin-bottom:4px;}
+#loginOverlay .member-state-text{font-size:10px;line-height:1.5;color:#fff;margin-bottom:5px;}
+#loginOverlay .member-state-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+#loginOverlay .member-separator{display:flex;align-items:center;gap:7px;margin:5px 0 2px;color:#d7efec;font-size:9px;}
+#loginOverlay .member-separator::before,#loginOverlay .member-separator::after{content:"";height:1px;background:rgba(255,255,255,.18);flex:1;}
+#loginOverlay .member-social-label{font-size:9px;color:#e5fffb;margin:2px 0 1px;}
+@media(max-width:600px){
+ #loginOverlay .member-input{height:32px;font-size:11px;}
+ #loginOverlay .member-action{min-height:32px;font-size:11px;}
+ #loginOverlay .member-tabs button{min-height:28px;font-size:10.5px;}
+}
+</style>
+
 <div id="loginOverlay" aria-modal="true" role="dialog">
   <div class="login-shell">
     <div class="login-logo">🎵</div>
     <h2 class="login-title" id="loginTitle">تجربة مجانية لمدة 24 ساعة</h2>
-    <div class="login-subtitle" id="loginSubtitle">أهلاً بك في Sakaker Business<br>سجّل الدخول لبدء يوم مجاني لمرة واحدة لكل حساب</div>
+    <div class="login-subtitle" id="loginSubtitle">أهلاً بك في Sakaker Business<br>أنشئ عضويتك ببريد مؤكد لبدء يوم مجاني لمرة واحدة لكل حساب</div>
     <div id="paypalGateStatus" style="margin:6px 0 2px;color:#9fffe9;font-size:12px;">جارٍ تجهيز التحقق من الحساب…</div>
 
-    <button id="googleButton" class="login-google" type="button" disabled>المتابعة باستخدام Google</button>
-    <button id="microsoftButton" type="button" disabled>المتابعة باستخدام Microsoft</button>
-    <button id="facebookButton" type="button" disabled>المتابعة باستخدام Facebook</button>
+    <div id="memberAuthBox" class="member-auth-box">
+      <div class="member-tabs" id="memberTabs">
+        <button id="memberLoginTab" class="active" type="button">تسجيل الدخول</button>
+        <button id="memberSignupTab" type="button">إنشاء حساب</button>
+      </div>
+
+      <form id="memberLoginForm" class="member-form" novalidate>
+        <input id="memberLoginEmail" class="member-input" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="البريد الإلكتروني" required>
+        <input id="memberLoginPassword" class="member-input" type="password" autocomplete="current-password" minlength="6" maxlength="128" placeholder="كلمة المرور" required>
+        <button id="memberLoginButton" class="member-action" type="submit">دخول بالبريد</button>
+        <button id="forgotPasswordButton" class="member-link" type="button">نسيت كلمة المرور؟</button>
+      </form>
+
+      <form id="memberSignupForm" class="member-form" novalidate hidden>
+        <input id="memberSignupUsername" class="member-input username" type="text" autocomplete="username" minlength="3" maxlength="30" placeholder="اسم المستخدم" required>
+        <input id="memberSignupEmail" class="member-input" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="البريد الإلكتروني الحقيقي" required>
+        <input id="memberSignupPassword" class="member-input" type="password" autocomplete="new-password" minlength="6" maxlength="128" placeholder="كلمة المرور — 6 أحرف على الأقل" required>
+        <input id="memberSignupPassword2" class="member-input" type="password" autocomplete="new-password" minlength="6" maxlength="128" placeholder="تأكيد كلمة المرور" required>
+        <div id="memberReservedHint" class="member-hint">يجب تأكيد البريد قبل فتح الموقع. الأسماء التي تحتوي sakaker أو abwalqmrzmrd محجوزة للمالك.</div>
+        <button id="memberSignupButton" class="member-action" type="submit">إنشاء الحساب وإرسال التحقق</button>
+      </form>
+
+      <div id="memberVerifyBox" class="member-state" hidden>
+        <div id="memberVerifyTitle" class="member-state-title">تحقق من بريدك الإلكتروني</div>
+        <div id="memberVerifyText" class="member-state-text">أرسلنا رابط تحقق إلى بريدك. لن يفتح الموقع قبل الضغط على الرابط.</div>
+        <div class="member-state-actions">
+          <button id="verifiedCheckButton" class="member-action" type="button">تحققت من بريدي</button>
+          <button id="resendVerificationButton" class="member-secondary" type="button">إعادة إرسال الرابط</button>
+        </div>
+      </div>
+
+      <div id="memberProfileBox" class="member-state" hidden>
+        <div id="memberProfileTitle" class="member-state-title">إكمال العضوية</div>
+        <div id="memberProfileText" class="member-state-text">اختر اسم مستخدم فريدًا لإكمال حسابك.</div>
+        <input id="memberProfileUsername" class="member-input username" type="text" autocomplete="username" minlength="3" maxlength="30" placeholder="اسم المستخدم">
+        <button id="memberProfileSaveButton" class="member-action" type="button" style="margin-top:5px;width:100%;">حفظ اسم المستخدم</button>
+      </div>
+
+      <div id="memberSocialArea">
+        <div class="member-separator"><span id="memberOrText">أو</span></div>
+        <div id="memberSocialLabel" class="member-social-label">يمكنك أيضًا المتابعة بحساب موثوق</div>
+        <button id="googleButton" class="login-google" type="button" disabled>المتابعة باستخدام Google</button>
+        <button id="microsoftButton" type="button" disabled>المتابعة باستخدام Microsoft</button>
+        <button id="facebookButton" type="button" disabled>المتابعة باستخدام Facebook</button>
+      </div>
+    </div>
 
     <div id="loginError" role="alert"></div>
 
@@ -603,6 +687,13 @@ GoogleAuthProvider,
 OAuthProvider,
 FacebookAuthProvider,
 signInWithPopup,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+sendEmailVerification,
+sendPasswordResetEmail,
+updateProfile,
+reload,
+getIdToken,
 onAuthStateChanged,
 setPersistence,
 browserLocalPersistence,
@@ -775,106 +866,345 @@ async function loadAccess(user){
   accessStops.push(rt.onValue(rt.ref(db,'siteSubscriptions/'+user.uid),snap=>{if(token!==accessGeneration)return;accessPaid=snap.val();paidLoaded=true;ready();},fail));
  }catch(e){if(token!==accessGeneration)return;accessFailed=true;accessReady=false;refreshAccess();console.warn('Account access could not be verified.');}
 }
-accessRetry.onclick=()=>loadAccess(auth.currentUser);
+accessRetry.onclick=()=>window.sakakerRefreshMembership?.();
 new MutationObserver(refreshAccess).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadAccess(auth.currentUser);});
-window.addEventListener('pageshow',event=>{if(event.persisted)loadAccess(auth.currentUser);});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)window.sakakerRefreshMembership?.();});
+window.addEventListener('pageshow',()=>{window.sakakerRefreshMembership?.();});
 // A return URL is navigation, never proof of payment. No localStorage access grants.
 try{const url=new URL(location.href);if(url.searchParams.has('paypal')){url.searchParams.delete('paypal');history.replaceState({},document.title,url.pathname+url.search+url.hash);}}catch(_){}
 refreshAccess();
 
-/* Social sign-in only. Provider secrets belong in Firebase, never in HTML. */
+/* =========================================================
+   SAKAKER BUSINESS MEMBERSHIP
+   - Email/password accounts must verify the email before access.
+   - Every verified account must own a unique username in RTDB.
+   - Reserved names containing sakaker / abwalqmrzmrd are owner-only.
+   ========================================================= */
+const OWNER_EMAIL='sakaker@sakaker.co';
+const memberLoginTab=document.getElementById('memberLoginTab');
+const memberSignupTab=document.getElementById('memberSignupTab');
+const memberLoginForm=document.getElementById('memberLoginForm');
+const memberSignupForm=document.getElementById('memberSignupForm');
+const memberVerifyBox=document.getElementById('memberVerifyBox');
+const memberProfileBox=document.getElementById('memberProfileBox');
+const memberSocialArea=document.getElementById('memberSocialArea');
+const memberTabs=document.getElementById('memberTabs');
+const memberLoginEmail=document.getElementById('memberLoginEmail');
+const memberLoginPassword=document.getElementById('memberLoginPassword');
+const memberSignupUsername=document.getElementById('memberSignupUsername');
+const memberSignupEmail=document.getElementById('memberSignupEmail');
+const memberSignupPassword=document.getElementById('memberSignupPassword');
+const memberSignupPassword2=document.getElementById('memberSignupPassword2');
+const memberProfileUsername=document.getElementById('memberProfileUsername');
+const memberLoginButton=document.getElementById('memberLoginButton');
+const memberSignupButton=document.getElementById('memberSignupButton');
+const forgotPasswordButton=document.getElementById('forgotPasswordButton');
+const verifiedCheckButton=document.getElementById('verifiedCheckButton');
+const resendVerificationButton=document.getElementById('resendVerificationButton');
+const memberProfileSaveButton=document.getElementById('memberProfileSaveButton');
+const userProfile=document.getElementById('userProfile');
+const userNameLabel=document.getElementById('userName');
+const userPhoto=document.getElementById('userPhoto');
+
+let membershipBusy=false;
+let authFlowGeneration=0;
+let pendingProfileUser=null;
+let realtimeModulePromise=null;
+
+function memberIsEnglish(){return document.documentElement.lang==='en';}
+function memberMessage(ar,en,isError=true){
+  error.dataset.system='1';
+  error.style.color=isError?'#ffaaaa':'#aaffdf';
+  error.textContent=memberIsEnglish()?en:ar;
+}
+function clearMemberMessage(){error.dataset.system='0';error.textContent='';error.style.color='#ff9b9b';}
+function setMemberBusy(value){
+  membershipBusy=value;
+  [memberLoginButton,memberSignupButton,forgotPasswordButton,verifiedCheckButton,resendVerificationButton,memberProfileSaveButton].forEach(b=>{if(b)b.disabled=value;});
+}
+function setMemberMode(mode){
+  memberTabs.hidden=false;memberSocialArea.hidden=false;memberVerifyBox.hidden=true;memberProfileBox.hidden=true;
+  memberLoginForm.hidden=mode!=='login';memberSignupForm.hidden=mode!=='signup';
+  memberLoginTab.classList.toggle('active',mode==='login');memberSignupTab.classList.toggle('active',mode==='signup');
+  clearMemberMessage();
+}
+function showVerificationState(user){
+  showLoginGate();
+  memberTabs.hidden=true;memberLoginForm.hidden=true;memberSignupForm.hidden=true;memberSocialArea.hidden=true;memberProfileBox.hidden=true;memberVerifyBox.hidden=false;
+  const emailText=user?.email||'';
+  document.getElementById('memberVerifyText').textContent=memberIsEnglish()
+    ?`A verification link was sent to ${emailText}. The site stays locked until the link is confirmed.`
+    :`أرسلنا رابط تحقق إلى ${emailText}. سيبقى الموقع مقفولًا حتى تضغط رابط التأكيد.`;
+}
+function showProfileState(user,suggested='',reason=''){
+  pendingProfileUser=user;showLoginGate();
+  memberTabs.hidden=true;memberLoginForm.hidden=true;memberSignupForm.hidden=true;memberSocialArea.hidden=true;memberVerifyBox.hidden=true;memberProfileBox.hidden=false;
+  memberProfileUsername.value=suggested||'';
+  document.getElementById('memberProfileText').textContent=reason||(memberIsEnglish()?'Choose a unique username to complete your membership.':'اختر اسم مستخدم فريدًا لإكمال عضويتك.');
+  setTimeout(()=>memberProfileUsername.focus(),0);
+}
+function resetMemberGate(){
+  pendingProfileUser=null;memberVerifyBox.hidden=true;memberProfileBox.hidden=true;memberTabs.hidden=false;memberSocialArea.hidden=false;setMemberMode('login');
+}
+function normalizeUsername(value){return String(value||'').trim();}
+function usernameValidation(username,email){
+  const name=normalizeUsername(username),lower=name.toLowerCase(),owner=String(email||'').toLowerCase()===OWNER_EMAIL;
+  if(name.length<3||name.length>30)return 'length';
+  if(/[.#$\[\]\/]/.test(name))return 'chars';
+  if(!owner&&(lower.includes('sakaker')||lower.includes('abwalqmrzmrd')))return 'reserved';
+  return '';
+}
+function usernameErrorText(code){
+  const en=memberIsEnglish();
+  return ({
+    length:en?'Username must be 3–30 characters.':'اسم المستخدم يجب أن يكون من 3 إلى 30 حرفًا.',
+    chars:en?'Username cannot contain . # $ [ ] or /.':'اسم المستخدم لا يمكن أن يحتوي على . أو # أو $ أو [ ] أو /.',
+    reserved:en?'This name is reserved for the Sakaker owner.':'هذا الاسم محجوز لمالك Sakaker فقط.',
+    taken:en?'This username is already in use. Choose another.':'اسم المستخدم مستخدم بالفعل. اختر اسمًا آخر.'
+  })[code]||(en?'Choose another username.':'اختر اسم مستخدم آخر.');
+}
+async function getRealtimeModule(){
+  if(!realtimeModulePromise)realtimeModulePromise=import('https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js');
+  return realtimeModulePromise;
+}
+async function getMemberRTDB(){
+  const rt=await getRealtimeModule();
+  const rtdb=window.firebaseRTDB||rt.getDatabase(app,'https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app');
+  window.firebaseRTDB=rtdb;return {rt,rtdb};
+}
+async function createMemberProfile(user,rawUsername){
+  const username=normalizeUsername(rawUsername),problem=usernameValidation(username,user.email);
+  if(problem)return {ok:false,reason:problem};
+  await getIdToken(user,true);
+  const {rt,rtdb}=await getMemberRTDB();
+  const usernameKey=username.toLowerCase();
+  const usernameRef=rt.ref(rtdb,'usernames/'+usernameKey);
+  const profileRef=rt.ref(rtdb,'users/'+user.uid);
+  const occupied=await rt.get(usernameRef);
+  if(occupied.exists()&&occupied.val()!==user.uid)return {ok:false,reason:'taken'};
+  let reservedNow=false;
+  if(!occupied.exists()){
+    await rt.set(usernameRef,user.uid);
+    reservedNow=true;
+  }
+  try{
+    await rt.set(profileRef,{username,usernameKey,email:user.email,joinedAt:rt.serverTimestamp(),status:'active'});
+    if(user.displayName!==username)await updateProfile(user,{displayName:username});
+    return {ok:true,profile:{username,usernameKey,email:user.email,status:'active'}};
+  }catch(e){
+    if(reservedNow){try{await rt.remove(usernameRef);}catch(_){}}
+    throw e;
+  }
+}
+async function ensureMemberProfile(user){
+  await getIdToken(user,true);
+  const {rt,rtdb}=await getMemberRTDB();
+  const profileRef=rt.ref(rtdb,'users/'+user.uid);
+  const snap=await rt.get(profileRef);
+  if(snap.exists())return {ok:true,profile:snap.val()};
+  const suggested=normalizeUsername(user.displayName||'');
+  if(!suggested)return {ok:false,needsName:true,suggested:''};
+  const created=await createMemberProfile(user,suggested);
+  if(created.ok)return created;
+  return {ok:false,needsName:true,suggested,reason:created.reason};
+}
+function showSignedInProfile(user,profile){
+  userProfile.style.display='flex';
+  userNameLabel.textContent=profile?.username||user.displayName||user.email||'User';
+  userPhoto.src=user.photoURL||'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+}
+async function processAuthenticatedUser(user){
+  const flow=++authFlowGeneration;
+  showLoginGate();userProfile.style.display='none';
+  if(!user){await loadAccess(null);resetMemberGate();return;}
+  try{
+    await reload(user);
+    await getIdToken(user,true);
+    if(flow!==authFlowGeneration)return;
+    if(!user.email||user.emailVerified!==true){
+      await loadAccess(null);showVerificationState(user);return;
+    }
+    const member=await ensureMemberProfile(user);
+    if(flow!==authFlowGeneration)return;
+    if(!member.ok){
+      await loadAccess(null);
+      const reason=member.reason?usernameErrorText(member.reason):'';
+      showProfileState(user,member.suggested||user.displayName||'',reason);return;
+    }
+    pendingProfileUser=null;memberProfileBox.hidden=true;memberVerifyBox.hidden=true;
+    showSignedInProfile(user,member.profile);
+    await loadAccess(user);
+  }catch(e){
+    if(flow!==authFlowGeneration)return;
+    await loadAccess(null);
+    showLoginGate();
+    console.warn('Membership verification failed',e?.code||e);
+    memberMessage('تعذر التحقق من العضوية. تحقق من الاتصال أو أعد تسجيل الدخول.','Could not verify membership. Check your connection or sign in again.');
+  }
+}
+window.sakakerRefreshMembership=()=>processAuthenticatedUser(auth.currentUser);
+
+memberLoginTab.onclick=()=>setMemberMode('login');
+memberSignupTab.onclick=()=>setMemberMode('signup');
+
+memberLoginForm.addEventListener('submit',async event=>{
+  event.preventDefault();if(membershipBusy)return;
+  const email=memberLoginEmail.value.trim(),password=memberLoginPassword.value;
+  if(!email||!password){memberMessage('أدخل البريد وكلمة المرور.','Enter your email and password.');return;}
+  setMemberBusy(true);clearMemberMessage();
+  try{auth.languageCode=memberIsEnglish()?'en':'ar';await signInWithEmailAndPassword(auth,email,password);}
+  catch(e){
+    const code=e?.code||'';
+    const msg=code==='auth/invalid-credential'||code==='auth/user-not-found'||code==='auth/wrong-password'
+      ?['البريد أو كلمة المرور غير صحيحة.','Email or password is incorrect.']
+      :code==='auth/too-many-requests'?['محاولات كثيرة. حاول لاحقًا.','Too many attempts. Try again later.']
+      :code==='auth/operation-not-allowed'?['فعّل Email/Password من Firebase Authentication أولًا.','Enable Email/Password in Firebase Authentication first.']
+      :['تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.','Could not sign in. Check your details and try again.'];
+    memberMessage(msg[0],msg[1]);
+  }finally{setMemberBusy(false);}
+});
+
+memberSignupForm.addEventListener('submit',async event=>{
+  event.preventDefault();if(membershipBusy)return;
+  const username=normalizeUsername(memberSignupUsername.value),email=memberSignupEmail.value.trim(),password=memberSignupPassword.value,confirm=memberSignupPassword2.value;
+  const problem=usernameValidation(username,email);
+  if(problem){memberMessage(usernameErrorText(problem),usernameErrorText(problem));return;}
+  if(!email){memberMessage('أدخل بريدًا إلكترونيًا صحيحًا.','Enter a valid email address.');return;}
+  if(password.length<6){memberMessage('كلمة المرور يجب أن تكون 6 أحرف على الأقل.','Password must be at least 6 characters.');return;}
+  if(password!==confirm){memberMessage('كلمتا المرور غير متطابقتين.','Passwords do not match.');return;}
+  setMemberBusy(true);clearMemberMessage();
+  try{
+    auth.languageCode=memberIsEnglish()?'en':'ar';
+    const credential=await createUserWithEmailAndPassword(auth,email,password);
+    await updateProfile(credential.user,{displayName:username});
+    await sendEmailVerification(credential.user);
+    showVerificationState(credential.user);
+    memberMessage('تم إنشاء الحساب وإرسال رابط التحقق. افتح بريدك واضغط الرابط قبل الدخول.','Account created. Open the verification email and confirm the link before entering.',false);
+  }catch(e){
+    const code=e?.code||'';
+    const msg=code==='auth/email-already-in-use'?['هذا البريد مسجل بالفعل. استخدم تسجيل الدخول أو استعادة كلمة المرور.','This email is already registered. Sign in or reset your password.']
+      :code==='auth/invalid-email'?['صيغة البريد الإلكتروني غير صحيحة.','Invalid email address.']
+      :code==='auth/weak-password'?['اختر كلمة مرور أقوى.','Choose a stronger password.']
+      :code==='auth/operation-not-allowed'?['فعّل Email/Password من Firebase Authentication أولًا.','Enable Email/Password in Firebase Authentication first.']
+      :['تعذر إنشاء الحساب. حاول مرة أخرى.','Could not create the account. Try again.'];
+    memberMessage(msg[0],msg[1]);
+  }finally{setMemberBusy(false);}
+});
+
+forgotPasswordButton.onclick=async()=>{
+  if(membershipBusy)return;
+  const email=memberLoginEmail.value.trim()||memberSignupEmail.value.trim();
+  if(!email){memberMessage('اكتب بريدك في خانة البريد أولًا.','Enter your email address first.');return;}
+  setMemberBusy(true);
+  try{auth.languageCode=memberIsEnglish()?'en':'ar';await sendPasswordResetEmail(auth,email);}
+  catch(e){if(e?.code==='auth/invalid-email'){setMemberBusy(false);memberMessage('صيغة البريد غير صحيحة.','Invalid email address.');return;}}
+  setMemberBusy(false);
+  memberMessage('إذا كان البريد مسجلًا، فسيصلك رابط إعادة تعيين كلمة المرور.','If the address is registered, a password reset email will be sent.',false);
+};
+
+let resendCooldownUntil=0;
+resendVerificationButton.onclick=async()=>{
+  const user=auth.currentUser;if(!user||membershipBusy)return;
+  const remaining=resendCooldownUntil-Date.now();
+  if(remaining>0){memberMessage('انتظر قليلًا قبل إعادة إرسال رابط آخر.','Please wait before sending another verification email.');return;}
+  setMemberBusy(true);
+  try{auth.languageCode=memberIsEnglish()?'en':'ar';await sendEmailVerification(user);resendCooldownUntil=Date.now()+30000;memberMessage('تم إرسال رابط تحقق جديد.','A new verification link was sent.',false);}
+  catch(e){memberMessage('تعذر إرسال الرابط الآن. حاول بعد قليل.','Could not send the link now. Try again shortly.');}
+  finally{setMemberBusy(false);}
+};
+
+verifiedCheckButton.onclick=async()=>{
+  if(membershipBusy)return;setMemberBusy(true);clearMemberMessage();
+  try{
+    const user=auth.currentUser;if(!user)throw new Error('no-user');
+    await reload(user);await getIdToken(user,true);
+    if(!user.emailVerified){memberMessage('لم يتم تأكيد البريد بعد. اضغط رابط التحقق في بريدك ثم حاول مجددًا.','Email is not verified yet. Open the verification link, then try again.');return;}
+    await processAuthenticatedUser(user);
+  }catch(e){memberMessage('تعذر تحديث حالة البريد. حاول مرة أخرى.','Could not refresh verification status. Try again.');}
+  finally{setMemberBusy(false);}
+};
+
+memberProfileSaveButton.onclick=async()=>{
+  if(membershipBusy)return;
+  const user=pendingProfileUser||auth.currentUser;if(!user)return;
+  const username=normalizeUsername(memberProfileUsername.value),problem=usernameValidation(username,user.email);
+  if(problem){memberMessage(usernameErrorText(problem),usernameErrorText(problem));return;}
+  setMemberBusy(true);clearMemberMessage();
+  try{
+    const result=await createMemberProfile(user,username);
+    if(!result.ok){memberMessage(usernameErrorText(result.reason),usernameErrorText(result.reason));return;}
+    pendingProfileUser=null;showSignedInProfile(user,result.profile);await loadAccess(user);
+  }catch(e){
+    if(e?.code==='PERMISSION_DENIED')memberMessage('تعذر حفظ اسم المستخدم. تأكد أن البريد مؤكد وأن قواعد Firebase منشورة.','Could not save the username. Make sure the email is verified and Firebase Rules are published.');
+    else memberMessage('تعذر إكمال العضوية الآن. حاول مرة أخرى.','Could not complete membership. Try again.');
+  }finally{setMemberBusy(false);}
+};
+
+/* Social sign-in remains available as an optional verified provider. */
 const socialButtons=['googleButton','microsoftButton','facebookButton'].map(id=>document.getElementById(id));
 const socialProviders={googleButton:()=>new GoogleAuthProvider(),microsoftButton:()=>new OAuthProvider('microsoft.com'),facebookButton:()=>new FacebookAuthProvider()};
 let socialBusy=false,socialErrorCode='';
 function showSocialError(code){
  socialErrorCode=code;
- const en=document.documentElement.lang==='en';
+ const en=memberIsEnglish();
  const messages={
   local:en?'Open the published HTTPS site to sign in. Local file previews cannot complete this login.':'افتح رابط الموقع المنشور عبر HTTPS لتسجيل الدخول؛ معاينة الملف المحلي لا تدعم إكمال هذا الدخول.',
-  'auth/operation-not-allowed':en?'This sign-in provider is not enabled yet. Try another option or contact site support.':'لم يتم تفعيل مزوّد الدخول هذا بعد. جرّب خيارًا آخر أو تواصل مع دعم الموقع.',
+  'auth/operation-not-allowed':en?'This sign-in provider is not enabled yet.':'لم يتم تفعيل مزوّد الدخول هذا بعد.',
   'auth/unauthorized-domain':en?'This website domain must be authorized in Firebase.':'يجب إضافة نطاق هذا الموقع إلى النطاقات المسموحة في Firebase.',
   'auth/popup-blocked':en?'Allow the sign-in popup, then try again.':'اسمح بفتح نافذة تسجيل الدخول ثم أعد المحاولة.',
-  'auth/popup-closed-by-user':en?'Sign-in was cancelled. Choose a provider to try again.':'أُلغيت عملية الدخول. اختر المزوّد للمحاولة مجددًا.',
-  'auth/account-exists-with-different-credential':en?'Use the provider already linked to your account to keep your trial and subscription. Contact support if needed.':'استخدم مزوّد الدخول المرتبط بحسابك للحفاظ على تجربتك واشتراكك، أو تواصل مع الدعم.',
+  'auth/popup-closed-by-user':en?'Sign-in was cancelled.':'أُلغيت عملية تسجيل الدخول.',
+  'auth/account-exists-with-different-credential':en?'Use the sign-in method already linked to this email.':'استخدم طريقة الدخول المرتبطة بهذا البريد مسبقًا.',
   'auth/network-request-failed':en?'Could not connect. Check your internet and retry.':'تعذر الاتصال. تحقق من الإنترنت وأعد المحاولة.'
  };
- error.dataset.system='1';error.textContent=code?(messages[code]||(en?'Sign-in failed. Try another provider or contact support.':'تعذر تسجيل الدخول. جرّب مزوّدًا آخر أو تواصل مع الدعم.')):'';
+ memberMessage(messages[code]||(en?'Sign-in failed. Try again.':'تعذر تسجيل الدخول. حاول مرة أخرى.'),messages[code]||(en?'Sign-in failed. Try again.':'تعذر تسجيل الدخول. حاول مرة أخرى.'));
 }
 async function socialSignIn(id){
  if(socialBusy)return;
  if(!/^https?:$/.test(location.protocol)){showSocialError('local');return;}
- socialBusy=true;socialButtons.forEach(button=>button.disabled=true);showSocialError('');
- try{auth.languageCode=document.documentElement.lang==='en'?'en':'ar';await signInWithPopup(auth,socialProviders[id]());}
+ socialBusy=true;socialButtons.forEach(button=>button.disabled=true);clearMemberMessage();
+ try{auth.languageCode=memberIsEnglish()?'en':'ar';await signInWithPopup(auth,socialProviders[id]());}
  catch(e){showSocialError(e.code||'unknown');}
  finally{socialBusy=false;socialButtons.forEach(button=>button.disabled=false);}
 }
 socialButtons.forEach(button=>{button.onclick=()=>socialSignIn(button.id);button.disabled=false;});
-new MutationObserver(()=>{if(socialErrorCode)showSocialError(socialErrorCode);}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 
+onAuthStateChanged(auth,user=>{processAuthenticatedUser(user);});
 
+document.getElementById('logoutButton').onclick=async()=>{await signOut(auth);};
 
-
-
-/* مراقبة الدخول */
-
-onAuthStateChanged(auth,async(user)=>{
-  if(user){
-    document.getElementById("userProfile").style.display="flex";
-    document.getElementById("userName").textContent = user.displayName || user.email || "User";
-    document.getElementById("userPhoto").src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-  }else{
-    document.getElementById("userProfile").style.display="none";
-  }
-
-  await loadAccess(user);
-});
-
-/* خروج */
-
-document.getElementById("logoutButton").onclick=async()=>{
-
-await signOut(auth);
-
-};
-
-
-
-console.log("SAKAKER Firebase Ready");
+console.log("SAKAKER Firebase Ready — verified membership enabled");
 
 </script>
   <script>
 (function(){
-  const ar=document.getElementById("langAR");
-  const en=document.getElementById("langEN");
-  const title=document.getElementById("loginTitle");
-  const subtitle=document.getElementById("loginSubtitle");
-  const google=document.getElementById("googleButton");
-  const microsoft=document.getElementById("microsoftButton");
-  const facebook=document.getElementById("facebookButton");
-  const footer=document.getElementById("loginFooter");
-  const err=document.getElementById("loginError");
-
+  const ar=document.getElementById("langAR"),en=document.getElementById("langEN");
+  const title=document.getElementById("loginTitle"),subtitle=document.getElementById("loginSubtitle"),footer=document.getElementById("loginFooter"),err=document.getElementById("loginError");
+  function txt(id,value){const el=document.getElementById(id);if(el)el.textContent=value;}
+  function ph(id,value){const el=document.getElementById(id);if(el)el.placeholder=value;}
   function setLang(lang){
     const isAR=lang!=="en";
-    document.documentElement.lang=isAR?"ar":"en";
-    document.documentElement.dir=isAR?"rtl":"ltr";
-    document.body.dir=isAR?"rtl":"ltr";
+    document.documentElement.lang=isAR?"ar":"en";document.documentElement.dir=isAR?"rtl":"ltr";document.body.dir=isAR?"rtl":"ltr";
     title.textContent=isAR?"تجربة مجانية لمدة 24 ساعة":"24-hour free trial";
-    subtitle.innerHTML=isAR?"أهلاً بك في Sakaker Business<br>سجّل الدخول لبدء يوم مجاني لمرة واحدة لكل حساب":"Welcome to Sakaker Business<br>Sign in for one free day per account";
-    google.textContent=isAR?"المتابعة باستخدام Google":"Continue with Google";
-    microsoft.textContent=isAR?"المتابعة باستخدام Microsoft":"Continue with Microsoft";
-    facebook.textContent=isAR?"المتابعة باستخدام Facebook":"Continue with Facebook";
-    footer.textContent=isAR?"بعد التجربة: اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من تاريخ التفعيل، دون تجديد تلقائي.":"After the trial: USD 3 for one year from activation, with no automatic renewal.";
-    document.getElementById('loginPaymentSupportText').textContent=isAR?'إذا لم تتمكن من متابعة الدخول بعد الاشتراك، تواصل عبر البريد الإلكتروني مع رقم العملية ومعرّف حسابك: ':'If you cannot continue signing in after subscribing, email your transaction reference and account ID to: ';
-    document.getElementById('loginPaypalTitleText').textContent=isAR?'الاشتراك السنوي — 3 دولارات أمريكية عبر PayPal':'Annual access — USD 3 via PayPal';
-    ar.classList.toggle("active",isAR); en.classList.toggle("active",!isAR);
-    if(err.dataset.system!="1") err.textContent="";
+    subtitle.innerHTML=isAR?"أهلاً بك في Sakaker Business<br>عضوية باسم مستخدم وبريد إلكتروني مؤكد":"Welcome to Sakaker Business<br>Membership with a username and verified email";
+    txt('memberLoginTab',isAR?'تسجيل الدخول':'Sign in');txt('memberSignupTab',isAR?'إنشاء حساب':'Create account');
+    ph('memberLoginEmail',isAR?'البريد الإلكتروني':'Email address');ph('memberLoginPassword',isAR?'كلمة المرور':'Password');
+    txt('memberLoginButton',isAR?'دخول بالبريد':'Sign in with email');txt('forgotPasswordButton',isAR?'نسيت كلمة المرور؟':'Forgot password?');
+    ph('memberSignupUsername',isAR?'اسم المستخدم':'Username');ph('memberSignupEmail',isAR?'البريد الإلكتروني الحقيقي':'Real email address');
+    ph('memberSignupPassword',isAR?'كلمة المرور — 6 أحرف على الأقل':'Password — at least 6 characters');ph('memberSignupPassword2',isAR?'تأكيد كلمة المرور':'Confirm password');
+    txt('memberReservedHint',isAR?'يجب تأكيد البريد قبل فتح الموقع. الأسماء التي تحتوي sakaker أو abwalqmrzmrd محجوزة للمالك.':'Email must be verified before access. Names containing sakaker or abwalqmrzmrd are reserved for the owner.');
+    txt('memberSignupButton',isAR?'إنشاء الحساب وإرسال التحقق':'Create account and send verification');
+    txt('memberVerifyTitle',isAR?'تحقق من بريدك الإلكتروني':'Verify your email');txt('verifiedCheckButton',isAR?'تحققت من بريدي':'I verified my email');txt('resendVerificationButton',isAR?'إعادة إرسال الرابط':'Resend link');
+    txt('memberProfileTitle',isAR?'إكمال العضوية':'Complete membership');txt('memberProfileText',isAR?'اختر اسم مستخدم فريدًا لإكمال حسابك.':'Choose a unique username to complete your account.');ph('memberProfileUsername',isAR?'اسم المستخدم':'Username');txt('memberProfileSaveButton',isAR?'حفظ اسم المستخدم':'Save username');
+    txt('memberOrText',isAR?'أو':'OR');txt('memberSocialLabel',isAR?'يمكنك أيضًا المتابعة بحساب موثوق':'You can also continue with a trusted account');
+    txt('googleButton',isAR?'المتابعة باستخدام Google':'Continue with Google');txt('microsoftButton',isAR?'المتابعة باستخدام Microsoft':'Continue with Microsoft');txt('facebookButton',isAR?'المتابعة باستخدام Facebook':'Continue with Facebook');
+    footer.textContent=isAR?'بعد تأكيد البريد تبدأ التجربة المجانية لمدة 24 ساعة لمرة واحدة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل، دون تجديد تلقائي.':'After email verification, the one-time 24-hour trial starts. Then annual access is USD 3 for one year from activation, with no automatic renewal.';
+    txt('loginPaymentSupportText',isAR?'إذا لم تتمكن من متابعة الدخول بعد الاشتراك، تواصل عبر البريد الإلكتروني مع رقم العملية ومعرّف حسابك: ':'If you cannot continue signing in after subscribing, email your transaction reference and account ID to: ');
+    txt('loginPaypalTitleText',isAR?'الاشتراك السنوي — 3 دولارات أمريكية عبر PayPal':'Annual access — USD 3 via PayPal');
+    txt('logoutButton',isAR?'خروج':'Sign out');
+    ar.classList.toggle("active",isAR);en.classList.toggle("active",!isAR);
+    if(err.dataset.system!="1")err.textContent="";
   }
-  ar.onclick=()=>setLang("ar");
-  en.onclick=()=>setLang("en");
-  window.sakakerLoginLanguage={setLang};
-  setLang("ar");
+  ar.onclick=()=>setLang("ar");en.onclick=()=>setLang("en");window.sakakerLoginLanguage={setLang};setLang("ar");
 })();
 </script>
 
