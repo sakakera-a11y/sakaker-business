@@ -798,19 +798,10 @@ const error=document.getElementById("loginError");
 
 /* =========================================================
    بوابة التجربة والاشتراك: الوقت من Firebase، وسجل الاشتراك يكتبه المالك.
-   رابط العودة من PayPal ليس إثبات دفع ولا يمنح صلاحية الدخول.
+   لا توجد روابط تمنح دخولًا مجانيًا. أي ?access=... يتم تجاهله وحذفه من الرابط.
 ========================================================= */
 /* One server-recorded 24-hour trial per Firebase UID. Paid access is admin-owned. */
 const TRIAL_MS=86400000;
-// Owner-authorized free access, NOT PayPal payment verification.
-// رابط المنحة access=return صالح لمدة 30 يومًا من تاريخ إنشاء الحملة.
-// تاريخ إنشاء الرابط: 2026-09-26T02:12:00+03:00
-// انتهاء الرابط: 2026-10-26T02:12:00+03:00
-const RETURN_GRANT_MS=30*86400000;
-const RETURN_LINK_CREATED_AT=1790377920000;
-const RETURN_LINK_EXPIRES_AT=RETURN_LINK_CREATED_AT+RETURN_GRANT_MS;
-let returnGrantRequested=new URL(location.href).searchParams.get('access')==='return';
-let accessGrant=null;
 let accessGeneration=0,accessStops=[],accessTimer=null,accessUser=null;
 let accessTrial=null,accessPaid=null,accessReady=false,accessConnected=false,accessFailed=false;
 let accessClock={server:0,monotonic:0},accessClockReady=false;
@@ -829,19 +820,13 @@ function showLoginGate(){if(overlay.style.display!=='flex')overlay.style.display
 function openSiteAfterPayment(){if(overlay.style.display!=='none')overlay.style.display='none';if(document.body.classList.contains('locked'))document.body.classList.remove('locked');}
 function refreshAccess(){
  const en=document.documentElement.lang==='en',now=accessNow();
- const grantValid=Number.isFinite(accessGrant?.startedAt)&&accessGrant.startedAt<=now&&now<accessGrant.startedAt+RETURN_GRANT_MS;
- const returnLinkValid=now>=RETURN_LINK_CREATED_AT&&now<RETURN_LINK_EXPIRES_AT;
  const result=accessDecision(accessUser,accessReady,accessConnected,accessClockReady,accessTrial,accessPaid,now);
- if(accessUser&&accessReady&&accessConnected&&accessClockReady&&grantValid&&result.kind!=='paid'){result.kind='paid';result.until=accessGrant.startedAt+RETURN_GRANT_MS;result.freeGrant=true;}
- if(accessUser&&accessReady&&accessConnected&&accessClockReady&&!returnLinkValid&&returnGrantRequested){returnGrantRequested=false;}
  const unlocked=result.kind==='paid'||result.kind==='trial';
  if(unlocked)openSiteAfterPayment();else showLoginGate();
  const status=document.getElementById('paypalGateStatus');
  if(accessFailed)status.textContent=en?'Access could not be verified. Check your connection and try again.':'تعذر التحقق من صلاحية الدخول. تحقق من الاتصال ثم أعد المحاولة.';
  else status.textContent=({login:en?'Sign in to start your one-time 24-hour free trial.':'سجّل الدخول لبدء تجربتك المجانية لمرة واحدة لمدة 24 ساعة.',checking:en?'Verifying account access…':'جارٍ التحقق من صلاحية الحساب…',paid:en?'Verified subscription active.':'الاشتراك الموثق نشط.',trial:en?'Your free trial is active.':'تجربتك المجانية نشطة.',expired:en?'Your free trial has ended. A verified subscription is required.':'انتهت التجربة المجانية. يلزم اشتراك موثّق للمتابعة.'})[result.kind];
  accessAccount.textContent=accessUser?(en?'Account ID for subscription support: ':'معرّف الحساب لدعم الاشتراك: ')+accessUser.uid:'';
- if(result.freeGrant)status.textContent=en?'Free return-link access is active for 30 days (not a payment confirmation).':'منحة رابط الرجوع نشطة لمدة 30 يومًا (وليست تأكيدًا للدفع).';
- if(accessUser&&accessReady&&accessConnected&&accessClockReady&&!returnLinkValid&&!grantValid&&accessGrant?.startedAt)status.textContent=en?'The return-link grant has expired. A verified subscription is required.':'انتهت منحة رابط الرجوع. يلزم اشتراك موثّق للمتابعة.';
  accessRetry.textContent=en?'Check access again':'إعادة التحقق من الدخول';accessRetry.hidden=!accessUser||unlocked;
  accessBanner.hidden=result.kind!=='trial';
  if(result.kind==='trial'){const seconds=Math.max(0,Math.ceil((result.until-now)/1000)),h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),s=seconds%60;accessBanner.textContent=(en?'Free trial: ':'التجربة المجانية: ')+[h,m,s].map(n=>String(n).padStart(2,'0')).join(':');}
@@ -850,7 +835,7 @@ function refreshAccess(){
 }
 function stopAccess(){accessGeneration++;accessStops.forEach(stop=>stop());accessStops=[];clearTimeout(accessTimer);accessTrial=accessPaid=null;accessReady=accessConnected=accessClockReady=false;accessFailed=false;}
 async function loadAccess(user){
- stopAccess();accessGrant=null;accessUser=user;refreshAccess();if(!user)return;
+ stopAccess();accessUser=user;refreshAccess();if(!user)return;
  const token=accessGeneration;
  try{
   const rt=await import('https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js');
@@ -866,26 +851,8 @@ async function loadAccess(user){
    catch(error){const existing=await rt.get(trialRef);if(!existing.exists())throw error;}
   }
   if(token!==accessGeneration)return;
-  const grantRef=rt.ref(db,'siteReturnGrants/'+user.uid);
-  if(returnGrantRequested){
-   // لا يمكن إنشاء منحة جديدة بعد انتهاء صلاحية الرابط.
-   const now=accessClockReady?accessNow():Date.now();
-   if(now>=RETURN_LINK_CREATED_AT&&now<RETURN_LINK_EXPIRES_AT){
-    const previous=await rt.get(grantRef);
-    // إنشاء المنحة مرة واحدة فقط للحساب؛ وجود السجل يمنع تمديدها بإعادة فتح الرابط.
-    if(!previous.exists()){
-     try{await rt.set(grantRef,{startedAt:rt.serverTimestamp(),linkCreatedAt:RETURN_LINK_CREATED_AT,linkExpiresAt:RETURN_LINK_EXPIRES_AT});}
-     catch(error){if(!(await rt.get(grantRef)).exists())throw error;}
-    }
-   }
-   if(token!==accessGeneration)return;
-   returnGrantRequested=false;
-   const url=new URL(location.href);url.searchParams.delete('access');history.replaceState({},document.title,url.pathname+url.search+url.hash);
-  }
-  if(token!==accessGeneration)return;
-  let trialLoaded=false,paidLoaded=false,grantLoaded=false;
-  const ready=()=>{accessReady=trialLoaded&&paidLoaded&&grantLoaded;accessFailed=false;refreshAccess();};
-  accessStops.push(rt.onValue(grantRef,snap=>{if(token!==accessGeneration)return;accessGrant=snap.val();grantLoaded=true;ready();},fail));
+  let trialLoaded=false,paidLoaded=false;
+  const ready=()=>{accessReady=trialLoaded&&paidLoaded;accessFailed=false;refreshAccess();};
   accessStops.push(rt.onValue(trialRef,snap=>{if(token!==accessGeneration)return;accessTrial=snap.val();trialLoaded=true;ready();},fail));
   accessStops.push(rt.onValue(rt.ref(db,'siteSubscriptions/'+user.uid),snap=>{if(token!==accessGeneration)return;accessPaid=snap.val();paidLoaded=true;ready();},fail));
  }catch(e){if(token!==accessGeneration)return;accessFailed=true;accessReady=false;refreshAccess();console.warn('Account access could not be verified.');}
@@ -894,8 +861,14 @@ accessRetry.onclick=()=>window.sakakerRefreshMembership?.();
 new MutationObserver(refreshAccess).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)window.sakakerRefreshMembership?.();});
 window.addEventListener('pageshow',()=>{window.sakakerRefreshMembership?.();});
-// A return URL is navigation, never proof of payment. No localStorage access grants.
-try{const url=new URL(location.href);if(url.searchParams.has('paypal')){url.searchParams.delete('paypal');history.replaceState({},document.title,url.pathname+url.search+url.hash);}}catch(_){}
+// Query-string parameters never grant access. Remove legacy/free-access markers from the address bar.
+try{
+ const url=new URL(location.href);
+ let changed=false;
+ if(url.searchParams.has('access')){url.searchParams.delete('access');changed=true;}
+ if(url.searchParams.has('paypal')){url.searchParams.delete('paypal');changed=true;}
+ if(changed)history.replaceState({},document.title,url.pathname+url.search+url.hash);
+}catch(_){}
 refreshAccess();
 
 /* =========================================================
