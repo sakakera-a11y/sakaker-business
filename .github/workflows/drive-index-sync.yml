@@ -1,0 +1,85 @@
+name: Sync index.html from Google Drive
+
+on:
+  workflow_dispatch:
+    inputs:
+      drive_file_id:
+        description: "Google Drive file ID (optional; otherwise uses .github/drive-index-source.txt)"
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - '.github/drive-index-source.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: drive-index-sync-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  sync-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Resolve Google Drive file ID
+        shell: bash
+        env:
+          MANUAL_ID: ${{ github.event.inputs.drive_file_id || '' }}
+        run: |
+          set -euo pipefail
+          ID="${MANUAL_ID:-}"
+          if [ -z "$ID" ] && [ -f .github/drive-index-source.txt ]; then
+            ID="$(grep -vE '^[[:space:]]*(#|$)' .github/drive-index-source.txt | head -n1 | tr -d '[:space:]' || true)"
+          fi
+          if [ -z "$ID" ]; then
+            echo 'No Drive file ID configured; nothing to sync.'
+            echo 'SKIP_SYNC=1' >> "$GITHUB_ENV"
+            exit 0
+          fi
+          if ! [[ "$ID" =~ ^[A-Za-z0-9_-]{10,}$ ]]; then
+            echo 'Invalid Google Drive file ID.'
+            exit 1
+          fi
+          echo "DRIVE_FILE_ID=$ID" >> "$GITHUB_ENV"
+          echo 'SKIP_SYNC=0' >> "$GITHUB_ENV"
+
+      - name: Download and validate index.html
+        if: env.SKIP_SYNC != '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://drive.google.com/uc?export=download&id=${DRIVE_FILE_ID}"
+          curl -L --fail --retry 3 --retry-delay 2 "$URL" -o index.html.new
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html.new')
+          data = p.read_bytes()
+          if len(data) < 100:
+              raise SystemExit('Downloaded file is unexpectedly small')
+          text = data.decode('utf-8', errors='ignore').lower()
+          if '<html' not in text or '</html>' not in text:
+              raise SystemExit('Downloaded file does not look like a complete HTML document')
+          PY
+          mv index.html.new index.html
+
+      - name: Commit index.html only
+        if: env.SKIP_SYNC != '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'index.html is already current.'
+            exit 0
+          fi
+          git commit -m 'Sync index.html from Google Drive'
+          git push origin HEAD:main
