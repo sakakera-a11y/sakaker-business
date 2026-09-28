@@ -592,7 +592,7 @@ html body #loginOverlay #loginPaypalInner form{
         <input id="memberLoginEmail" class="member-input" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="البريد الإلكتروني" required>
         <input id="memberLoginPassword" class="member-input" type="password" autocomplete="current-password" minlength="6" maxlength="128" placeholder="كلمة المرور" required>
         <button id="memberLoginButton" class="member-action" type="submit">دخول بالبريد</button>
-        <button id="forgotPasswordButton" class="member-link" type="button">نسيت كلمة المرور؟</button>
+        <button id="forgotPasswordButton" class="member-link" type="button">نسيت كلمة مرور حساب البريد؟</button>
       </form>
 
       <form id="memberSignupForm" class="member-form" novalidate hidden>
@@ -1169,12 +1169,23 @@ memberSignupForm.addEventListener('submit',async event=>{
 forgotPasswordButton.onclick=async()=>{
   if(membershipBusy)return;
   const email=memberLoginEmail.value.trim()||memberSignupEmail.value.trim();
-  if(!email){memberMessage('اكتب بريدك في خانة البريد أولًا.','Enter your email address first.');return;}
-  setMemberBusy(true);
-  try{auth.languageCode=memberIsEnglish()?'en':'ar';await sendPasswordResetEmail(auth,email);}
-  catch(e){if(e?.code==='auth/invalid-email'){setMemberBusy(false);memberMessage('صيغة البريد غير صحيحة.','Invalid email address.');return;}}
-  setMemberBusy(false);
-  memberMessage('إذا كان البريد مسجلًا، فسيصلك رابط إعادة تعيين كلمة المرور.','If the address is registered, a password reset email will be sent.',false);
+  if(!email){memberMessage('اكتب بريد حساب البريد وكلمة المرور في خانة البريد أولًا.','Enter the email for your email/password account first.');return;}
+  setMemberBusy(true);clearMemberMessage();
+  try{
+    auth.languageCode=memberIsEnglish()?'en':'ar';
+    await sendPasswordResetEmail(auth,email);
+    memberMessage('إذا كان هذا البريد مسجلًا بحساب بريد وكلمة مرور، فسيصلك رابط إعادة التعيين. حسابات Google وMicrosoft وFacebook تستعيد كلمة المرور من مزودها نفسه.','If this address is registered with email/password, a reset link will be sent. Google, Microsoft and Facebook passwords are reset with those providers.',false);
+  }catch(e){
+    const code=e?.code||'';
+    const msg=code==='auth/invalid-email'?['صيغة البريد غير صحيحة.','Invalid email address.']
+      :code==='auth/operation-not-allowed'?['تسجيل Email/Password غير مفعّل في Firebase Authentication. فعّله أولًا.','Email/Password sign-in is not enabled in Firebase Authentication. Enable it first.']
+      :code==='auth/too-many-requests'?['تم إرسال طلبات كثيرة. انتظر قليلًا ثم حاول مرة أخرى.','Too many reset requests. Wait a little and try again.']
+      :code==='auth/network-request-failed'?['تعذر الاتصال بخدمة Firebase. تحقق من الإنترنت ثم حاول مجددًا.','Could not reach Firebase. Check your connection and try again.']
+      :code==='auth/unauthorized-continue-uri'?['نطاق business.sakaker.co غير مضاف ضمن النطاقات المسموحة في Firebase Authentication.','business.sakaker.co is not authorized in Firebase Authentication.']
+      :code==='auth/invalid-continue-uri'?['رابط الرجوع لاستعادة كلمة المرور غير صحيح.','The password-reset continue URL is invalid.']
+      :['تعذر إرسال رابط الاستعادة الآن. رمز الخطأ: '+(code||'unknown'),'Could not send the reset link. Error: '+(code||'unknown')];
+    memberMessage(msg[0],msg[1]);
+  }finally{setMemberBusy(false);}
 };
 
 resendVerificationButton.onclick=async()=>{
@@ -1246,21 +1257,45 @@ memberProfileSaveButton.onclick=async()=>{
 
 /* Social sign-in remains available as an optional verified provider. */
 const socialButtons=['googleButton','microsoftButton','facebookButton'].map(id=>document.getElementById(id));
-const socialProviders={googleButton:()=>new GoogleAuthProvider(),microsoftButton:()=>new OAuthProvider('microsoft.com'),facebookButton:()=>new FacebookAuthProvider()};
+function buildGoogleProvider(){
+  const provider=new GoogleAuthProvider();
+  provider.setCustomParameters({prompt:'select_account'});
+  return provider;
+}
+function buildMicrosoftProvider(){
+  const provider=new OAuthProvider('microsoft.com');
+  provider.addScope('email');
+  provider.addScope('profile');
+  provider.setCustomParameters({prompt:'select_account',tenant:'common'});
+  return provider;
+}
+function buildFacebookProvider(){
+  const provider=new FacebookAuthProvider();
+  provider.addScope('email');
+  provider.setCustomParameters({display:'popup'});
+  return provider;
+}
+const socialProviders={googleButton:buildGoogleProvider,microsoftButton:buildMicrosoftProvider,facebookButton:buildFacebookProvider};
 let socialBusy=false,socialErrorCode='';
-function showSocialError(code){
+function showSocialError(code,id=''){
  socialErrorCode=code;
  const en=memberIsEnglish();
+ const providerName=id==='microsoftButton'?'Microsoft':id==='facebookButton'?'Facebook':id==='googleButton'?'Google':'provider';
  const messages={
   local:en?'Open the published HTTPS site to sign in. Local file previews cannot complete this login.':'افتح رابط الموقع المنشور عبر HTTPS لتسجيل الدخول؛ معاينة الملف المحلي لا تدعم إكمال هذا الدخول.',
-  'auth/operation-not-allowed':en?'This sign-in provider is not enabled yet.':'لم يتم تفعيل مزوّد الدخول هذا بعد.',
-  'auth/unauthorized-domain':en?'This website domain must be authorized in Firebase.':'يجب إضافة نطاق هذا الموقع إلى النطاقات المسموحة في Firebase.',
+  'auth/operation-not-allowed':en?`${providerName} sign-in is not enabled/configured in Firebase Authentication.`:`تسجيل ${providerName} غير مفعّل أو غير مكتمل الإعداد في Firebase Authentication.`,
+  'auth/unauthorized-domain':en?'This website domain must be authorized in Firebase Authentication.':'يجب إضافة business.sakaker.co إلى النطاقات المسموحة في Firebase Authentication.',
   'auth/popup-blocked':en?'Allow the sign-in popup, then try again.':'اسمح بفتح نافذة تسجيل الدخول ثم أعد المحاولة.',
   'auth/popup-closed-by-user':en?'Sign-in was cancelled.':'أُلغيت عملية تسجيل الدخول.',
-  'auth/account-exists-with-different-credential':en?'Use the sign-in method already linked to this email.':'استخدم طريقة الدخول المرتبطة بهذا البريد مسبقًا.',
-  'auth/network-request-failed':en?'Could not connect. Check your internet and retry.':'تعذر الاتصال. تحقق من الإنترنت وأعد المحاولة.'
+  'auth/account-exists-with-different-credential':en?'This email already belongs to an account created with another provider. Sign in using the original provider.':'هذا البريد مرتبط مسبقًا بطريقة دخول أخرى. سجّل الدخول بالمزوّد الذي أنشأت به الحساب أولًا.',
+  'auth/network-request-failed':en?'Could not connect. Check your internet and retry.':'تعذر الاتصال. تحقق من الإنترنت وأعد المحاولة.',
+  'auth/internal-error':en?`${providerName} returned a configuration error. Check its Client/App ID, secret and OAuth redirect URI.`:`أعاد ${providerName} خطأ إعداد. تحقق من App/Client ID والـ Secret ورابط OAuth Redirect.`,
+  'auth/invalid-credential':en?`${providerName} credential was rejected. Check the provider configuration in Firebase.`:`تم رفض بيانات ${providerName}. تحقق من إعداد المزوّد داخل Firebase.`,
+  'auth/invalid-oauth-client-id':en?`${providerName} Client/App ID is invalid.`:`معرّف Client/App الخاص بـ ${providerName} غير صحيح.`
  };
- memberMessage(messages[code]||(en?'Sign-in failed. Try again.':'تعذر تسجيل الدخول. حاول مرة أخرى.'),messages[code]||(en?'Sign-in failed. Try again.':'تعذر تسجيل الدخول. حاول مرة أخرى.'));
+ const fallback=en?`Could not sign in with ${providerName}. Error: ${code||'unknown'}`:`تعذر تسجيل الدخول عبر ${providerName}. رمز الخطأ: ${code||'unknown'}`;
+ const text=messages[code]||fallback;
+ memberMessage(text,text);
 }
 async function socialSignIn(id){
  if(socialBusy)return;
@@ -1271,7 +1306,7 @@ async function socialSignIn(id){
    const result=await signInWithPopup(auth,socialProviders[id]());
    if(result?.user)await processAuthenticatedUser(result.user);
  }
- catch(e){showSocialError(e.code||'unknown');}
+ catch(e){showSocialError(e.code||'unknown',id);}
  finally{socialBusy=false;socialButtons.forEach(button=>button.disabled=false);}
 }
 socialButtons.forEach(button=>{button.onclick=()=>socialSignIn(button.id);button.disabled=false;});
@@ -1297,7 +1332,7 @@ console.log("SAKAKER Firebase Ready — verified membership enabled");
     txt('memberLandingTitle','Sakaker Business');txt('memberOpenLogin',isAR?'تسجيل الدخول':'Sign in');txt('memberOpenSignup',isAR?'إنشاء حساب':'Create account');txt('memberBackButton',isAR?'الرجوع':'Back');
     txt('memberLoginTab',isAR?'تسجيل الدخول':'Sign in');txt('memberSignupTab',isAR?'إنشاء حساب':'Create account');
     ph('memberLoginEmail',isAR?'البريد الإلكتروني':'Email address');ph('memberLoginPassword',isAR?'كلمة المرور':'Password');
-    txt('memberLoginButton',isAR?'دخول بالبريد':'Sign in with email');txt('forgotPasswordButton',isAR?'نسيت كلمة المرور؟':'Forgot password?');
+    txt('memberLoginButton',isAR?'دخول بالبريد':'Sign in with email');txt('forgotPasswordButton',isAR?'نسيت كلمة مرور حساب البريد؟':'Forgot email-account password?');
     ph('memberSignupUsername',isAR?'اسم المستخدم':'Username');ph('memberSignupEmail',isAR?'البريد الإلكتروني الحقيقي':'Real email address');
     ph('memberSignupPassword',isAR?'كلمة المرور — 6 أحرف على الأقل':'Password — at least 6 characters');ph('memberSignupPassword2',isAR?'تأكيد كلمة المرور':'Confirm password');
     txt('memberReservedHint',isAR?'الحساب بالبريد وكلمة المرور يحتاج تأكيد البريد. Google وMicrosoft وFacebook لا تحتاج رسالة تحقق إضافية. الأسماء التي تحتوي sakaker أو abwalqmrzmrd محجوزة للمالك.':'Email/password accounts require email verification. Google, Microsoft, and Facebook do not need an extra verification email. Names containing sakaker or abwalqmrzmrd are reserved for the owner.');
