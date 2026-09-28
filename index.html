@@ -798,12 +798,14 @@ const error=document.getElementById("loginError");
 
 /* =========================================================
    بوابة التجربة والاشتراك: الوقت من Firebase، وسجل الاشتراك يكتبه المالك.
-   لا توجد روابط تمنح دخولًا مجانيًا. أي ?access=... يتم تجاهله وحذفه من الرابط.
+   المنح القديمة الموجودة سابقًا تبقى صالحة حتى تنتهي فقط.
+   لا يمكن لأي رابط ?access=... إنشاء منحة جديدة أو تمديد منحة قديمة.
 ========================================================= */
 /* One server-recorded 24-hour trial per Firebase UID. Paid access is admin-owned. */
 const TRIAL_MS=86400000;
+const LEGACY_RETURN_GRANT_MS=30*86400000;
 let accessGeneration=0,accessStops=[],accessTimer=null,accessUser=null;
-let accessTrial=null,accessPaid=null,accessReady=false,accessConnected=false,accessFailed=false;
+let accessTrial=null,accessPaid=null,accessGrant=null,accessReady=false,accessConnected=false,accessFailed=false;
 let accessClock={server:0,monotonic:0},accessClockReady=false;
 const accessBanner=document.createElement('div');accessBanner.id='sakTrialCountdown';accessBanner.hidden=true;document.body.append(accessBanner);
 const accessAccount=document.createElement('p');accessAccount.id='sakTrialAccount';document.getElementById('paypalGateStatus').after(accessAccount);
@@ -821,11 +823,14 @@ function openSiteAfterPayment(){if(overlay.style.display!=='none')overlay.style.
 function refreshAccess(){
  const en=document.documentElement.lang==='en',now=accessNow();
  const result=accessDecision(accessUser,accessReady,accessConnected,accessClockReady,accessTrial,accessPaid,now);
- const unlocked=result.kind==='paid'||result.kind==='trial';
+ const legacyGrantUntil=Number.isFinite(accessGrant?.startedAt)?accessGrant.startedAt+LEGACY_RETURN_GRANT_MS:0;
+ const legacyGrantValid=accessUser&&accessReady&&accessConnected&&accessClockReady&&accessGrant&&Number.isFinite(accessGrant.startedAt)&&accessGrant.startedAt<=now&&now<legacyGrantUntil;
+ if(legacyGrantValid&&result.kind!=='paid'){result.kind='legacy';result.until=legacyGrantUntil;}
+ const unlocked=result.kind==='paid'||result.kind==='trial'||result.kind==='legacy';
  if(unlocked)openSiteAfterPayment();else showLoginGate();
  const status=document.getElementById('paypalGateStatus');
  if(accessFailed)status.textContent=en?'Access could not be verified. Check your connection and try again.':'تعذر التحقق من صلاحية الدخول. تحقق من الاتصال ثم أعد المحاولة.';
- else status.textContent=({login:en?'Sign in to start your one-time 24-hour free trial.':'سجّل الدخول لبدء تجربتك المجانية لمرة واحدة لمدة 24 ساعة.',checking:en?'Verifying account access…':'جارٍ التحقق من صلاحية الحساب…',paid:en?'Verified subscription active.':'الاشتراك الموثق نشط.',trial:en?'Your free trial is active.':'تجربتك المجانية نشطة.',expired:en?'Your free trial has ended. A verified subscription is required.':'انتهت التجربة المجانية. يلزم اشتراك موثّق للمتابعة.'})[result.kind];
+ else status.textContent=({login:en?'Sign in to start your one-time 24-hour free trial.':'سجّل الدخول لبدء تجربتك المجانية لمرة واحدة لمدة 24 ساعة.',checking:en?'Verifying account access…':'جارٍ التحقق من صلاحية الحساب…',paid:en?'Verified subscription active.':'الاشتراك الموثق نشط.',trial:en?'Your free trial is active.':'تجربتك المجانية نشطة.',legacy:en?'Your existing access remains active until its original expiry.':'صلاحية دخولك السابقة ما زالت نشطة حتى موعد انتهائها الأصلي.',expired:en?'Your free trial has ended. A verified subscription is required.':'انتهت التجربة المجانية. يلزم اشتراك موثّق للمتابعة.'})[result.kind];
  accessAccount.textContent=accessUser?(en?'Account ID for subscription support: ':'معرّف الحساب لدعم الاشتراك: ')+accessUser.uid:'';
  accessRetry.textContent=en?'Check access again':'إعادة التحقق من الدخول';accessRetry.hidden=!accessUser||unlocked;
  accessBanner.hidden=result.kind!=='trial';
@@ -833,7 +838,7 @@ function refreshAccess(){
  clearTimeout(accessTimer);
  if(accessUser)accessTimer=setTimeout(refreshAccess,Math.min(1000,Math.max(1,result.until?result.until-now:1000)));
 }
-function stopAccess(){accessGeneration++;accessStops.forEach(stop=>stop());accessStops=[];clearTimeout(accessTimer);accessTrial=accessPaid=null;accessReady=accessConnected=accessClockReady=false;accessFailed=false;}
+function stopAccess(){accessGeneration++;accessStops.forEach(stop=>stop());accessStops=[];clearTimeout(accessTimer);accessTrial=accessPaid=accessGrant=null;accessReady=accessConnected=accessClockReady=false;accessFailed=false;}
 async function loadAccess(user){
  stopAccess();accessUser=user;refreshAccess();if(!user)return;
  const token=accessGeneration;
@@ -851,8 +856,10 @@ async function loadAccess(user){
    catch(error){const existing=await rt.get(trialRef);if(!existing.exists())throw error;}
   }
   if(token!==accessGeneration)return;
-  let trialLoaded=false,paidLoaded=false;
-  const ready=()=>{accessReady=trialLoaded&&paidLoaded;accessFailed=false;refreshAccess();};
+  const grantRef=rt.ref(db,'siteReturnGrants/'+user.uid);
+  let trialLoaded=false,paidLoaded=false,grantLoaded=false;
+  const ready=()=>{accessReady=trialLoaded&&paidLoaded&&grantLoaded;accessFailed=false;refreshAccess();};
+  accessStops.push(rt.onValue(grantRef,snap=>{if(token!==accessGeneration)return;accessGrant=snap.val();grantLoaded=true;ready();},fail));
   accessStops.push(rt.onValue(trialRef,snap=>{if(token!==accessGeneration)return;accessTrial=snap.val();trialLoaded=true;ready();},fail));
   accessStops.push(rt.onValue(rt.ref(db,'siteSubscriptions/'+user.uid),snap=>{if(token!==accessGeneration)return;accessPaid=snap.val();paidLoaded=true;ready();},fail));
  }catch(e){if(token!==accessGeneration)return;accessFailed=true;accessReady=false;refreshAccess();console.warn('Account access could not be verified.');}
