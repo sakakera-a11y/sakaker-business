@@ -1,0 +1,12 @@
+# Keep maintenance files in git, outside the published static website.
+exclude:
+  - server
+  - firebase
+  - docs/performance-audit-20260930.json
+  - assets/chess/verify.mjs
+  - assets/chess/verify-premium.mjs
+  - assets/chess/package.json
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
