@@ -1,1 +1,1 @@
-{"version":1,"onlineEnabled":false,"reason":"Firebase chessV1 rules must be reviewed and deployed before enabling account synchronization and online play.","chatMaxCharacters":240,"chatTTLMilliseconds":180000,"initialTrainingRating":1000,"computerLevels":[{"depth":1,"estimate":700},{"depth":2,"estimate":1100},{"depth":4,"estimate":1500}]}
+{"version":2,"onlineEnabled":true,"chatMaxCharacters":240,"chatTTLMilliseconds":180000,"initialTrainingRating":1000,"computerLevels":[{"depth":1,"estimate":700},{"depth":2,"estimate":1100},{"depth":4,"estimate":1500}]}
