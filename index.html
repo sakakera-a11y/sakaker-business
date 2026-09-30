@@ -649,8 +649,6 @@ html body #loginOverlay #loginPaypalInner form{
       <button id="langAR" class="active" type="button">العربية</button>
       <button id="langEN" type="button">English</button>
     </div>
-
-    <div class="login-footer" id="loginFooter">تجربة مجانية لمدة 24 ساعة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل بعد مراجعة الدفع. لا تجديد تلقائي.</div>
     <p id="loginPaymentSupport" style="margin:10px 0;color:#efffff;font-size:14px;line-height:1.7;background:transparent;">
       <a href="mailto:sakaker@outlook.com" style="color:#a3f3dc;text-decoration:underline;display:inline-block;direction:ltr;padding:8px 0;">sakaker@outlook.com</a>
     </p>
@@ -1323,7 +1321,7 @@ console.log("SAKAKER Firebase Ready — verified membership enabled");
   <script>
 (function(){
   const ar=document.getElementById("langAR"),en=document.getElementById("langEN");
-  const title=document.getElementById("loginTitle"),subtitle=document.getElementById("loginSubtitle"),footer=document.getElementById("loginFooter"),err=document.getElementById("loginError");
+  const title=document.getElementById("loginTitle"),subtitle=document.getElementById("loginSubtitle"),err=document.getElementById("loginError");
   function txt(id,value){const el=document.getElementById(id);if(el)el.textContent=value;}
   function ph(id,value){const el=document.getElementById(id);if(el)el.placeholder=value;}
   function setLang(lang){
@@ -1343,7 +1341,6 @@ console.log("SAKAKER Firebase Ready — verified membership enabled");
     txt('memberProfileTitle',isAR?'إكمال العضوية':'Complete membership');txt('memberProfileText',isAR?'اختر اسم مستخدم فريدًا لإكمال حسابك.':'Choose a unique username to complete your account.');ph('memberProfileUsername',isAR?'اسم المستخدم':'Username');txt('memberProfileSaveButton',isAR?'حفظ اسم المستخدم':'Save username');
     txt('memberOrText',isAR?'أو':'OR');txt('memberSocialLabel',isAR?'يمكنك أيضًا المتابعة بحساب موثوق':'You can also continue with a trusted account');
     txt('googleButton',isAR?'المتابعة باستخدام Google':'Continue with Google');txt('microsoftButton',isAR?'المتابعة باستخدام Microsoft':'Continue with Microsoft');txt('facebookButton',isAR?'المتابعة باستخدام Facebook':'Continue with Facebook');
-    footer.textContent=isAR?'لحساب البريد وكلمة المرور: يجب تأكيد البريد أولًا. أما Google وMicrosoft وFacebook فيعتمد الموقع نجاح التوثيق من المزوّد نفسه حتى إن لم يرسل بريدًا فتُعتمد مصادقة المزود. بعد اكتمال العضوية تبدأ التجربة المجانية لمدة 24 ساعة لمرة واحدة، ثم اشتراك سنوي بسعر 3 دولارات أمريكية لمدة سنة من التفعيل، دون تجديد تلقائي.':'Email/password accounts must verify the email first. Google, Microsoft, and Facebook use provider authentication. After membership is complete, the one-time 24-hour trial starts; then annual access is USD 3 for one year from activation with no automatic renewal.';
     txt('loginPaypalTitleText',isAR?'الاشتراك السنوي — 3 دولارات أمريكية عبر PayPal':'Annual access — USD 3 via PayPal');
     txt('logoutButton',isAR?'خروج':'Sign out');
     ar.classList.toggle("active",isAR);en.classList.toggle("active",!isAR);
