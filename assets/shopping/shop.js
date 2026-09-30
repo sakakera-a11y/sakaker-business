@@ -1,6 +1,6 @@
 // Store links are publisher-supplied affiliate URLs. Never synthesize tracking links.
 const stores=[
- {id:'ebay',name:['إيباي','eBay'],mark:'eBay',color:'#8dbaff',url:null,categories:['tech','home','fashion','games','books'],description:['سوق عالمي؛ رابط العمولة الخاص بالموقع قيد التجهيز.','Global marketplace; our affiliate link is not available yet.']},
+ {id:'ebay',name:['إيباي','eBay'],mark:'eBay',color:'#8dbaff',url:'https://www.ebay.com/?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339216417&customid=&toolid=10001&mkevt=1',categories:['tech','home','fashion','games','books'],description:['تسوق الإلكترونيات والأزياء ومنتجات المنزل والكتب والهوايات.','Shop electronics, fashion, home products, books and hobbies.']},
  {id:'etsy',name:['إتسي','Etsy'],mark:'Etsy',color:'#ffa881',url:null,categories:['home','fashion'],description:['متجر عالمي للأعمال الإبداعية والهدايا؛ الرابط قريبًا.','A global marketplace for creative goods and gifts; link coming soon.']},
  {id:'ali',name:['علي إكسبرس','AliExpress'],mark:'Ali',color:'#ff8054',url:'https://s.click.aliexpress.com/e/_c4Bn29x7',categories:['tech','home','fashion','games'],description:['منتجات متنوعة للمنزل والتقنية والأزياء والهوايات.','Explore home, technology, fashion and hobby products.']},
  {id:'amazon',name:['أمازون السعودية','Amazon Saudi Arabia'],mark:'amazon',color:'#f4c874',url:null,categories:['tech','home','fashion','games','books'],description:['سيُضاف رابط التسوق بعد تجهيز رابط العمولة.','Shopping will be available once our affiliate link is ready.']},
