@@ -3,7 +3,7 @@ const stores=[
  {id:'ebay',name:['إيباي','eBay'],mark:'eBay',color:'#8dbaff',url:'https://www.ebay.com/?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339216417&customid=&toolid=10001&mkevt=1',categories:['tech','home','fashion','games','books'],description:['تسوق الإلكترونيات والأزياء ومنتجات المنزل والكتب والهوايات.','Shop electronics, fashion, home products, books and hobbies.']},
  {id:'etsy',name:['إتسي','Etsy'],mark:'Etsy',color:'#ffa881',url:null,categories:['home','fashion'],description:['متجر عالمي للأعمال الإبداعية والهدايا؛ الرابط قريبًا.','A global marketplace for creative goods and gifts; link coming soon.']},
  {id:'ali',name:['علي إكسبرس','AliExpress'],mark:'Ali',color:'#ff8054',url:'https://s.click.aliexpress.com/e/_c4Bn29x7',categories:['tech','home','fashion','games'],description:['منتجات متنوعة للمنزل والتقنية والأزياء والهوايات.','Explore home, technology, fashion and hobby products.']},
- {id:'amazon',name:['أمازون السعودية','Amazon Saudi Arabia'],mark:'amazon',color:'#f4c874',url:null,categories:['tech','home','fashion','games','books'],description:['سيُضاف رابط التسوق بعد تجهيز رابط العمولة.','Shopping will be available once our affiliate link is ready.']},
+ {id:'amazon',name:['أمازون السعودية','Amazon Saudi Arabia'],mark:'amazon',color:'#f4c874',url:'https://amzn.to/3U0bKYn',categories:['tech','home','fashion','games','books'],description:['تسوق الإلكترونيات ومنتجات المنزل والأزياء والكتب والهوايات.','Shop electronics, home products, fashion, books and hobbies.']},
  {id:'noon',name:['نون','noon'],mark:'noon',color:'#f9e552',url:null,categories:['tech','home','fashion','games'],description:['سيُضاف رابط التسوق بعد تجهيز رابط العمولة.','Shopping will be available once our affiliate link is ready.']}
 ];
 const categories=[['all','✦','الكل','All'],['tech','⌘','إلكترونيات','Electronics'],['home','⌂','المنزل','Home'],['fashion','◇','أزياء وإكسسوارات','Fashion'],['games','♞','ألعاب وهوايات','Games & hobbies'],['books','▤','كتب','Books']];
@@ -26,7 +26,7 @@ function render(){
  if(!matches.length){const p=document.createElement('p');p.className='empty';p.textContent=t('لا توجد متاجر مطابقة. جرّب تصنيفًا آخر أو امسح البحث.','No matching stores. Try another category or clear your search.');grid.append(p)}
  root.querySelector('.count').textContent=t('المتاجر المعروضة: ','Stores shown: ')+matches.length;
  root.querySelector('.category-note').textContent=t('التصنيفات تنظّم المتاجر حسب أقسامها؛ زر التسوق يفتح الصفحة الرئيسية للمتجر، وليس قسمًا محددًا.','Categories organize stores by their departments; shopping buttons open the store homepage, not a specific department.');
- root.querySelector('.disclosure').textContent=t('إعلان · روابط تسويق بالعمولة. قد نحصل على عمولة من المشتريات المؤهلة عبر روابطنا. التسوق والدفع والشحن لدى المتجر، وتُفتح الروابط في علامة تبويب جديدة.','Advertising · Affiliate links. We may earn a commission on eligible purchases through our links. Shopping, payment and shipping are handled by the store. Links open in a new tab.');
+ root.querySelector('.disclosure').textContent=t('إعلان · روابط تسويق بالعمولة. بصفتي شريكًا لأمازون، أكسب من عمليات الشراء المؤهلة. قد نحصل على عمولة من المشتريات المؤهلة عبر روابطنا. التسوق والدفع والشحن لدى المتجر، وتُفتح الروابط في علامة تبويب جديدة.','Advertising · Affiliate links. As an Amazon Associate I earn from qualifying purchases. We may earn a commission on eligible purchases through our links. Shopping, payment and shipping are handled by the store. Links open in a new tab.');
 }
 export function openShop(){
  if(!dialog){
