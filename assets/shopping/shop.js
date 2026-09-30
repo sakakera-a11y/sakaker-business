@@ -1,0 +1,18 @@
+let dialog;
+function updateLanguage(){if(!dialog)return;const en=document.documentElement.lang==='en';dialog.lang=en?'en':'ar';dialog.dir=en?'ltr':'rtl';dialog.querySelector('h2').textContent=en?'Shopping & offers':'التسوق والعروض';dialog.querySelector('.intro').textContent=en?'Explore products and offers on AliExpress.':'تصفح المنتجات والعروض في علي إكسبرس.';dialog.querySelector('a').textContent=en?'Shop on AliExpress ↗':'تسوق في علي إكسبرس ↗';dialog.querySelector('.disclosure').textContent=en?'Advertising · Affiliate link. We may earn a commission on eligible purchases made through this link.':'إعلان · رابط تسويق بالعمولة. قد نحصل على عمولة من المشتريات المؤهلة عبر هذا الرابط.';dialog.querySelector('.note').textContent=en?'Shopping and payment take place on AliExpress in a new tab.':'التسوق والدفع يتمان لدى علي إكسبرس في علامة تبويب جديدة.';dialog.querySelector('button').textContent=en?'Close':'إغلاق'}
+export function openShop(){
+if(!dialog){
+const style=document.createElement('style');style.textContent=`
+#sakShoppingDialog{position:fixed!important;inset:0!important;margin:auto!important;width:min(480px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;max-height:calc(100dvh - 32px)!important;height:fit-content!important;box-sizing:border-box!important;overflow:auto!important;padding:28px 22px!important;border:1px solid #b8f6df!important;border-radius:26px!important;background:linear-gradient(145deg,rgba(9,53,48,.96),rgba(4,18,27,.97))!important;box-shadow:0 0 32px #25d5a455!important;color:#f1fff9!important;text-align:center!important;font:16px/1.7 Tahoma,Arial,sans-serif!important;visibility:visible!important;pointer-events:auto!important}
+#sakShoppingDialog::backdrop{background:#000a;backdrop-filter:blur(6px)}
+#sakShoppingDialog h2{font:700 24px/1.5 Tahoma,Arial,sans-serif!important;color:#fff0bd!important;margin:0 0 12px!important}
+#sakShoppingDialog p{font:14px/1.8 Tahoma,Arial,sans-serif!important;color:#e0f5ed!important;margin:12px 0!important}
+#sakShoppingDialog a{display:block!important;padding:14px 18px!important;margin:24px 0!important;border-radius:14px!important;background:linear-gradient(120deg,#ffe4a0,#adf2d8)!important;color:#08362c!important;text-decoration:none!important;font-weight:700!important}
+#sakShoppingDialog .disclosure,#sakShoppingDialog .note{font-size:12px!important}
+#sakShoppingDialog button{position:static!important;display:block!important;margin:20px auto 0!important;padding:10px 30px!important;border:1px solid #a9dbc9!important;border-radius:22px!important;background:#123c36!important;color:#fff!important;cursor:pointer!important;font:700 14px Tahoma,Arial,sans-serif!important}
+#sakShoppingDialog :is(a,button):focus-visible{outline:3px solid #ffdb7e!important;outline-offset:4px}
+`;document.head.append(style);
+dialog=document.createElement('dialog');dialog.id='sakShoppingDialog';dialog.setAttribute('aria-labelledby','sakShoppingTitle');dialog.innerHTML='<h2 id="sakShoppingTitle"></h2><p class="intro"></p><a href="https://s.click.aliexpress.com/e/_c4Bn29x7" target="_blank" rel="sponsored noopener"></a><p class="disclosure"></p><p class="note"></p><button type="button" autofocus></button>';document.body.append(dialog);dialog.querySelector('button').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close()}});new MutationObserver(updateLanguage).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+}
+updateLanguage();if(!dialog.open)dialog.showModal();
+}
