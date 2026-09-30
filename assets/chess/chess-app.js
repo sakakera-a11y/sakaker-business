@@ -31,7 +31,7 @@ async function createGame(){
  function cached(){try{return JSON.parse(localStorage.getItem(storeKey())||'{}')}catch(_){return {}}}
  function cache(){try{localStorage.setItem(storeKey(),JSON.stringify({profile,prefs,pgn:mode==='computer'?game.pgn():'',flipped}))}catch(_){}}
  function status(key,error=false){$('status').textContent=t(key);$('status').classList.toggle('error',error)}
- function safeError(){status('error',true)}
+ function safeError(){status(config.onlineEnabled&&!window.firebaseAuth?.currentUser?'notLogin':'error',true)}
  const layerStyle=document.createElement('style');layerStyle.textContent='html body.sakChessPlaying :is(.video-top-container-fixed,#sakSecondStreamCorner,[popover]){display:none!important;visibility:hidden!important;pointer-events:none!important}';document.head.append(layerStyle);
  function fitBoard(){if(!dialog.open)return;const main=root.querySelector('.main'),play=root.querySelector('.play');const controls=['.modes','.quickLevel','.players','.watermark','.status','.actions'].reduce((sum,sel)=>sum+root.querySelector(sel).getBoundingClientRect().height,0);const size=Math.max(64,Math.min(play.clientWidth,main.clientHeight-controls-76));play.style.setProperty('--board-size',Math.floor(size)+'px');}
  const sizeObserver=new ResizeObserver(fitBoard);sizeObserver.observe(root.querySelector('.main'));sizeObserver.observe(root.querySelector('.modes'));sizeObserver.observe(root.querySelector('.actions'));window.visualViewport?.addEventListener('resize',fitBoard);
