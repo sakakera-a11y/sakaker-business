@@ -1,0 +1,45 @@
+name: Lighthouse performance report
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/**'
+      - '.lighthouserc.json'
+      - '.github/workflows/lighthouse-performance.yml'
+permissions:
+  contents: read
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Lighthouse CI
+        run: npm install --global @lhci/cli@0.15.1
+      - name: Check homepage
+        shell: bash
+        run: |
+          python3 -m http.server 9001 --bind 127.0.0.1 > /tmp/lighthouse-http.log 2>&1 &
+          HTTP_PID=$!
+          trap 'kill "$HTTP_PID" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:9001/index.html > /dev/null; then break; fi
+            sleep 1
+          done
+          lhci autorun
+      - name: Save performance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: lhci_reports
+          if-no-files-found: ignore
+          retention-days: 3
