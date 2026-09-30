@@ -12092,14 +12092,6 @@ html body #sakakerAllIconsDock #businessEncyclopedia{margin-inline:22px!importan
  dock.append(link);translate();new MutationObserver(translate).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 })();
 </script>
-<style id="business-scoreboard-style">
-html body #businessVisitScore{position:fixed;top:var(--visit-top,58px);left:12px;z-index:1000;display:grid;grid-template-columns:1fr 1fr;gap:2px;width:196px;max-width:calc(100vw - 24px);padding:6px;border:1px solid #9de6d780;border-top:3px solid #efcc69;border-radius:12px;background:linear-gradient(145deg,#092d39f5,#102031f5);box-shadow:0 5px 20px #0005;box-sizing:border-box;color:#f4fbff;font:12px/1.5 Tahoma,Arial,sans-serif;pointer-events:none;}
-html body #businessVisitScore .visit-cell{text-align:center;padding:5px;min-width:0;}
-html body #businessVisitScore .visit-cell+ .visit-cell{border-inline-start:1px solid #ffffff25;}
-html body #businessVisitScore strong{display:block;font:700 24px/1.4 Consolas,monospace;font-variant-numeric:tabular-nums;color:#ffe18c;overflow-wrap:anywhere;}
-html body #businessVisitScore small{grid-column:1/-1;text-align:center;color:#c5dfe7;font-size:10px;}
-@media(max-width:600px){html body #businessVisitScore{width:160px;font-size:11px;}html body #businessVisitScore strong{font-size:20px;}}
-</style>
 <style id="business-live-groups-style">
 html body #livePopup .sak-country-browser-header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 0;}
 html body #livePopup .sak-country-browser-header h3{font-size:18px;color:#a3f3dc;margin:0;}
@@ -12119,17 +12111,9 @@ html body #livePopup .sak-arabiya-choice .sak-channel-with-favorite{width:100%;}
 @media(max-width:600px){html body #livePopup #sakGlobalLiveResults:has(.sak-arabiya-choice){grid-template-columns:minmax(0,1fr)!important;}}
 </style>
 <style id="business-bottom-layout-repair">
-html body #businessVisitScore{position:fixed!important;top:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;right:max(8px,env(safe-area-inset-right))!important;left:auto!important;transform:none!important;width:min(320px,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;text-shadow:0 1px 3px #000,0 0 5px #000;pointer-events:auto!important;padding:2px!important;}
-html body #businessVisitScore .visit-cell{border:0!important;padding:2px 5px!important;}
-html body #businessVisitScore .annual-cell{display:none!important;}
-html body #businessVisitScore #visitScoreStatus{grid-column:1/-1;text-align:center;font-size:10px;color:#ffd0a6;}
-html body #businessVisitScore #visitScoreStatus[hidden]{display:none!important;}
-html body #businessVisitScore strong{font-size:20px!important;line-height:1.3!important;}
-html body #businessVisitScore #visitScoreStatus{font-size:10px;}
-html body #businessVisitRetry{grid-column:1/-1;justify-self:center;background:#123641;color:#fff;border:1px solid #95c9cf;border-radius:8px;padding:4px 12px;cursor:pointer;}
 html body #sakakerContactFooter{left:max(8px,env(safe-area-inset-left))!important;right:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;transform:none!important;width:auto!important;max-width:calc(100vw - 350px)!important;padding:5px 8px!important;text-align:left!important;direction:ltr!important;border-radius:10px!important;font-size:12px!important;white-space:nowrap!important;}
-html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:calc(var(--business-score-height,76px) + 12px + env(safe-area-inset-bottom))!important;width:min(580px,96vw)!important;max-width:96vw!important;justify-content:center!important;align-items:flex-start!important;flex-wrap:wrap!important;column-gap:20px!important;row-gap:40px!important;max-height:38dvh!important;overflow-y:auto!important;overflow-x:hidden!important;padding:10px 8px 42px!important;box-sizing:border-box!important;}
-@media(max-width:600px){html body #sakakerAllIconsDock{column-gap:12px!important;row-gap:40px!important;bottom:calc(var(--business-score-height,76px) + 8px + env(safe-area-inset-bottom))!important;}html body #businessVisitScore{font-size:10px!important;}html body #sakakerContactFooter{max-width:42vw!important;bottom:max(4px,env(safe-area-inset-bottom))!important;font-size:10px!important;padding:4px 5px!important;overflow:hidden!important;text-overflow:ellipsis!important;}}
+html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:calc(var(--business-footer-height,40px) + 12px + env(safe-area-inset-bottom))!important;width:min(580px,96vw)!important;max-width:96vw!important;justify-content:center!important;align-items:flex-start!important;flex-wrap:wrap!important;column-gap:20px!important;row-gap:40px!important;max-height:38dvh!important;overflow-y:auto!important;overflow-x:hidden!important;padding:10px 8px 42px!important;box-sizing:border-box!important;}
+@media(max-width:600px){html body #sakakerAllIconsDock{column-gap:12px!important;row-gap:40px!important;bottom:calc(var(--business-footer-height,40px) + 8px + env(safe-area-inset-bottom))!important;}html body #sakakerContactFooter{max-width:42vw!important;bottom:max(4px,env(safe-area-inset-bottom))!important;font-size:10px!important;padding:4px 5px!important;overflow:hidden!important;text-overflow:ellipsis!important;}}
 </style>
 <script id="business-feature-integration">
 (()=>{
@@ -12154,70 +12138,6 @@ html body #sakakerAllIconsDock{left:50%!important;right:auto!important;transform
  live.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const items=[...live.querySelectorAll('button,input,select,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length);const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
  new MutationObserver(()=>{if(!document.body.classList.contains('locked'))return;$('sakPongArena')?.close();$('emPanel')?.querySelector('.emClose')?.click();if(getComputedStyle(live).display!=='none')toggleLivePopup();closeVideo();$('sakGlobalPlayerClose')?.click();}).observe(document.body,{attributes:true,attributeFilter:['class']});
 })();
-</script>
-<section id="businessVisitScore" aria-label="عدد الزيارات">
- <div class="visit-cell"><span id="visitTodayLabel">زيارات اليوم</span><strong id="visitTodayValue">—</strong></div>
- <div class="visit-cell"><span id="visitTotalLabel">إجمالي الزيارات</span><strong id="visitTotalValue">—</strong></div>
- <small id="visitScoreStatus" role="status" aria-live="polite"></small>
- <button id="businessVisitRetry" type="button" hidden>إعادة المحاولة</button>
-</section>
-<script id="business-counter-bootstrap">
-window.businessCounterFirebaseReady=new Promise(resolve=>{
- function check(){if(window.firebaseApp&&window.firebaseAuth)resolve(window.firebaseApp);else setTimeout(check,250);}check();
-});
-(()=>{const score=document.getElementById('businessVisitScore'),footer=document.getElementById('sakakerContactFooter');let queued=false;function measure(){queued=false;document.body.style.setProperty('--business-score-height',Math.ceil(score.getBoundingClientRect().height)+'px');if(footer)document.body.style.setProperty('--business-footer-height',Math.ceil(footer.getBoundingClientRect().height)+'px');}function queue(){if(!queued){queued=true;requestAnimationFrame(measure);}}const observer=new ResizeObserver(queue);observer.observe(score);if(footer)observer.observe(footer);window.addEventListener('resize',queue,{passive:true});queue();})();
-</script>
-<script type="module" id="business-scoreboard-script">
-import {getDatabase,ref,onValue,runTransaction} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js';
-import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
-const box=document.getElementById('businessVisitScore');
-const retryButton=document.getElementById('businessVisitRetry');
-const statusEl=document.getElementById('visitScoreStatus');
-let data=null,offset=0,loaded=false,failed=false,counted=false,busy=false,clockReady=false,errorCode='',retryTimer=null,retryDelay=2000;
-const dayAt=time=>Math.floor((time+10800000)/86400000); // Saudi Arabia UTC+3
-const nextVisit=(current,time)=>{
- const day=dayAt(time),safe=current&&typeof current==='object'?current:{};
- return {day,total:(Number(safe.total)||0)+1,today:safe.day===day?(Number(safe.today)||0)+1:1};
-};
-function draw(){
- const en=document.documentElement.lang==='en',fmt=new Intl.NumberFormat(en?'en-US':'ar-SA'),today=data?.day===dayAt(Date.now()+offset)?Number(data?.today)||0:0;
- box.dir=en?'ltr':'rtl';box.setAttribute('aria-label',en?'Visit counter':'عداد الزيارات');
- document.getElementById('visitTodayLabel').textContent=en?'Today':'زيارات اليوم';
- document.getElementById('visitTotalLabel').textContent=en?'Total visits':'إجمالي الزيارات';
- document.getElementById('visitTodayValue').textContent=loaded?fmt.format(today):'—';
- document.getElementById('visitTotalValue').textContent=loaded?fmt.format(Number(data?.total)||0):'—';
- retryButton.textContent=en?'Retry counter':'إعادة محاولة العداد';
- statusEl.textContent=failed?(en?'Counter sync unavailable':'تعذر مزامنة العداد'):'';
- statusEl.hidden=!failed;retryButton.hidden=!failed;
-}
-new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-draw();
-try{
- await window.businessCounterFirebaseReady;
- if(!window.firebaseApp)throw Error('Firebase unavailable');
- const db=getDatabase(window.firebaseApp,'https://sakaker-basnusse-default-rtdb.asia-southeast1.firebasedatabase.app');
- const auth=getAuth(window.firebaseApp);
- const counter=ref(db,'businessVisitStats');
- const listen=()=>onValue(counter,s=>{data=s.val()||{};loaded=true;failed=false;errorCode='';draw();},e=>{failed=true;errorCode=e?.code||'connection';draw();});
- let stopListen=listen();
- onValue(ref(db,'.info/serverTimeOffset'),s=>{const n=s.val();if(typeof n==='number'){offset=n;clockReady=true;countVisit();}draw();});
- async function countVisit(){
-  if(counted||busy||!clockReady||!auth.currentUser)return;
-  clearTimeout(retryTimer);busy=true;
-  try{
-   const result=await runTransaction(counter,current=>nextVisit(current,Date.now()+offset),{applyLocally:false});
-   if(!result.committed)throw Error('not-committed');
-   counted=true;failed=false;errorCode='';retryDelay=2000;
-  }catch(error){
-   failed=true;errorCode=error?.code||error?.message||'connection';
-   if(!/permission/i.test(errorCode)){retryTimer=setTimeout(countVisit,retryDelay);retryDelay=Math.min(60000,retryDelay*2);}
-  }finally{busy=false;draw();}
- }
- retryButton.onclick=()=>{failed=false;errorCode='';stopListen?.();stopListen=listen();countVisit();draw();};
- let lastUid='';onAuthStateChanged(auth,user=>{const uid=user?.uid||'';if(uid&&uid!==lastUid){counted=false;lastUid=uid;}else if(!uid){lastUid='';}if(user)countVisit();});
- onValue(ref(db,'.info/connected'),s=>{if(s.val()===true)countVisit();});
- setInterval(draw,60000);
-}catch(error){failed=true;errorCode=error?.message||'firebase';draw();}
 </script>
 <style id="emerald-crystal-recording-style">
 html body #emeraldMusicHost #emPanel .emBox{background-color:#081b2c!important;background-image:radial-gradient(ellipse at 15% 5%,#63f3cd55,transparent 42%),radial-gradient(ellipse at 95% 60%,#a88cff44,transparent 45%),repeating-conic-gradient(from 20deg at 50% 30%,#a7efff18 0deg 30deg,#06152b10 30deg 65deg,#8df6cd20 65deg 90deg)!important;border:1px solid #c0ffed99!important;box-shadow:inset 0 0 50px #50e6c320,0 0 35px #52edd330!important;}
@@ -12354,22 +12274,19 @@ html body #sakakerContactFooter{
 }
 html body #sakakerContactFooter a{display:block!important;}
 html body #sakakerAllIconsDock{
-  bottom:calc(var(--business-score-height,76px) + 12px + env(safe-area-inset-bottom))!important;
+  bottom:calc(var(--business-footer-height,40px) + 12px + env(safe-area-inset-bottom))!important;
 }
 @media(max-width:600px){
   html body #sakakerContactFooter{max-width:42vw!important;font-size:10px!important;padding:4px 5px!important;overflow:hidden!important;text-overflow:ellipsis!important;}
   html body #sakakerContactFooter a{overflow:hidden!important;text-overflow:ellipsis!important;}
-  html body #sakakerAllIconsDock{bottom:calc(var(--business-score-height,76px) + 8px + env(safe-area-inset-bottom))!important;}
+  html body #sakakerAllIconsDock{bottom:calc(var(--business-footer-height,40px) + 8px + env(safe-area-inset-bottom))!important;}
 }
 </style>
 
 <style id="sakaker-final-bottom-zones-v4">
 html body #sakakerContactFooter a{white-space:nowrap!important;}
-html body #businessVisitScore{width:190px!important;max-width:190px!important;right:max(8px,env(safe-area-inset-right))!important;left:auto!important;bottom:max(6px,env(safe-area-inset-bottom))!important;transform:none!important;}
 html body #sakakerAllIconsDock::-webkit-scrollbar{display:none!important;}
 @media(max-width:700px){
- html body #businessVisitScore{width:150px!important;max-width:150px!important;font-size:9px!important;}
- html body #businessVisitScore strong{font-size:15px!important;}
  html body #sakakerContactFooter{max-width:26vw!important;font-size:8px!important;}
  html body #sakakerAllIconsDock :is(.sak-shore-gull,#emOpenBtn,#emeraldMusicHost){width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important;min-height:44px!important;max-height:44px!important;flex-basis:44px!important;}
 }
@@ -12378,7 +12295,6 @@ html body #sakakerAllIconsDock::-webkit-scrollbar{display:none!important;}
 (()=>{
  const footer=document.getElementById('sakakerContactFooter');
  const dock=document.getElementById('sakakerAllIconsDock');
- const score=document.getElementById('businessVisitScore');
  function apply(){
   if(footer){
    footer.style.setProperty('left','max(8px,env(safe-area-inset-left))','important');
@@ -12409,15 +12325,6 @@ html body #sakakerAllIconsDock::-webkit-scrollbar{display:none!important;}
    dock.style.setProperty('column-gap',matchMedia('(max-width:700px)').matches?'8px':'14px','important');
    dock.style.setProperty('padding','0 8px 28px','important');
   }
-  if(score){
-   score.style.setProperty('right','max(8px,env(safe-area-inset-right))','important');
-   score.style.setProperty('left','auto','important');
-   score.style.setProperty('bottom','max(6px,env(safe-area-inset-bottom))','important');
-   score.style.setProperty('transform','none','important');
-   const mobile=matchMedia('(max-width:700px)').matches;
-   score.style.setProperty('width',mobile?'150px':'190px','important');
-   score.style.setProperty('max-width',mobile?'150px':'190px','important');
-  }
  }
  apply();
  addEventListener('resize',apply,{passive:true});
@@ -12426,7 +12333,7 @@ html body #sakakerAllIconsDock::-webkit-scrollbar{display:none!important;}
 </script>
 
 <style id="sakaker-performance-mobile-v5">
-/* Mobile-safe bottom zones: icons above email/counter on narrow screens. */
+/* Mobile-safe bottom zones: icons above the contact footer on narrow screens. */
 @media(max-width:700px){
   html body #sakakerAllIconsDock{
     left:50%!important;right:auto!important;transform:translateX(-50%)!important;
@@ -12440,15 +12347,9 @@ html body #sakakerAllIconsDock::-webkit-scrollbar{display:none!important;}
     bottom:max(6px,env(safe-area-inset-bottom))!important;max-width:calc(100vw - 170px)!important;
     font-size:9px!important;padding:4px!important;
   }
-  html body #businessVisitScore{
-    right:max(6px,env(safe-area-inset-right))!important;left:auto!important;
-    bottom:max(4px,env(safe-area-inset-bottom))!important;width:148px!important;max-width:148px!important;
-  }
 }
 @media(max-width:380px){
   html body #sakakerContactFooter{max-width:calc(100vw - 158px)!important;font-size:8px!important;}
-  html body #businessVisitScore{width:142px!important;max-width:142px!important;}
-  html body #businessVisitScore strong{font-size:14px!important;}
   html body #sakakerAllIconsDock{bottom:calc(56px + env(safe-area-inset-bottom))!important;}
 }
 /* Avoid costly off-screen painting for heavy overlays until needed. */
@@ -12849,10 +12750,11 @@ html body #sakEmeraldChessIcon{position:relative!important;inset:auto!important;
  'use strict';
  let button=null,loading=false;
  function label(){if(!button)return;const en=document.documentElement.lang==='en';button.setAttribute('aria-label',en?'Abwalqmrzmrd Chess':'شطرنج أبوالقمر زمرد');button.title=button.getAttribute('aria-label');button.querySelector('small').textContent=en?'Abwalqmrzmrd Chess':'شطرنج أبوالقمر زمرد'}
- function mount(){const dock=document.getElementById('sakakerAllIconsDock');if(!dock||document.getElementById('sakEmeraldChessIcon'))return;button=document.createElement('button');button.id='sakEmeraldChessIcon';button.type='button';button.innerHTML='<svg viewBox="0 0 88 68" aria-hidden="true"><defs><linearGradient id="sakChessBirdMetal" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".55" stop-color="#d1eee5"/><stop offset="1" stop-color="#639b94"/></linearGradient></defs><path d="M38 38 18 49 12 44 25 35Z" fill="#e3fff4" stroke="#254b4d" stroke-width="1.4"/><path class="sak-chess-wing" d="M38 37C25 25 10 22 3 8C20 12 34 17 45 32L43 38Z" fill="url(#sakChessBirdMetal)" stroke="#234c4d" stroke-width="1.3"/><path class="sak-chess-wing" d="M42 34C52 19 69 14 78 5C76 22 67 32 49 41Z" fill="url(#sakChessBirdMetal)" stroke="#234c4d" stroke-width="1.3"/><path d="M25 37C29 30 39 28 46 33C52 34 51 27 52 18C53 8 62 8 67 12L75 15 67 19C64 18 60 17 59 22C60 34 55 43 45 44C37 46 29 43 25 37Z" fill="url(#sakChessBirdMetal)" stroke="#254b4d" stroke-width="1.5"/><path d="m67 13 13 4-13 2Z" fill="#e7bb53" stroke="#8b5b26"/><circle cx="64" cy="13" r="1.7" fill="#102529"/><path d="m39 43-3 7m10-7-2 7" stroke="#d9b967" stroke-width="2"/><circle cx="70" cy="48" r="10" fill="#06493a" stroke="#ccecbd"/><text x="70" y="54" text-anchor="middle" font-size="17" fill="#ffe8a4">♞</text></svg><small></small>';dock.append(button);label();button.addEventListener('click',async()=>{if(loading)return;loading=true;button.disabled=true;try{const module=await import('/assets/chess/chess-app.js?v=20260930-business-c');await module.openChess()}catch(error){const en=document.documentElement.lang==='en';alert(en?'Chess could not load. Please check your connection and retry.':'تعذر تحميل الشطرنج. تحقق من الاتصال ثم أعد المحاولة.')}finally{loading=false;button.disabled=false}})}
+ function mount(){const dock=document.getElementById('sakakerAllIconsDock');if(!dock||document.getElementById('sakEmeraldChessIcon'))return;button=document.createElement('button');button.id='sakEmeraldChessIcon';button.type='button';button.innerHTML='<svg viewBox="0 0 88 68" aria-hidden="true"><defs><linearGradient id="sakChessBirdMetal" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".55" stop-color="#d1eee5"/><stop offset="1" stop-color="#639b94"/></linearGradient></defs><path d="M38 38 18 49 12 44 25 35Z" fill="#e3fff4" stroke="#254b4d" stroke-width="1.4"/><path class="sak-chess-wing" d="M38 37C25 25 10 22 3 8C20 12 34 17 45 32L43 38Z" fill="url(#sakChessBirdMetal)" stroke="#234c4d" stroke-width="1.3"/><path class="sak-chess-wing" d="M42 34C52 19 69 14 78 5C76 22 67 32 49 41Z" fill="url(#sakChessBirdMetal)" stroke="#234c4d" stroke-width="1.3"/><path d="M25 37C29 30 39 28 46 33C52 34 51 27 52 18C53 8 62 8 67 12L75 15 67 19C64 18 60 17 59 22C60 34 55 43 45 44C37 46 29 43 25 37Z" fill="url(#sakChessBirdMetal)" stroke="#254b4d" stroke-width="1.5"/><path d="m67 13 13 4-13 2Z" fill="#e7bb53" stroke="#8b5b26"/><circle cx="64" cy="13" r="1.7" fill="#102529"/><path d="m39 43-3 7m10-7-2 7" stroke="#d9b967" stroke-width="2"/><circle cx="70" cy="48" r="10" fill="#06493a" stroke="#ccecbd"/><text x="70" y="54" text-anchor="middle" font-size="17" fill="#ffe8a4">♞</text></svg><small></small>';dock.append(button);label();button.addEventListener('click',async()=>{if(loading)return;loading=true;button.disabled=true;try{const module=await import('/assets/chess/chess-app.js?v=20260930-business-d');await module.openChess()}catch(error){const en=document.documentElement.lang==='en';alert(en?'Chess could not load. Please check your connection and retry.':'تعذر تحميل الشطرنج. تحقق من الاتصال ثم أعد المحاولة.')}finally{loading=false;button.disabled=false}})}
  mount();if(new URLSearchParams(location.search).get('chess')==='1'&&button)setTimeout(()=>button.click(),0);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});new MutationObserver(label).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});if(!button){const observer=new MutationObserver(()=>{mount();if(button)observer.disconnect()});observer.observe(document.body,{childList:true,subtree:true})}
 })();
 </script>
 
 </body>
 </html>
+
