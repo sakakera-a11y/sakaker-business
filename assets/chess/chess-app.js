@@ -64,7 +64,7 @@ async function createGame(){
   profile.name=name;
   const profileRef=api.ref(db,'chessV1/profiles/'+uid),existing=await api.get(profileRef);if(token!==session)return;
   let saved=existing.val();
-  if(!saved){let label=name.slice(0,24);if(/[\\uD800-\\uDBFF]$/.test(label))label=label.slice(0,-1);const result=await api.runTransaction(profileRef,old=>old||{name:label,settings:prefs,training});if(token!==session)return;saved=result.snapshot.val();}
+  if(!saved){let label=name.slice(0,24);if(label.charCodeAt(label.length-1)>=0xD800&&label.charCodeAt(label.length-1)<=0xDBFF)label=label.slice(0,-1);const result=await api.runTransaction(profileRef,old=>old||{name:label,settings:prefs,training});if(token!==session)return;saved=result.snapshot.val();}
   if(!saved?.name)throw Error('profile');
   cloudName=saved.name;profile={name,training:saved.training};prefs={...prefs,...saved.settings};cloudReady=true;
  }catch(_){if(token!==session)return;cloudReady=false;}}
