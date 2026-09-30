@@ -16,8 +16,19 @@
      خلفية فيديو موحدة لصفحة الدخول والموقع
      ========================================================= -->
 <video id="sakakerBackgroundVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" poster="https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/ChatGPT%20Image%20Sep%201%2C%202026%2C%2001_05_51%20PM.png" aria-hidden="true" tabindex="-1">
-  <source src="https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/gemini_generated_video_5b142333.mp4" type="video/mp4">
+  <source data-src="/assets/background/business-background.mp4?v=20260930" type="video/mp4">
 </video>
+<script id="sak-business-background-loader">
+(()=>{
+ const video=document.getElementById('sakakerBackgroundVideo'),source=video?.querySelector('source[data-src]');
+ if(!video||!source)return;
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(reduced||navigator.connection?.saveData){video.autoplay=false;return;}
+ const start=()=>{source.src=source.dataset.src;video.load();if(!document.hidden)video.play().catch(()=>{});};
+ if('requestIdleCallback' in window)requestIdleCallback(start,{timeout:1500});
+ else window.addEventListener('load',start,{once:true});
+})();
+</script>
 <style id="sakaker-video-background-style">
 html{background:#000!important;}
 html,body{min-height:100%;background-color:#000!important;}
@@ -7456,7 +7467,7 @@ html body #sakStudio #studioTools button{font-size:13px!important;min-height:40p
 <div id="videoOverlay">
 <div id="videoBox">
 <button id="closeVideo" onclick="closeVideo()">❌</button>
-<iframe loading="lazy" allowfullscreen="" id="mainVideo" src=""></iframe>
+<iframe loading="lazy" allowfullscreen="" id="mainVideo"></iframe>
 </div>
 </div>
 <style id="sakaker-global-live-directory-final">

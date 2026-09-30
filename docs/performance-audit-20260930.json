@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-30",
+  "repository": "sakakera-a11y/sakaker-business",
+  "sourceCommit": "95fa009d122bbb025a1f8ecb1f2bb868b34215c0",
+  "originalVideoBytes": 8929608,
+  "optimizedVideoBytes": 2927048,
+  "changes": [
+    "H.264 recompression, unchanged 1280x720 size and 10 second duration; audio retained",
+    "Video hosted on GitHub Pages, archived on Drive; Drive is not used as runtime script/CDN hosting",
+    "Skip background video download for reduced-motion and data-saver visitors",
+    "Defer video initialization until idle",
+    "Remove empty src from mainVideo iframe to avoid loading the site inside itself"
+  ],
+  "limitations": [
+    "Authenticated subscription, rooms and chats not tested",
+    "Poster PNG still 2687941 bytes; original retained",
+    "Drive sync source remains unconfigured; no automatic overwrite enabled"
+  ]
+}
