@@ -4,7 +4,7 @@ const stores=[
  {id:'etsy',name:['إتسي','Etsy'],mark:'Etsy',color:'#ffa881',url:null,categories:['home','fashion'],description:['متجر عالمي للأعمال الإبداعية والهدايا؛ الرابط قريبًا.','A global marketplace for creative goods and gifts; link coming soon.']},
  {id:'ali',name:['علي إكسبرس','AliExpress'],mark:'Ali',color:'#ff8054',url:'https://s.click.aliexpress.com/e/_c4Bn29x7',categories:['tech','home','fashion','games'],description:['منتجات متنوعة للمنزل والتقنية والأزياء والهوايات.','Explore home, technology, fashion and hobby products.']},
  {id:'amazon',name:['أمازون السعودية','Amazon Saudi Arabia'],mark:'amazon',color:'#f4c874',url:'https://amzn.to/3U0bKYn',categories:['tech','home','fashion','games','books'],description:['تسوق الإلكترونيات ومنتجات المنزل والأزياء والكتب والهوايات.','Shop electronics, home products, fashion, books and hobbies.']},
- {id:'noon',name:['نون','noon'],mark:'noon',color:'#f9e552',url:null,categories:['tech','home','fashion','games'],description:['سيُضاف رابط التسوق بعد تجهيز رابط العمولة.','Shopping will be available once our affiliate link is ready.']}
+ {id:'noon',name:['نون','noon'],mark:'noon',color:'#f9e552',url:'https://s.noon.com/zjZ_-_OfG7Y',categories:['tech','home','fashion','games'],description:['تسوق الإلكترونيات ومنتجات المنزل والأزياء والألعاب من نون السعودية.','Shop electronics, home products, fashion and games at noon Saudi Arabia.']}
 ];
 const categories=[['all','✦','الكل','All'],['tech','⌘','إلكترونيات','Electronics'],['home','⌂','المنزل','Home'],['fashion','◇','أزياء وإكسسوارات','Fashion'],['games','♞','ألعاب وهوايات','Games & hobbies'],['books','▤','كتب','Books']];
 let dialog,root,category='all',availability='all',query='',opener;
