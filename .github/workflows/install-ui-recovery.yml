@@ -1,0 +1,54 @@
+name: Install UI recovery runtime
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/install-ui-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Link recovery runtime
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script id="sak-ui-recovery-runtime" src="/assets/ui-recovery.js?v=20261003-1" defer></script>'
+          if 'id="sak-ui-recovery-runtime"' in s:
+              s=re.sub(r'<script\s+id="sak-ui-recovery-runtime"[^>]*></script>',tag,s,count=1,flags=re.I)
+          else:
+              pos=s.lower().rfind('</body>')
+              if pos<0: raise SystemExit('Closing body tag not found')
+              s=s[:pos]+tag+'\n'+s[pos:]
+          p.write_text(s,encoding='utf-8')
+      - name: Verify runtime
+        run: |
+          test -s assets/ui-recovery.js
+          grep -Fq 'sakChessGameMenu' assets/ui-recovery.js
+          grep -Fq 'pongGame-btn' assets/ui-recovery.js
+          grep -Fq 'emCamRec' assets/ui-recovery.js
+          grep -Fq 'sakBusinessImageVideoLauncher' assets/ui-recovery.js
+          grep -Fq 'sak-ui-recovery-runtime' index.html
+          node --check assets/ui-recovery.js
+      - name: Commit runtime link
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet -- index.html; then
+            echo 'Runtime already linked.'
+            exit 0
+          fi
+          git add index.html
+          git commit -m 'Enable combined chess Pong launcher and restore music controls'
+          git push origin HEAD:main
