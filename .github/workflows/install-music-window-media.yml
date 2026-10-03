@@ -1,0 +1,58 @@
+name: Install transparent music window and local media player
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/install-music-window-media.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Link music window media runtime
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if '<html' not in s.lower() or '</html>' not in s.lower():
+              raise SystemExit('index.html incomplete')
+          tag='<script id="sak-music-window-media-runtime" src="/assets/music-window-media.js?v=20261003-1" defer></script>'
+          if 'id="sak-music-window-media-runtime"' in s:
+              s=re.sub(r'<script\s+id="sak-music-window-media-runtime"[^>]*></script>',tag,s,count=1,flags=re.I)
+          else:
+              pos=s.lower().rfind('</body>')
+              if pos<0: raise SystemExit('body close not found')
+              s=s[:pos]+tag+'\n'+s[pos:]
+          p.write_text(s,encoding='utf-8')
+      - name: Verify music runtime
+        shell: bash
+        run: |
+          test -f assets/music-window-media.js
+          grep -Fq 'sak-music-window-media-runtime' index.html
+          grep -Fq 'music-window-media.js?v=20261003-1' index.html
+          grep -Fq 'sakMusicLocalMedia' assets/music-window-media.js
+          grep -Fq 'background:transparent!important' assets/music-window-media.js
+          grep -Fq 'accept="audio/*,video/*' assets/music-window-media.js
+          node --check assets/music-window-media.js
+      - name: Commit runtime link
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet -- index.html; then
+            echo 'Music runtime already linked.'
+            exit 0
+          fi
+          git add index.html
+          git commit -m 'Enable transparent music window and local media player'
+          git push
