@@ -12752,6 +12752,49 @@ html body #sakEmeraldChessIcon{position:relative!important;inset:auto!important;
 
 <script id="sak-business-image-video-launcher-runtime" src="/assets/image-video-launcher.js?v=20261003-1" defer></script>
 <script id="sak-music-window-media-runtime" src="/assets/music-window-media.js?v=20261003-2" defer></script>
+<!-- SAKAKER BUSINESS IMAGE-TO-VIDEO GULL -->
+<style id="sak-image-video-gull-style">
+#sakImageVideoModal{position:fixed;inset:0;z-index:2147483646;display:none;align-items:center;justify-content:center;background:rgba(0,8,14,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:12px;box-sizing:border-box}
+#sakImageVideoModal.open{display:flex}
+#sakImageVideoBox{position:relative;width:min(1120px,96vw);height:min(820px,94dvh);border:1px solid rgba(137,255,225,.72);border-radius:22px;overflow:hidden;background:#06151b;box-shadow:0 0 34px rgba(0,255,213,.24)}
+#sakImageVideoBrand{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:3;padding:7px 15px;border:1px solid rgba(255,215,0,.68);border-radius:999px;background:rgba(2,22,26,.82);color:#ffe889;font:700 13px/1.2 Tahoma,Arial,sans-serif;letter-spacing:.04em;box-shadow:0 0 15px rgba(255,215,0,.22);pointer-events:none}
+#sakImageVideoClose{position:absolute;top:8px;right:10px;z-index:4;width:40px;height:40px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(0,0,0,.58);color:#fff;font:700 25px/1 Arial;cursor:pointer}
+#sakImageVideoFrame{width:100%;height:100%;border:0;background:#06151b}
+@media(max-width:600px){#sakImageVideoBox{width:98vw;height:92dvh;border-radius:16px}#sakImageVideoBrand{font-size:11px;max-width:65vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+</style>
+<div id="sakImageVideoModal" role="dialog" aria-modal="true" aria-label="تحويل الصورة إلى فيديو / Image to Video">
+  <div id="sakImageVideoBox">
+    <div id="sakImageVideoBrand">SAKAKER BUSINESS</div>
+    <button id="sakImageVideoClose" type="button" aria-label="إغلاق / Close">×</button>
+    <iframe id="sakImageVideoFrame" title="تحويل الصورة إلى فيديو / Image to Video" loading="lazy"></iframe>
+  </div>
+</div>
+<script id="sak-image-video-gull-js">
+(()=>{'use strict';
+ const setup=()=>{
+   const dock=document.getElementById('sakakerAllIconsDock');
+   if(!dock||document.getElementById('sakImageVideoGull'))return;
+   const btn=document.createElement('button');
+   btn.id='sakImageVideoGull';
+   btn.type='button';
+   btn.className='icon-card sak-shore-gull';
+   btn.setAttribute('aria-label','تحويل الصورة إلى فيديو / Image to Video');
+   const setLabel=()=>{const en=document.documentElement.lang==='en';btn.dataset.gullLabel=en?'Image to Video':'صورة إلى فيديو';btn.title=en?'Image to Video — Sakaker Business':'تحويل الصورة إلى فيديو — سكاكر بزنس';};
+   setLabel();
+   dock.appendChild(btn);
+   const modal=document.getElementById('sakImageVideoModal'),frame=document.getElementById('sakImageVideoFrame'),close=document.getElementById('sakImageVideoClose');
+   const open=()=>{if(document.body.classList.contains('locked'))return;frame.src='audio-video.html';modal.classList.add('open');document.body.style.overflow='hidden';close.focus();};
+   const shut=()=>{modal.classList.remove('open');frame.src='about:blank';document.body.style.overflow='';btn.focus();};
+   btn.addEventListener('click',open);
+   close.addEventListener('click',shut);
+   modal.addEventListener('click',e=>{if(e.target===modal)shut();});
+   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))shut();});
+   new MutationObserver(setLabel).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
+})();
+</script>
+
 </body>
 </html>
 
