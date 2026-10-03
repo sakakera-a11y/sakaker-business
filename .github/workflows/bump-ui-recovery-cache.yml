@@ -1,0 +1,47 @@
+name: Bump UI recovery runtime cache
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/bump-ui-recovery-cache.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify UI recovery JavaScript
+        run: node --check assets/ui-recovery.js
+      - name: Bump runtime version
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old=s
+          tag='<script id="sak-ui-recovery-runtime" src="/assets/ui-recovery.js?v=20261003-2" defer></script>'
+          if 'id="sak-ui-recovery-runtime"' in s:
+              s=re.sub(r'<script\s+id="sak-ui-recovery-runtime"[^>]*></script>',tag,s,count=1,flags=re.I)
+          else:
+              pos=s.lower().rfind('</body>')
+              if pos<0: raise SystemExit('body close not found')
+              s=s[:pos]+tag+'\n'+s[pos:]
+          p.write_text(s,encoding='utf-8')
+          if s==old:
+              print('runtime already current')
+      - name: Commit cache bump
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet -- index.html; then exit 0; fi
+          git add index.html
+          git commit -m 'Load responsive UI recovery runtime'
+          git push
