@@ -1,0 +1,59 @@
+name: Install video replacement editor
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/install-video-replace-editor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inject editor runtime
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          p=Path('audio-video.html')
+          s=p.read_text(encoding='utf-8')
+          if '<html' not in s.lower() or '</html>' not in s.lower():
+              raise SystemExit('audio-video.html incomplete')
+          tag='<script id="sak-video-replace-editor-runtime" src="/assets/video-replace-editor.js?v=20261003-1" defer></script>'
+          if 'id="sak-video-replace-editor-runtime"' in s:
+              s=re.sub(r'<script\s+id="sak-video-replace-editor-runtime"[^>]*></script>',tag,s,count=1,flags=re.I)
+          else:
+              pos=s.lower().rfind('</body>')
+              if pos<0: raise SystemExit('body close not found')
+              s=s[:pos]+tag+'\n'+s[pos:]
+          p.write_text(s,encoding='utf-8')
+      - name: Verify editor
+        shell: bash
+        run: |
+          test -f assets/video-replace-editor.js
+          grep -Fq 'sak-video-replace-editor-runtime' audio-video.html
+          grep -Fq 'video-replace-editor.js?v=20261003-1' audio-video.html
+          grep -Fq 'vreVideo' assets/video-replace-editor.js
+          grep -Fq 'vreAudio' assets/video-replace-editor.js
+          grep -Fq 'vreImages' assets/video-replace-editor.js
+          grep -Fq 'MediaRecorder' assets/video-replace-editor.js
+          node --check assets/video-replace-editor.js
+      - name: Commit editor link
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet -- audio-video.html; then
+            echo 'Editor already linked.'
+            exit 0
+          fi
+          git add audio-video.html
+          git commit -m 'Enable video audio and scene replacement editor'
+          git push
