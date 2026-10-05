@@ -578,6 +578,92 @@ html body #loginOverlay #loginPaypalInner form{
 }
 </style>
 
+<!-- =========================================================
+     LOGIN ONLY VIDEO BACKGROUND — added without changing the site logic
+     ========================================================= -->
+<video id="sakakerLoginVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+  <source src="https://raw.githubusercontent.com/sakakera-a11y/sakaker-business/main/gemini_generated_video_c4ac39f9.mp4" type="video/mp4">
+</video>
+<style id="sakaker-login-video-only-style">
+#sakakerLoginVideo{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  height:100dvh!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  z-index:2147483646!important;
+  pointer-events:none!important;
+  background:#000!important;
+  transform:translateZ(0);
+}
+body:not(.locked) #sakakerLoginVideo{display:none!important;}
+#sakakerLoginVideo::after{content:"";display:block;}
+#sakakerLoginVideoControls{
+  position:fixed!important;
+  top:14px!important;
+  right:14px!important;
+  display:flex!important;
+  gap:8px!important;
+  z-index:2147483648!important;
+  direction:rtl;
+}
+#sakakerLoginVideoControls button{
+  width:42px!important;
+  height:42px!important;
+  padding:0!important;
+  border-radius:50%!important;
+  border:1px solid rgba(255,255,255,.55)!important;
+  background:rgba(0,0,0,.58)!important;
+  color:#fff!important;
+  font:20px/1 Arial,sans-serif!important;
+  cursor:pointer!important;
+  box-shadow:0 0 14px rgba(0,255,213,.24)!important;
+  backdrop-filter:blur(5px)!important;
+}
+#sakakerLoginVideoControls button:hover{background:rgba(0,40,42,.78)!important;}
+body:not(.locked) #sakakerLoginVideoControls{display:none!important;}
+@media(max-width:600px){
+  #sakakerLoginVideoControls{top:9px!important;right:9px!important;gap:6px!important;}
+  #sakakerLoginVideoControls button{width:38px!important;height:38px!important;font-size:18px!important;}
+}
+</style>
+<script id="sakaker-login-video-only-script">
+(()=>{
+  const video=document.getElementById('sakakerLoginVideo');
+  if(!video)return;
+  const setup=()=>{
+    const overlay=document.getElementById('loginOverlay');
+    if(!overlay||document.getElementById('sakakerLoginVideoControls'))return;
+    const controls=document.createElement('div');
+    controls.id='sakakerLoginVideoControls';
+    controls.innerHTML=`
+      <button type="button" id="sakakerLoginVideoClose" aria-label="إغلاق الفيديو" title="إغلاق الفيديو">✕</button>
+      <button type="button" id="sakakerLoginVideoSound" aria-label="تشغيل الصوت" title="تشغيل الصوت">🔇</button>
+    `;
+    overlay.appendChild(controls);
+    const close=document.getElementById('sakakerLoginVideoClose');
+    const sound=document.getElementById('sakakerLoginVideoSound');
+    close.addEventListener('click',()=>{
+      video.pause();
+      video.style.display='none';
+      controls.style.display='none';
+    });
+    sound.addEventListener('click',()=>{
+      video.muted=!video.muted;
+      sound.textContent=video.muted?'🔇':'🔊';
+      sound.setAttribute('aria-label',video.muted?'تشغيل الصوت':'كتم الصوت');
+      sound.title=video.muted?'تشغيل الصوت':'كتم الصوت';
+      if(!video.muted)video.play().catch(()=>{});
+    });
+    video.play().catch(()=>{});
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
+  else setup();
+})();
+</script>
+
 <div id="loginOverlay" data-auth-view="home" aria-modal="true" role="dialog">
   <div class="login-shell">
     <div class="login-logo">🎵</div>
